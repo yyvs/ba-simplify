@@ -1,0 +1,31 @@
+{
+  "label": "fine-tuned",
+  "model_id": "yunvs/bart-base-dwikipedia-simplification",
+  "sources_sha": "7095c6ceb08c16c2",
+  "n_total": 20,
+  "n_done": 20,
+  "complete": true,
+  "elapsed_seconds": 25.3,
+  "predictions": [
+    "gauntlet could mean :",
+    "kunya may mean :",
+    "the arctic national wildlife refuge ( anwr or arctic refuge ) is a federal wildlife refuge in northeastern alaska , united states . it consists of in the alaska north slope region . it is larger than the yukon delta national wildlife Refuge . the refuge is administered from offices in fairbanks . anwr includes a large variety of species of plants and animals , such as polar bears , grizzly bears , black bears , moose , caribou , wolves , eagles , lynx , wolverine , marten , beaver and migratory birds .",
+    "hans von borsody ( 20 september 1929 \u2013 4 november 2013 ) was a german movie actor . he was born in vienna into a hungarian descent artistic family . his father eduard was a film director , his uncle julius a set designer . his daughter suzanne is an actress .",
+    "very high frequency ( vhf ) omni-directional range ( vor ) is a type of short-range radio navigation system for aircraft . it allows aircraft with a receiving unit to determine its position and stay on course by receiving radio signals transmitted by a network of fixed ground radio beacons . it uses frequencies in the very high frequency band from 108.00 to 117.95 mhz . it is the standard air navigational system in the world , used by both commercial and general aviation . in the year 2000 there were about 3,000 vor stations operating around the world including 1,033 in the us , reduced to 967 by 2013 .",
+    "sant'antonio , italian for saint anthony of padua , most often refers to places named after saints anthony and padua .",
+    "oppens is a municipality of the district gros-de-vaud in the canton of vaud in switzerland .",
+    "niflheim is a place in norse cosmology . it is the second of the two primordial realms to emanate out of ginnungagap , the other one being muspelheim , the realm of fire .",
+    "guerbigny is a town and commune of the somme `` d\u00e9partement '' in hauts-de-france in northern france .",
+    "washington county is a county in the u.s. state of maine . as of the 2000 census , its population was 32,856 . its county seat is machias . the county was established on june 25 , 1789 . it borders the canadian province of new brunswick .",
+    "tr\u00e9voux is a town and commune of the ain `` d\u00e9partement '' in eastern france .",
+    "dexter in the dark is a 2007 book written by jeff lindsay . it is the third book in the dexter series , preceded by the 2004 novel `` darkly dreaming dexter '' , which formed the basis of the showtime television series `` dexter '' .",
+    "kuthwal is one of the 51 union councils of abbottabad district in the khyber-pakhtunkhwa province of pakistan .",
+    "the national flag of singapore was adopted in 1959 , the year singapore became self-governing within the british empire . it was reconfirmed as the national flag when the republic gained independence from malaysia on 9 august 1965 . prior to its independence , it was the only state flag in malaysian not to have a 1:2 ratio . the design is a horizontal bicolour of red above white , overlaid in the canton ( upper-left quadrant ) by a white crescent moon facing a pentagon of five small white five-pointed stars . the elements of the flag denote a young nation on the ascendant , universal brotherhood and equality , and national ideals .vessels at sea do not use the national flags as an ensign . merchant vessels and pleasure craft fly a civil ensign of red charged in white with a variant of the crescent and stars emblem in the centre . non-military government vessels such as coast guard ships fly a state ensign that is similar to the state flag but charged with an eight-pointing red and white compass rose in the lower fly . naval warships fly a naval ensign similar to this , but with a red compass rose emblem .",
+    "grandval is a municipality of the jura bernois administrative district in the canton of bern in switzerland .",
+    "the blossoms were an american girl-group . they were formed in california in the 1960s . their members were darlene love , fanita james , and jean king . the group had a recording career in their own right , they were most famous for being the group to actually record the # 1 hit `` he 's a rebel '' ( which producer phil spector credited to the crystals ) , and for providing backing vocals for many of the biggest hits of the late 1960s.it has been said that the blossoms are to the west coast what the sweet inspirations were to the east coast and the andantes were for motown .",
+    "the division of murray was an australian electoral division in the state of victoria . it was in the north of the state , adjoining the murray river , which forms victoria 's border with new south wales .",
+    "greifswald is a city in the state of mecklenburg-vorpommern in germany . it has about 55,000 people living in it . it is near the baltic sea , and is crossed by a small river , the ryck .",
+    "kraftwerk ( german : `` power station '' ) is a german electronic music band . they formed in 1970 in d\u00fcsseldorf , germany . their first album , `` autobahn '' , was released in 1974 . it was the first album to use synthesizers , drum machines , and vocoders . the band 's music has influenced a diverse range of artists and many genres of modern music , including synth-pop , hip hop , post-punk , techno , and club music .",
+    "returns , in economics and political economy , are the distributions or payments awarded to the various suppliers of a good or service ."
+  ]
+}

@@ -1,0 +1,51 @@
+\chapter{Conclusion}
+\label{sec:conclusion}
+
+\glsresetall
+This thesis compared three approaches to \gls{ats} at sentence and document granularity: an off-the-shelf simplifier (the \emph{comparison simplifier}), a \gls{seqseq} model fine-tuned for this thesis, and prompted open-weight \glspl{llm}.
+All three are served by a browser extension that simplifies web pages in place, and this deployment was audited on twelve authentic pages.
+
+\textbf{\Cref{rq:comparison}} asks how the approaches compare.
+No approach wins outright: the ranking depends on which systems are compared and on which metric is used.
+Fine-tuning the 139\gls{million}-parameter base version of \gls{bart} on a task-matched corpus clearly improves on the untuned checkpoint on \gls{sari} and \gls{dsari}.
+\Gls{sari} rises from \num{21.39} to \num{37.80} at sentence level (\(+16.42\), \glsxtrlong{ci} \([+15.38, +17.50]\), \(\gls{pval} < 0.001\)), and \gls{dsari} from \num{14.34} to \num{35.44} on the complete document test split (\(\gls{pval} < 0.001\)).
+These are the only comparisons tested for significance.
+Against the comparison simplifier, which is three times its size, the fine-tuned checkpoint scores \num{0.37}~\gls{sari} lower, well inside the \({\approx}2\)-point noise floor, so its advantage over that model is serving cost.
+
+Both prompted \glspl{llm} score higher than the fine-tuned checkpoint on \gls{sari} at sentence level.
+At document level, the prompted 7\gls{billion}-parameter model scores higher on \gls{lens} but lower on \gls{dsari}, consistently across three sampling seeds.
+\Gls{lens} cannot settle this disagreement, because it is applied outside the sentence-level data it was trained on \parencite[16385--16386]{maddela-etal-2023-lens}, so the document-level ordering remains open.
+
+Structured manual inspection found errors that the aggregate scores did not reveal: a document checkpoint trained on less data changed the census year 2010 to 2000 in 27 of 35 affected documents.
+
+\textbf{\Cref{rq:deployment}} asks which content-selection and replacement strategies make a deployed simplifier reliable on real pages, and what an audit shows about its robustness.
+The exploratory site audit gives a mixed answer: replacement is reliable, content selection mostly is, and most emptied links trace back to the model's edits rather than to the replacement.
+Replacement preserved the page's \gls{dom} on all 24 runs (twelve pages at both granularities): no tag, image source or link target was lost, and reverting restored the page's text and attributes every time.
+Content selection mostly withholds the right text, but its heuristic for code-like text also rejects ordinary prose that contains a semicolon.
+
+The most serious result of the audit is that five sentences were served with a negation deleted, which reversed their meaning, and no guard fired.
+Prompt injection also succeeded end to end on both prompted \glspl{llm}.
+Whether the prompts' audience parameter serves the audiences it names was not tested.
+
+This thesis makes four contributions (\cref{sec:contributions}).
+It assesses the corpora used and documents data-quality issues in them, such as encoding errors and overlap between training and test data.
+It compares the three approaches at both granularities in one evaluation harness, including the complete \num{8000}-document D-Wikipedia test split.
+It provides a \gls{dom}-preserving browser extension in which the approaches can be compared on authentic web pages.
+Finally, it derives methodological findings about the evaluation of \gls{ats} (\cref{sec:cross-cutting}).
+These are three observations that plausibly transfer beyond the models used here: the unit a model is trained on should match the unit a deployment feeds it; the choice of benchmark and metric can change a conclusion; and inspecting outputs finds failures that the scores do not show.
+
+I consider the deployment half of this thesis the more useful one.
+Benchmark scores said nothing about the negation deletions, the withheld prose or the sub-sentence fragments sent to the model; each was found only on closer inspection of the deployed system.
+In my view, work of that kind is under-reported in \gls{ats} research relative to what it costs to find.
+Since 2010, that research has been dominated by sentence-aligned Simple English Wikipedia data \parencite[402]{xu-etal-2016-optimizing}.
+
+The next steps follow from what remains open (\cref{sec:future-work}): a human study to settle the document-level ordering, a polarity check so that the change guard catches deleted negations, and a language gate before any multilingual training.
+
+The motivating example of \cref{sec:motivation} shows why benchmark scores alone are not enough.
+The sentence-level \gls{seqseq} models in this thesis turned the four-word heading ``Municipal recycling policy revisions'' into ``Other websites''.
+The output may originate in the training corpus, which maps short fragments with little content onto exactly that phrase in 38 pairs.
+A system pointed at a live page receives inputs whose handling no benchmark score describes.
+
+Finding such failures took something other than a better metric.
+It took a log of what the model produced and what was served; a harness that runs the extension's own code rather than a reimplementation of it; and structured inspection of outputs.
+The failures and findings that mattered most in this deployment did not show up in the benchmark scores.

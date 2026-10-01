@@ -1,0 +1,82 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: #f5f5f7;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+/* same column as shared/home.css, so text doesn't reflow between the two pages */
+.wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+h1 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  color: #555;
+  margin-top: 0;
+}
+
+h2 { font-size: 16px; }
+
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+code {
+  background: #eaeaea;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+pre {
+  background: #1e1e1e;
+  color: #eee;
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+ol { padding-left: 20px; }
+li { margin-bottom: 10px; }
+
+/* a button, not a link: opens the demo server via the service worker */
+.cta {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  padding: 16px 18px;
+}
+
+.cta h2 {
+  margin-top: 0;
+}
+
+.cta p {
+  color: #555;
+  font-size: 14px;
+  margin: 0 0 14px;
+}
+
+.cta-btn {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 1px solid #3b78dd;
+  background: #4688f1;
+  color: #fff;
+  cursor: pointer;
+}
+
+.cta-btn:hover {
+  background: #3b78dd;
+}

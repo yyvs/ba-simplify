@@ -1,0 +1,619 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: #f5f5f7;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.wrap {
+  max-width: none;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  color: #555;
+  margin-top: 0;
+}
+
+.empty {
+  color: #666;
+}
+
+.history-actions {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 20px;
+}
+
+.hist-btn {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+}
+
+.hist-btn:hover {
+  background: #f0f0f0;
+}
+
+.hist-btn-danger {
+  color: #a3261b;
+  border-color: #e3b3ae;
+}
+
+.hist-btn-danger:hover {
+  background: #fdecea;
+}
+
+.page-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.page-actions .hist-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+.page-menu-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.page-menu-btn {
+  min-width: 32px;
+  padding: 4px 8px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.page-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.page-summary-left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.page-summary .page-menu-wrap {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.page-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  display: none;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  /* above the sticky toolbar and open modals */
+  z-index: var(--layer-menu, 1100);
+}
+
+.page-menu-wrap.open .page-menu {
+  display: block;
+}
+
+.page-menu button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.page-menu button:hover {
+  background: #f3f3f4;
+}
+
+.history-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Transient feedback (e.g. row copied), matching content.js's in-page notice box.
+   Top of shared/layers.css's scale: it overlaps the toolbar and often reports on an
+   action from a menu or modal. */
+.page-notice {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 320px;
+  max-width: calc(100vw - 20px);
+  box-sizing: border-box;
+  background: rgba(20,20,20,0.92);
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: break-word;
+  z-index: var(--layer-notice, 1200);
+  transition: opacity 0.25s ease;
+}
+
+/* kept in the DOM rather than removed so the aria-live region stays put */
+.page-notice-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.page-notice-error {
+  background: rgba(122, 30, 22, 0.94);
+}
+
+.compare-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* backdrop covers the sticky toolbar too; see shared/layers.css */
+  z-index: var(--layer-modal, 1000);
+}
+
+.compare-modal.hidden {
+  display: none;
+}
+
+.compare-panel {
+  width: min(900px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  padding: 16px;
+}
+
+.compare-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.compare-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.compare-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.compare-controls label {
+  font-weight: 600;
+}
+
+.compare-controls select {
+  min-width: 220px;
+  padding: 6px 8px;
+  font: inherit;
+}
+
+.hist-btn.primary {
+  background: #1d4ed8;
+  color: #fff;
+  border-color: #1d4ed8;
+}
+
+.hist-btn.primary:hover {
+  background: #1e40af;
+}
+
+.compare-status {
+  color: #555;
+  margin-bottom: 12px;
+  min-height: 20px;
+}
+
+.compare-results {
+  display: grid;
+  gap: 12px;
+}
+
+.analyze-summary {
+  margin-bottom: 12px;
+}
+
+.analyze-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.analyze-stat {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.analyze-stat .label {
+  display: block;
+  color: #555;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+
+.analyze-stat .value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.analyze-results .compare-row {
+  background: #f8fafc;
+}
+
+.hist-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.analyze-section-note {
+  margin: 0 0 8px;
+  color: #555;
+}
+
+/* frame on the scroller, not the table: wide comparisons scroll sideways here rather
+   than crushing the first column */
+.analyze-table-scroll {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+/* one row per metric; the label cell carries its explanation */
+.analyze-table {
+  width: 100%;
+  /* overrides the fixed layout of the bare `table` rule below, which sizes columns from
+     the header row alone and crushed the metric column */
+  table-layout: auto;
+  /* separate, not collapsed: collapsed borders don't paint on sticky cells */
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+}
+
+/* metric column stays pinned while the rest scrolls */
+.analyze-table th:first-child,
+.analyze-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 200px;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+}
+
+.analyze-table th:first-child {
+  z-index: 2;
+  background: #f3f4f6;
+}
+
+.analyze-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #555;
+  background: #f3f4f6;
+  padding: 6px 8px;
+}
+
+/* shared width with a floor; past it the scroller takes over instead of wrapping */
+.analyze-table th:not(:first-child),
+.analyze-table td:not(:first-child) {
+  text-align: right;
+  width: 15%;
+  min-width: 92px;
+  white-space: nowrap;
+}
+
+.analyze-table td {
+  padding: 6px 8px;
+  border-top: 1px solid #f1f5f9;
+  vertical-align: top;
+}
+
+.analyze-table .metric-label {
+  display: block;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Enforces the metric column floor: min-width on a table cell is only advisory, on a
+   block inside it it's hard. 184px + 2x8px padding = 200px. */
+.analyze-table th:first-child .metric-head-label,
+.analyze-table td:first-child .metric-label {
+  display: block;
+  min-width: 184px;
+}
+
+.analyze-table .metric-detail {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.analyze-table .metric-value {
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* change toward / away from simpler text; the sign carries it without colour */
+.analyze-table .metric-better {
+  color: #15803d;
+}
+
+.analyze-table .metric-worse {
+  color: #b91c1c;
+}
+
+/* winning comparison cell; bold too, so it survives without colour */
+.analyze-table .metric-best {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.analyze-note {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.compare-row {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fafafa;
+}
+
+.compare-row h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.compare-box {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@media (max-width: 700px) {
+  .compare-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* No `overflow: hidden`: it would clip the absolutely positioned burger menus, which
+   open past the block's bottom edge (no z-index escapes an ancestor's clip). The 8px
+   side padding keeps content clear of the rounded corners. */
+.page-block {
+  margin: 0 0 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0 8px 8px;
+  box-sizing: border-box;
+}
+
+.page-block summary {
+  cursor: pointer;
+  padding: 12px 8px;
+  /* marker drawn in the flex row instead (see .page-toggle) */
+  list-style: none;
+}
+
+.page-block summary::-webkit-details-marker {
+  display: none;
+}
+
+.page-block summary:hover {
+  background: #f7f7f8;
+}
+
+.page-block summary h2 {
+  display: inline;
+  font-size: 15px;
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+/* align the dot with the title's letters however the title wraps */
+.page-block summary h2 .status-dot {
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+.page-meta {
+  color: #777;
+  font-size: 12px;
+  margin: 4px 0 0;
+  overflow-wrap: break-word;
+}
+
+/* summary body lines; medium weight so the title stands out above them */
+.page-aggregate {
+  display: block;
+  color: #333;
+  font-size: 12px;
+  margin: 4px 0 0;
+  font-weight: 500;
+}
+
+/* exact repo id / Ollama tag, monospace as a copyable string */
+.page-model-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 11px;
+  background: #f1f2f4;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.page-aggregate-metrics {
+  color: #555;
+}
+
+/* --- run status ---------------------------------------------------------
+   Coloured dot with its explanation in a tooltip, so colour isn't the only signal. */
+.status-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: baseline;
+  flex: none;
+  cursor: help;
+}
+
+.status-dot-ok {
+  background: #16a34a;
+}
+
+.status-dot-warn {
+  background: #ea580c;
+}
+
+.status-dot-fail {
+  background: #dc2626;
+}
+
+/* stopped by the user: blue, not orange/red, since nothing went wrong */
+.status-dot-stopped {
+  background: #2563eb;
+}
+
+/* recorded before runs had a status */
+.status-dot-unknown {
+  background: #c3c6cb;
+}
+
+table {
+  width: calc(100% - 8px);
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+  border-top: 1px solid #e0e0e0;
+  margin: 0 4px 0 4px;
+}
+
+th, td {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid #eee;
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+
+th {
+  background: #f0f0f0;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+td:first-child, th:first-child {
+  color: #888;
+}
+
+/* Unchanged row's output and metrics, cached row's Time. Per cell, not per row: the
+   input is still real page text. */
+.cell-muted {
+  color: #999;
+}
+
+.cell-time {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* secondary cell detail: target audience (Model cell); rejection reason and rejected
+   text (Simplification cell) */
+.entry-meta {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+.entry-meta-warn {
+  color: #b45309;
+  opacity: 1;
+}
+/* rejected generation under its reason; muted rather than warn-coloured, since it is
+   evidence, not a second problem */
+.entry-meta-rejected {
+  font-style: italic;
+  color: #6b7280;
+  opacity: 1;
+}
+
+/* drawn disclosure marker (see .page-block summary); rotates down when open */
+.page-toggle {
+  flex: none;
+  display: inline-block;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 20px;
+  transition: transform 120ms ease;
+}
+
+.page-block[open] > .page-summary .page-toggle {
+  transform: rotate(90deg);
+}

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo 08 — HTML checker</title>
+    <link rel="stylesheet" href="demo.css" />
+    <style>
+      /* Wider than demo.css's 760px so the two rendered copies get real room. */
+      body {
+        max-width: 1200px;
+      }
+
+      .checker-input {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        min-height: 220px;
+        padding: 12px 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.9em;
+        line-height: 1.5;
+        /* grown to fit its content by autoResize() below */
+        resize: none;
+        overflow: hidden;
+        tab-size: 2;
+      }
+      .checker-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      .checker-clear {
+        appearance: none;
+        border: 1px solid #dc2626;
+        background: #fee2e2;
+        color: #991b1b;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .checker-clear:hover {
+        background: #fecaca;
+      }
+
+      /* `flex: 1 1 0` with `min-width: 0`: equal columns regardless of content. */
+      .checker-row {
+        display: flex;
+        gap: 16px;
+        align-items: stretch;
+        margin-top: 20px;
+      }
+      .checker-row > * {
+        flex: 1 1 0;
+        min-width: 0;
+        width: 0;
+      }
+      .checker-col {
+        box-sizing: border-box;
+        min-height: 160px;
+        padding: 14px 18px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow-wrap: anywhere;
+      }
+      .checker-col-original {
+        background: #f3f4f6;
+      }
+      .checker-col > :first-child {
+        margin-top: 0;
+      }
+      .checker-col > :last-child {
+        margin-bottom: 0;
+      }
+      .checker-labels {
+        display: flex;
+        gap: 16px;
+        margin-top: 20px;
+      }
+      .checker-labels > * {
+        flex: 1 1 0;
+        min-width: 0;
+        width: 0;
+      }
+      .checker-label {
+        font-size: 0.85em;
+        font-weight: 600;
+        color: #444;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      @media (max-width: 860px) {
+        .checker-row,
+        .checker-labels {
+          flex-direction: column;
+        }
+        .checker-row > *,
+        .checker-labels > * {
+          width: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="demo-nav">
+      <a href="index.html" translate="no" class="notranslate"
+        >← back to index</a
+      >
+    </nav>
+    <h1>08 — HTML checker</h1>
+    <p class="meta notranslate">
+      Paste arbitrary markup and see it rendered twice, side by side at equal
+      width: the left copy is pinned with <code>translate="no"</code>/<code
+        >.notranslate</code
+      >
+      so it stays as the reference, the right copy is a normal candidate for the
+      extension. Toggle the extension to simplify the right column only, then
+      compare against the left in place — no scrolling between before/after.
+      Both copies re-render (debounced) whenever the input changes.
+    </p>
+
+    <p class="meta notranslate">
+      Notes: <code>&lt;script&gt;</code> tags in the input do not execute (<code
+        >innerHTML</code
+      >
+      never runs them), so paste content markup, not behaviour. Editing the
+      input while the extension is ON replaces both columns' DOM — the
+      <code>MutationObserver</code> then treats the right column as fresh
+      content and simplifies it again, which also means "revert" no longer has
+      the pre-edit text to restore. Toggle off before editing if you want a
+      clean revert.
+    </p>
+
+    <div class="checker-toolbar">
+      <label for="html-input" class="meta notranslate" style="margin: 0"
+        >HTML input</label
+      >
+      <button
+        id="html-clear"
+        class="checker-clear"
+        type="button"
+        translate="no"
+      >
+        Clear
+      </button>
+    </div>
+    <textarea
+      id="html-input"
+      class="checker-input"
+      spellcheck="false"
+    ></textarea>
+
+    <div class="checker-labels notranslate" translate="no">
+      <div class="checker-label">Original (not simplified)</div>
+      <div class="checker-label">To be simplified</div>
+    </div>
+
+    <div class="checker-row">
+      <div
+        id="html-original"
+        class="checker-col checker-col-original notranslate"
+        translate="no"
+      ></div>
+      <div id="html-simplified" class="checker-col"></div>
+    </div>
+
+    <script>
+      // Page-level demo script — NOT part of the extension.
+      const input = document.getElementById("html-input");
+      const original = document.getElementById("html-original");
+      const simplified = document.getElementById("html-simplified");
+      const clearButton = document.getElementById("html-clear");
+
+      const STORAGE_KEY = "demo-html-checker-markup";
+      const DEFAULT_MARKUP = [
+        "<h2>Municipal recycling policy revisions</h2>",
+        "<p>Subsequent to the deliberations of the committee, it has been determined that the collection schedule shall be modified in order to accommodate an increased volume of recyclable materials.</p>",
+        "<ul>",
+        "  <li>Residents are requested to position their receptacles at the kerbside.</li>",
+        "  <li>Collections will commence at approximately 6 a.m. on Tuesdays.</li>",
+        "</ul>",
+        '<p>Should you require additional clarification or supplementary data, you are encouraged to initiate correspondence with the municipal solid <a href="#">waste management department</a>.</p>',
+      ].join("\n");
+
+      const MIN_HEIGHT = 220;
+      let lastRendered = null;
+      let renderTimer = null;
+
+      function autoResize() {
+        input.style.height = "auto";
+        input.style.height = `${Math.max(input.scrollHeight, MIN_HEIGHT)}px`;
+      }
+
+      function render() {
+        const markup = input.value;
+        // replacing innerHTML would discard the extension's work and revert state
+        if (markup === lastRendered) return;
+        lastRendered = markup;
+        original.innerHTML = markup;
+        simplified.innerHTML = markup;
+      }
+
+      function onInput() {
+        autoResize();
+        localStorage.setItem(STORAGE_KEY, input.value);
+        clearTimeout(renderTimer);
+        renderTimer = setTimeout(render, 400);
+      }
+
+      input.addEventListener("input", onInput);
+
+      clearButton.addEventListener("click", () => {
+        input.value = "";
+        localStorage.removeItem(STORAGE_KEY);
+        clearTimeout(renderTimer);
+        autoResize();
+        render();
+        input.focus();
+      });
+
+      const saved = localStorage.getItem(STORAGE_KEY);
+      input.value = saved !== null ? saved : DEFAULT_MARKUP;
+      autoResize();
+      render();
+    </script>
+  </body>
+</html>

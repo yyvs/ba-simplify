@@ -1,0 +1,143 @@
+\ProvidesPackage{glossary-entries}
+
+% begin: glossary-entries
+
+	\setabbreviationstyle[acronym]{long-short}
+	\setabbreviationstyle[unit]{long-short-desc}
+
+	%
+	% Task and evaluation
+	%
+	\newacronym{ats}{ATS}{automatic text simplification}
+	\newacronym{hf}{HF}{Hugging Face}
+	\newacronym{sari}{SARI}{System output Against References and against the Input sentence}
+	\newacronym{dsari}{D-SARI}{document-level SARI}
+	\newacronym{bleu}{BLEU}{Bilingual Evaluation Understudy}
+	\newacronym{fkgl}{FKGL}{Flesch--Kincaid Grade Level}
+	\newacronym{lens}{LENS}{Learnable Evaluation metric for Text Simplification}
+	\newacronym{taaco}{TAACO}{Tool for the Automatic Analysis of Cohesion}
+	\newacronym{ci}{CI}{confidence interval}
+
+	%
+	% Models and architectures
+	%
+	\newacronym{llm}{LLM}{large language model}
+	\newacronym{seqseq}{seq2seq}{sequence-to-sequence}
+	\newacronym{bart}{BART}{Bidirectional and Auto-Regressive Transformers}
+	\newacronym{bert}{BERT}{Bidirectional Encoder Representations from Transformers}
+	\newacronym{tfive}{T5}{Text-to-Text Transfer Transformer}
+	\newacronym{access}{ACCESS}{AudienCe-CEntric Sentence Simplification}
+	\newacronym{muss}{MUSS}{Multilingual Unsupervised Sentence Simplification}
+
+	%
+	% Corpora and benchmarks
+	%
+	\newacronym{pwkp}{PWKP}{Parallel Wikipedia Simplification}
+	\newacronym{bless}{BLESS}{Benchmarking Large language models on Sentence Simplification}
+	\newacronym{tfidf}{TF*IDF}{term frequency--inverse document frequency}
+
+	%
+	% Browser and web platform
+	%
+	\newacronym{dom}{DOM}{Document Object Model}
+	\newacronym{html}{HTML}{HyperText Markup Language}
+	\newacronym{css}{CSS}{Cascading Style Sheets}
+	\newacronym{url}{URL}{uniform resource locator}
+	\newacronym{api}{API}{application programming interface}
+	\newacronym{cpu}{CPU}{central processing unit}
+	\newacronym{gpu}{GPU}{graphics processing unit}
+	\newacronym{mps}{MPS}{Metal Performance Shaders}
+	% units: text expands the name once, the list gives the size
+	\newacronym[category=unit,shortplural={GB},longplural={gigabytes},description={decimal unit of memory, \(10^{9}\) bytes, used for file and machine sizes}]{gb}{GB}{gigabyte}
+	\newacronym[category=unit,shortplural={GiB},longplural={gibibytes},description={binary unit of memory, \(2^{30}\) bytes (about \qty{7}{\percent} more than a gigabyte), as reported by the training framework}]{gib}{GiB}{gibibyte}
+
+	%
+	% Symbols
+	%
+	\newglossaryentry{ngram}{
+		name={\ensuremath{n}-gram},
+		description={Contiguous sequence of \ensuremath{n} items (such as words, characters, or tokens) from a sample of text or speech},
+		sort={0a}, type=symbols
+	}
+	\newglossaryentry{fadd}{
+		name={\ensuremath{F_{\mathrm{add}}}},
+		description={SARI's F-score over the \ensuremath{n}-grams a system adds},
+		sort={1a}, type=symbols
+	}
+	\newglossaryentry{fkeep}{
+		name={\ensuremath{F_{\mathrm{keep}}}},
+		description={SARI's F-score over the \ensuremath{n}-grams a system keeps},
+		sort={1b}, type=symbols
+	}
+	\newglossaryentry{pdel}{
+		name={\ensuremath{P_{\mathrm{del}}}},
+		description={SARI's precision over the \ensuremath{n}-grams a system deletes},
+		sort={1c}, type=symbols
+	}
+	\newglossaryentry{deltasari}{
+		name={\ensuremath{\Delta}SARI},
+		description={Change in SARI against the untuned checkpoint, reported with a paired-bootstrap interval},
+		sort={1d}, type=symbols
+	}
+	\newglossaryentry{nsize}{
+		name={\ensuremath{n}},
+		description={Number of items in a sample or an evaluation split},
+		sort={2a}, type=symbols
+	}
+	\newglossaryentry{kref}{
+		name={\ensuremath{k}},
+		description={Number of references a reference-overlap metric is computed against},
+		sort={2b}, type=symbols
+	}
+	\newglossaryentry{pval}{
+		name={\ensuremath{p}},
+		description={Significance level from the paired bootstrap, never the sampling threshold},
+		sort={2c}, type=symbols
+	}
+	\newglossaryentry{topp}{
+		name={top-\ensuremath{p}},
+		description={Nucleus-sampling probability threshold, never the significance level},
+		sort={2d}, type=symbols
+	}
+	\newglossaryentry{p90}{
+		name={\ensuremath{P_{90}}},
+		first={90th percentile (\ensuremath{P_{90}})},
+		description={90th percentile of a distribution},
+		sort={2e}, type=symbols
+	}
+	\newglossaryentry{p95}{
+		name={\ensuremath{P_{95}}},
+		first={95th percentile (\ensuremath{P_{95}})},
+		description={95th percentile of a distribution, used for token lengths and request latency},
+		sort={2f}, type=symbols
+	}
+	\newglossaryentry{thousand}{
+		name={k},
+		description={Thousand, as a suffix to a count (300k examples)},
+		sort={3a}, type=symbols
+	}
+	\newglossaryentry{million}{
+		name={M},
+		description={Million, as a suffix to a parameter count (139M parameters)},
+		sort={3b}, type=symbols
+	}
+	\newglossaryentry{billion}{
+		name={B},
+		description={Billion, as a suffix to a parameter count (7B parameters)},
+		sort={3c}, type=symbols
+	}
+	\newglossaryentry{fp16}{
+		name={fp16},
+		first={16-bit floating point (fp16)},
+		description={16-bit floating-point number format},
+		sort={4a}, type=symbols
+	}
+	\newglossaryentry{bf16}{
+		name={bf16},
+		first={bfloat16 (bf16)},
+		description={bfloat16, a 16-bit floating-point number format with the exponent range of 32-bit floats},
+		sort={4b}, type=symbols
+	}
+
+% end: glossary-entries
+\endinput

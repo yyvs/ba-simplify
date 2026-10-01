@@ -1,0 +1,13 @@
+# Includes the runtime requirements, so one install covers suite and server. httpx
+# (main.py's Ollama client, also needed by TestClient) is pinned only there.
+-r ../requirements.txt
+
+pytest==9.1.1
+# Runs the bare `async def test_*` tests (with pytest.ini's `asyncio_mode = auto`).
+pytest-asyncio==1.4.0
+
+# File watcher for `run_dev.sh --reload`; required in practice. Without it uvicorn uses
+# StatReload, which stats every .py under backend/ (17,680 of 17,693 are in venv/)
+# several times a second: ~96% of a core. --reload-exclude doesn't help, since uvicorn
+# ignores includes/excludes unless watchfiles is installed.
+watchfiles==1.2.0

@@ -1,0 +1,136 @@
+#ext-toolbar {
+  position: sticky;
+  top: 0;
+  /* bottom of shared/layers.css's scale: below menus, modals and notices */
+  z-index: var(--layer-toolbar, 100);
+  display: flex;
+  align-items: center;
+  /* wrap on narrow windows instead of pushing Reload off the edge */
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 8px 16px;
+  background: #1e1e1e;
+  color: #eee;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+#ext-toolbar .ext-toolbar-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-right: 6px;
+}
+
+/* sized here so the bar's padding sets row height; `display: block` drops the
+   inline baseline gap */
+#ext-toolbar .ext-toolbar-logo {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+#ext-toolbar nav {
+  display: flex;
+  gap: 4px;
+  /* pushes the selection controls right on wide windows; shrinks rather than wrapping */
+  flex: 1 1 auto;
+}
+
+#ext-toolbar .ext-toolbar-title,
+#ext-toolbar nav a,
+#ext-toolbar nav button {
+  color: #ccc;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+#ext-toolbar .ext-toolbar-title {
+  color: #fff;
+  font-weight: 600;
+}
+
+#ext-toolbar nav a:hover,
+#ext-toolbar nav button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#ext-toolbar nav a.active {
+  background: #4688f1;
+  color: #fff;
+}
+
+#ext-toolbar .ext-toolbar-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#ext-toolbar .ext-toolbar-model-label {
+  color: #aaa;
+  white-space: nowrap;
+}
+
+/* Destructive controls ("Clear cache"). Lighter red than the pages' #a3261b, which fails
+   contrast on #2a2a2a. Fill only on hover so the button doesn't dominate the bar. */
+#ext-toolbar button.ext-toolbar-danger {
+  color: #ff8f85;
+  border-color: #7a3630;
+}
+
+#ext-toolbar button.ext-toolbar-danger:hover {
+  background: #4a1f1b;
+  color: #ffb3ab;
+}
+
+/* disabled while reporting status in its label, so keep it legible */
+#ext-toolbar button.ext-toolbar-danger:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+/* selection summary button: wider (whole configuration), truncated rather than wrapped */
+#ext-toolbar .ext-toolbar-picker {
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-color: #4688f1;
+}
+
+#ext-toolbar select,
+#ext-toolbar button {
+  font: inherit;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #2a2a2a;
+  color: #eee;
+  cursor: pointer;
+}
+
+#ext-toolbar select {
+  max-width: 260px;
+}
+
+#ext-toolbar select:hover,
+#ext-toolbar button:hover {
+  background: #383838;
+}
+
+#ext-toolbar select:disabled,
+#ext-toolbar option:disabled {
+  color: #777;
+}
+
+/* `hidden` must remove elements from the flex layout */
+#ext-toolbar [hidden] {
+  display: none;
+}

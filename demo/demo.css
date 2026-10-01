@@ -1,0 +1,22 @@
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 760px;
+  margin: 40px auto;
+  line-height: 1.5;
+  padding: 0 16px;
+}
+.demo-nav { margin-bottom: 20px; }
+.case {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+.meta {
+  color: #666;
+  font-size: 0.85em;
+  margin: 0 0 8px 0;
+}
+code { background: #f0f0f0; padding: 2px 5px; border-radius: 3px; }
+table { border-collapse: collapse; width: 100%; }
+td, th { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }

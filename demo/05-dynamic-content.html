@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo 05 — Dynamic content</title>
+    <link rel="stylesheet" href="demo.css" />
+  </head>
+  <body>
+    <nav class="demo-nav">
+      <a href="index.html" translate="no" class="notranslate"
+        >← back to index</a
+      >
+    </nav>
+    <h1>05 — Dynamic content</h1>
+    <p class="meta notranslate">
+      Simulates infinite scroll / lazily-loaded content to exercise the
+      <code>MutationObserver</code> path in <code>content.js</code>.
+    </p>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Steps: 1) toggle the extension ON first (this initial paragraph is the
+        page's only candidate, so the notice's progress bar reads "1 / 1" and
+        the line under it reads "1 simplified · 0 unchanged" or "0 simplified ·
+        1 unchanged" depending on whether the model actually changed the
+        wording). 2) Click "Load more content" a few times — one template per
+        click, cycling through four. Expected: each click's new items are
+        processed automatically without re-toggling, and the notice's counts are
+        <em>cumulative</em> across clicks (the bar's total climbs and the
+        skipped line's "x / y" grows with it), not reset each time — the running
+        totals are kept across observer batches rather than reset per batch —
+        see the <code>foundTotal</code>/<code>sentCount</code> comments at the
+        top of <code>extension/content.js</code>. The 4th template ("OK") is
+        under the 4-word minimum, so it always lands in the muted "skipped (e.g.
+        too short)" line without ever calling the API — the bar's total counts
+        only items that actually got a request, and "simplified" is the subset
+        of those whose text came back different from what was sent. 3) Click
+        "Remove oldest loaded item" a few times. Expected: the totals decrease
+        to match, in whichever line that item had landed in (the bar's count,
+        the simplified/unchanged split, or the skipped line) — simulating a
+        virtualized/infinite-scroll list recycling old rows out of the DOM.
+      </p>
+      <p>
+        This initial paragraph exists before any dynamic content is loaded,
+        verbosely stated for the purpose of demonstration.
+      </p>
+    </section>
+
+    <button type="button" id="load-more" translate="no">
+      Load more content
+    </button>
+    <button type="button" id="remove-oldest" translate="no">
+      Remove oldest loaded item
+    </button>
+
+    <div id="feed"></div>
+
+    <script>
+      // Page-level demo script — NOT part of the extension. Simulates an
+      // infinite-scroll feed that appends/removes text nodes.
+      let batch = 0;
+      const templates = [
+        () => {
+          const h = document.createElement("h3");
+          h.textContent =
+            "A freshly loaded heading regarding municipal policy revisions";
+          return h;
+        },
+        () => {
+          const p = document.createElement("p");
+          p.textContent =
+            "This paragraph was injected dynamically after the initial page load, " +
+            "in order to verify that the mutation observer picks it up automatically.";
+          return p;
+        },
+        () => {
+          const ul = document.createElement("ul");
+          const li1 = document.createElement("li");
+          li1.textContent =
+            "A dynamically appended list item requiring simplification.";
+          const li2 = document.createElement("li");
+          li2.textContent =
+            "A second dynamically appended list item, likewise verbose.";
+          ul.append(li1, li2);
+          return ul;
+        },
+        () => {
+          // Under content.js's 4-word minimum: always "skipped", never sent. Checks
+          // that removal decrements whichever bucket an item settled into.
+          const p = document.createElement("p");
+          p.textContent = "OK";
+          return p;
+        },
+      ];
+
+      document.getElementById("load-more").addEventListener("click", () => {
+        const feed = document.getElementById("feed");
+        const make = templates[batch % templates.length];
+        feed.appendChild(make());
+        batch += 1;
+      });
+
+      document.getElementById("remove-oldest").addEventListener("click", () => {
+        const feed = document.getElementById("feed");
+        if (feed.firstElementChild) feed.firstElementChild.remove();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,165 @@
+\chapter{Discussion}
+\label{sec:discussion}
+
+\section{\rqnolink{rq:comparison}: Comparing the three approaches}
+\label{sec:rq1}
+
+No approach wins the comparison outright:
+a 139\gls{million}-parameter \gls{seqseq} model fine-tuned on a task-matched parallel corpus scores clearly and significantly higher than the untuned checkpoint on \gls{sari} and \gls{dsari} and roughly matches an existing simplifier three times its size on \gls{sari} at sentence level.
+It is beaten by prompted instruction-tuned \glspl{llm} on \gls{sari} at sentence level and on \gls{lens} at document level.
+
+The comparison therefore supports a claim about serving cost, and reinforces the methodological findings regarding \gls{ats} metric disagreement, rather than establishing a definitive ranking.
+This is an issue analysed further in the cross-cutting findings (\cref{sec:cross-cutting}).
+
+How the approaches rank depends on which systems are compared and which metric is used.
+\Cref{tab:scoreboard} gives the four pairwise readings; they do not all agree in sign, and none supersedes the others.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{3.5pt}
+	\caption{Score Differences Between the Fine-Tuned Checkpoint and the Other Systems}
+	\label{tab:scoreboard}
+	\begin{tabular}{@{}P{3.1cm}P{4.25cm}P{4.8cm}@{}}
+		\toprule
+		\textbf{Comparison}                                 & \textbf{Sentence level}                              & \textbf{Document level}                  \\
+		\midrule
+		untuned \newline checkpoint                         & \(+16.42\)~\gls{sari}, \gls{ci}~\([+15.38, +17.50]\) & \(+21.09\)~\gls{dsari} (35.44 vs. 14.34) \\
+		comparison \newline simplifier                      & \(-0.37\)~\gls{sari}, intervals overlapping          & not measured                             \\
+		\gls{llm}, \newline \gls{ngram} metrics             & \(-8.15\) to \(-9.23\)~\gls{sari}                    & \(+12.54\)~\gls{dsari}                   \\
+		\gls{llm}, learned human- \newline judgement metric & not measured                                         & \(-23.80\)~\gls{lens}                    \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		Positive values mean that the fine-tuned checkpoint scores higher than the system in the row.
+		Only the first row was tested for significance (paired bootstrap, \(\gls{pval} < 0.001\) for both margins).
+		The \gls{llm} rows span the 7\gls{billion} and the 3\gls{billion} at sentence level and are the 7\gls{billion} at \(\gls{nsize} = 2{,}000\) at document level.
+		\emph{Not measured}: the comparison simplifier has no document counterpart, and \gls{lens} was not computed at sentence level (\cref{sec:limitations}).
+	}
+\end{table}
+
+\pagebreak
+
+\paragraph{Against the untuned checkpoint, fine-tuning raises \gls{sari} and \gls{dsari} decisively.}
+The sentence-level margin is robust to the one contamination worry the benchmark carries: eight ASSET test sentences also occur in the training data, and removing them moves it by \num{0.006}.
+This comparison is the only one of the four that holds architecture and scale fixed, so it isolates the effect of fine-tuning; since the margin is significant at both granularities, Hypothesis~\cref{hyp:finetuning} holds.
+
+\paragraph{Against the larger comparison simplifier, the \gls{sari} difference is within the noise floor, and the advantage is serving cost.}
+The scores are \num{37.80} against \num{38.17}~\gls{sari}, a difference well inside the \({\approx}2\)-point noise floor estimated from two unseeded training runs (\cref{sec:sentence-results}).
+No paired test between the two was run, but their intervals against the untuned checkpoint overlap almost completely.
+
+The fine-tuned model reaches that score with 139\gls{million} parameters against 406\gls{million}, and on the one article profiled runs \num{2.4}~times faster per request and \num{2.8}~times faster per page (\cref{sec:runtime}).
+On-device simplification faces the same constraint: \textcite[105]{romero-etal-2025-efficient} quantise their models, reducing their size by up to \qty{75}{\percent}, so that simplification runs entirely on the user's device.
+
+Serving cost is also what links \cref{rq:comparison} to \cref{rq:deployment}, since the extension runs all of its models locally (\cref{sec:architecture}).
+The comparison simplifier was fine-tuned on a pre-cleaned WikiLarge mirror \parencite[3]{cohen2026simplify}.
+The fine-tuned model used the same mirror with \qty{1.8}{\percent} of its rows removed by the targeted filter (\cref{sec:corpus-preparation}), so the two checkpoints were trained on essentially the same data.
+The comparison simplifier was scored without the \texttt{Simplify:} prefix its training used, but the score its authors report using the prefix is \num{0.21}~\gls{sari} lower than the one measured here, although with different scoring and decoding settings (\cref{sec:limitations}).
+
+\paragraph{Against the prompted \glspl{llm}, the fine-tuned checkpoint loses on \gls{sari} and \gls{lens} and wins on \gls{dsari}.}
+It loses at sentence level on \gls{sari}, and at document level on \gls{lens}, which was trained on sentence-level human judgements \parencite[16385--16386]{maddela-etal-2023-lens} and is applied here out of domain.
+At document level it wins on \gls{dsari}, an \gls{ngram} metric \parencite[8002]{sun-etal-2021-document} computed here against a single reference.
+Both document orderings hold across three sampling seeds, whose standard deviations of \num{0.071}~\gls{lens} and \num{0.039}~\gls{dsari} points are far below the gaps of \num{23.80} and \num{12.54} points.
+This shows that neither ordering is a sampling artefact.
+At document level, which system scores higher therefore depends on the metric.
+
+\pagebreak
+
+Hypothesis~\cref{hyp:llm-vs-finetuned} draws on the finding of \textcite[13291]{kew-etal-2023-bless} that their best prompted \glspl{llm} perform comparably with trained baselines.
+The hypothesis, that a prompted \gls{llm} matches or exceeds the fine-tuned model, holds at sentence level: both prompted \glspl{llm} score above the fine-tuned checkpoint on \gls{sari}.
+At document level the evidence is contradictory: the prompted 7\gls{billion} scores below the fine-tuned checkpoint on \gls{dsari} and above it on \gls{lens}, so the hypothesis remains open there.
+
+\paragraph{The disagreement is a finding.}
+Measurements rule out four artefacts as its cause: truncation, sample size, normalisation, and sampling seed.
+The differential test against the reference implementation (\cref{sec:evaluation-protocol}) also rules out a defect in the \gls{dsari} reimplementation.
+What remains is a disagreement with a plausible mechanism: \gls{dsari} rewards agreement with a single reference and penalises structural departure from it, whereas \gls{lens} is trained to reproduce human ratings of simplified sentences.
+
+\textcite[148, 150--151]{alva-manchego-etal-2020-survey} report that \gls{bleu} and \gls{sari} correlate with human judgement only on some dimensions, and poorly once sentences are split.
+Here the two metrics diverge far enough to reverse a system ranking.
+One unmeasured factor could also affect the prompted \gls{llm}: in the document evaluation it receives the D-Wikipedia test sources as they are, lowercased and pre-tokenised, unlike the natural prose it receives in the extension.
+If this input format changes its scores at all, it more plausibly lowers than raises them.
+
+The disagreement cannot be settled here: \gls{lens} is applied outside the sentence-level data it was trained on (\cref{sec:limitations}), so it cannot act as the tie-breaker, and this project has no human ratings with which to decide between the two metrics.
+The document-level system ordering under \cref{rq:comparison} is therefore metric-dependent and remains open; \cref{sec:future-work} specifies a study that could settle the disagreement.
+
+\paragraph{Two qualifications limit the gain over the untuned checkpoint.}
+First, \gls{bleu} favours the untuned checkpoint, which leaves \qty{93.9}{\percent} of sentences unchanged against the fine-tuned checkpoint's \qty{11.7}{\percent}.
+This is expected, since \gls{bleu} does not compare the output with the input and so favours conservative, low-edit output (\cref{sec:background-evaluation}).
+Since \gls{sari} ranks the untuned checkpoint last, the two metrics rank the conditions differently, and Hypothesis~\cref{hyp:metrics} holds.
+
+Second, the aggregate scores do not reveal at least one systematic class of factual error.
+The reduced-scope document checkpoint rewrote the census year 2010 as 2000 in 27 of 35 affected documents (\cref{sec:qualitative}), and this was found only by inspecting the outputs, not from any score.
+The improvement over the untuned checkpoint is therefore significant on these metrics, which do not show whether the outputs are factually faithful.
+
+\section{\rqnolink{rq:deployment}: Effective strategies and behavioural robustness}
+\label{sec:rq2}
+
+The answer to \cref{rq:deployment} rests on an exploratory site audit of twelve pages labelled by the author, and \cref{sec:limitations} sets out what an audit of this scale cannot show.
+
+\paragraph{\Gls{dom} preservation}, the part of \cref{rq:deployment} that concerns replacement, holds.
+Across 24 runs on twelve authentic pages, no tag, image source, or link target was lost, and reverting restored the text content and attribute sets on every run.
+The raw \gls{html} is byte-identical on 18 of the 24 runs.
+The six differences are cosmetic: once the extension writes an inline style, \texttt{jsdom} re-serialises the page's own inline styles, while the computed styles stay the same.
+
+\paragraph{Content selection mostly withholds the right text, with two diagnosed false-positive triggers.}
+The filters withhold \qty{74.7}{\percent} of sentence-cut candidates and \qty{90.9}{\percent} of document-cut candidates (\cref{sec:deployment-results}), and 48 of the 69 hand-labelled skips are correct.
+The 15 wrongly withheld items in the labelled sample are ordinary prose that the code-like-text heuristic rejected: 12 because it contains a semicolon and 3 because it contains the word ``let''.
+
+Removing the semicolon from the heuristic is not a simple fix: it would release all \num{102} items the semicolon matched, not only the 17 running-prose items among them.
+The audit was the last study before data collection closed, so the heuristic was left unchanged; \cref{sec:future-work} gives the trade-off.
+
+\paragraph{Most emptied links and the negation deletions trace back to the model's edits rather than to the \gls{dom} machinery.}
+Of the \num{331} links left without text, \num{237} lost it because the model deleted the phrase they were attached to.
+Deletion is a regular simplification operation, and write-back can only place a link on text that survives the rewrite (\cref{sec:content-selection}).
+The remaining 94 are link text misplaced by the fragmentation defect, 93 of them on a single densely linked article.
+The negation deletions are model edits that the change guard lets through by design (\cref{sec:deployment-results}).
+Fixes for these failures therefore belong mainly in the guards and the model, with the fragmentation defect as the one cause on the extension side.
+
+The latency measurements add one further observation.
+On one Wikipedia article, for example, the sentence cut sent 79 small requests (median \num{124} characters) and the document cut 11 large ones (median \num{1262} characters) for almost the same text.
+
+\pagebreak
+
+The sentence cut finished the page sooner (\qty{15.5}{\second} against \qty{22.5}{\second}), because its requests overlap in the client's eight-slot queue, but its latency varied more: its \gls{p95} was \(2.6\times\) its median, while the document cut's was almost equal to its median.
+In a separate run made while the machine was also running an evaluation job, the sentence cut's wall clock was \num{7.8} times and its \gls{p95} latency 19 times as long, while the document cut's stayed about the same.
+For an extension that shares a laptop with the user's other programs, this stability may matter more than speed, although it rests on a single run; a comparison of throughput alone would not have shown it.
+
+Several deployment defects left no visible trace and were found only on closer inspection, by checking the page's structure after simplification or by checking that item counts add up.
+Some examples are: a folded section that took a list of links with it; a log that recorded what was sent rather than what the page showed; leaves that went uncounted because the document cut registered only one item per section; and prose withheld on a semicolon without any indication to the reader (\cref{sec:deployment-results,sec:granularity-findings}).
+Two of these are absences rather than wrong outputs, and no benchmark would show any of them.
+Two findings of the audit were also invisible to earlier checks: the withheld prose needed a skip reason that no interface reported, and the negation deletions needed a word-by-word comparison of input and output.
+CheckList starts from the observation that held-out accuracy often overestimates real performance \parencite[4902]{ribeiro-etal-2020-beyond}.
+Most of the failures found here lie in parts of the system that no benchmark evaluates, such as content selection and write-back, so Hypothesis~\cref{hyp:web} holds, and in a stronger form: the benchmarks cannot observe these failures at all.
+
+\section{Cross-cutting findings}
+\label{sec:cross-cutting}
+
+Three observations plausibly transfer beyond the particular models used here.
+Each is supported by at least two measurements in this project, though none was isolated experimentally.
+
+\paragraph{Training and deployment should agree on the unit of text.}
+A mismatch arose at both granularities.
+
+At sentence level it happened: selecting text node by text node kept inline formatting but split sentences, so the sentence-trained models received \num{173} units for one article's prose instead of 79 sentences (\cref{sec:granularity-findings}).
+
+At document level it was only a risk: sending one element at a time would have given the document-trained model single paragraphs, which the heading-delimited document cut avoids (\cref{sec:unit-of-simplification}).
+
+\pagebreak
+
+Neither corpus nor benchmark could have revealed either mismatch, because both lie in the interface between the model and its input, not in the model or the data.
+Document-level corpora, metrics, and models address the modelling side of this problem \parencites[7999, 8002]{sun-etal-2021-document}[1, 3]{vasquezrodriguez2024simple}, but not the deployment side.
+
+\paragraph{Benchmark and metric choice can change conclusions}, as two results show.
+First, \gls{bleu} ranks the untuned checkpoint above the fine-tuned sentence checkpoint on ASSET, but below the fine-tuned document checkpoint on D-Wikipedia.
+The untuned model is the same in both evaluations, but the fine-tuned checkpoints differ, so the reversal cannot be assigned to the benchmark alone; a plausible contributor is how much copying the source is worth against each benchmark's references \parencite[404, 410]{xu-etal-2016-optimizing}.
+Second, \gls{dsari} and \gls{lens} rank the fine-tuned document checkpoint and the prompted 7\gls{billion} in opposite orders, consistently across seeds.
+
+\paragraph{Inspecting the outputs finds what the scores do not show.}
+The structured inspection of generations already on disk (\cref{sec:qualitative}) found both the census-year substitution and the disambiguation stubs paired with full articles.
+From the reduced-scope to the full-scope checkpoint, the rate of stating a wrong census year falls from \qty{77}{\percent} to \qty{0.2}{\percent}, while the corpus-level \gls{dsari} rises by \num{3.82}.
+That score cannot show whether its rise includes this correction, since the affected documents make up only \qty{7.2}{\percent} of the test split and the metric is not broken down by error class.
+This is the case for the human evaluation proposed in \cref{sec:future-work}, made from this project's own data.
+
+The deployment showed the same problem: \gls{dom} integrity and linguistic integrity are separate properties, and a check on one says nothing about the other.
+While the system was sending sub-sentence fragments to the model, the robustness check only tested whether the page's \gls{dom} structure survived.
+It therefore kept passing, although the text the model received was linguistically broken.

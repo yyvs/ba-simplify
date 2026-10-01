@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simplify — Troubleshooting</title>
+    <link rel="stylesheet" href="shared/layers.css" />
+    <link rel="stylesheet" href="shared/toolbar.css" />
+    <link rel="stylesheet" href="shared/error.css" />
+  </head>
+  <body>
+    <script src="shared/model-labels.js"></script>
+    <script src="shared/model-selection.js"></script>
+    <script src="shared/demo-pages.js"></script>
+    <script src="shared/picker.js"></script>
+    <script src="shared/toolbar.js"></script>
+    <div class="wrap">
+      <h1>Simplify</h1>
+      <p id="subtitle" class="subtitle">Checking what's wrong…</p>
+
+      <div id="live-status" class="status-box status-checking">
+        <span id="live-status-dot" class="dot"></span>
+        <span id="live-status-text">Checking backend…</span>
+      </div>
+
+      <section id="stage-reachable" class="stage">
+        <h2>Start the backend server</h2>
+        <p>
+          The extension talks to a local backend running at
+          <code>http://127.0.0.1:8000</code>. It isn't running right now, so
+          nothing happens when you try to simplify a page.
+        </p>
+        <ol>
+          <li>
+            Open a terminal and go to the <code>backend/</code> folder of the
+            project.
+          </li>
+          <li>
+            First time only — set up the environment:
+            <pre>
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt</pre>
+          </li>
+          <li>
+            Start the server:
+            <pre>./run_dev.sh</pre>
+            (or directly: <code>uvicorn main:app --reload --port 8000</code>)
+          </li>
+          <li>
+            Come back to this tab — it will update automatically once the
+            backend is reachable.
+          </li>
+        </ol>
+      </section>
+
+      <section id="stage-model_loaded" class="stage">
+        <h2>Wait for the model to finish loading</h2>
+        <p>
+          The backend is running, but it hasn't finished loading the
+          simplification model yet (this can take a little while on first start,
+          especially the first time it downloads a model). Keep this tab open —
+          it will update automatically once loading finishes.
+        </p>
+        <p id="model-loaded-elapsed" class="hint"></p>
+        <p>
+          If it's been stuck for a long time, check the terminal running the
+          backend for errors, e.g. a missing or misconfigured model. There's no
+          live download-progress percentage available yet — the elapsed timer
+          above is the only signal this page can show right now.
+        </p>
+      </section>
+
+      <section id="stage-model_unavailable" class="stage">
+        <h2>This model isn't configured on the backend</h2>
+        <p>
+          The backend finished starting up, but the model you've selected isn't
+          one of the ones it actually loaded — this won't resolve itself by
+          waiting, unlike a model that's still loading.
+        </p>
+        <div id="model-unavailable-actions"></div>
+        <p>
+          To make it available instead, set that model's env var and restart the
+          backend. Each key has one, named after it —
+          <code>SIMPLIFIER_MODEL_ONLINE</code>,
+          <code>SIMPLIFIER_MODEL_FINETUNED</code>,
+          <code>SIMPLIFIER_MODEL_DOCUMENT</code>,
+          <code>SIMPLIFIER_MODEL_LLM_7B</code>, and so on. The backend's startup
+          log names every key it skipped and the variable that would enable it.
+        </p>
+        <p>
+          For the prompted-LLM keys (<code>llm_…</code>) the usual cause is the
+          Ollama sidecar: it has to be running <em>before</em> the backend
+          starts, with the tag already pulled. <code>./run_dev.sh</code> starts
+          it for you; otherwise run <code>ollama serve</code> and
+          <code>ollama pull &lt;tag&gt;</code>, then restart the backend.
+        </p>
+      </section>
+
+      <section id="stage-model_response" class="stage">
+        <h2>The backend didn't respond correctly</h2>
+        <p>
+          The backend is up and reports its model as loaded, but a test request
+          failed or returned no usable text. Check the terminal running the
+          backend for errors.
+        </p>
+      </section>
+
+      <section id="stage-unsupported_page" class="stage">
+        <h2>Open a regular webpage</h2>
+        <p>
+          Browser pages like <code>chrome://</code>, <code>about:</code>, the
+          new-tab page, and local <code>file://</code> pages can't run
+          extensions at all — that's a restriction the browser enforces, not
+          something this extension can change.
+        </p>
+        <p>
+          Open a normal website (<code>http://</code> or <code>https://</code>)
+          and click the toolbar icon there instead.
+        </p>
+        <p>
+          If you specifically need this on a local <code>file://</code> page, go
+          to <code>chrome://extensions</code>, find this extension, and enable
+          "Allow access to file URLs".
+        </p>
+      </section>
+
+      <section id="stage-content_script_unreachable" class="stage">
+        <h2>Refresh the tab you're trying to use</h2>
+        <p>
+          The tab you clicked the icon on was already open before the extension
+          was installed, reloaded, or updated, so it doesn't have the
+          extension's script loaded yet.
+        </p>
+        <p>
+          <strong>Refresh that tab</strong> (or close and reopen it), then click
+          the toolbar icon again.
+        </p>
+      </section>
+
+      <section id="stage-demo_unreachable" class="stage">
+        <h2>Start the demo server</h2>
+        <p>
+          The demo pages (<code>demo/</code>) are served separately, by the same
+          script that runs the backend.
+        </p>
+        <ol>
+          <li>
+            Open a terminal and go to the <code>backend/</code> folder of the
+            project.
+          </li>
+          <li>
+            Start it:
+            <pre>./run_dev.sh</pre>
+          </li>
+          <li>
+            Open the demo page again from the toolbar icon's right-click menu.
+          </li>
+        </ol>
+        <p class="hint">
+          Serves on port 8001 by default. If you started it with a custom
+          <code>DEMO_PORT</code>, update <code>DEMO_ORIGIN</code> in
+          <code>extension/background.js</code> to match.
+        </p>
+      </section>
+
+      <details id="raw-error-details">
+        <summary>Technical details</summary>
+        <pre id="raw-error"></pre>
+      </details>
+    </div>
+    <script src="shared/error.js"></script>
+  </body>
+</html>

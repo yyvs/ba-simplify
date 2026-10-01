@@ -1,0 +1,59 @@
+# HHU access for this project: two hops, one command.
+#
+#   cp ssh/config.example ~/.ssh/config      # or append, if you already have one
+#   chmod 600 ~/.ssh/config
+#   # then replace the two <...> usernames below
+#
+# uzziel.phil.hhu.de is the faculty SSH GATEWAY, not a compute machine: never train on it.
+# beet (isi-8.phil.hhu.de) is unreachable from outside HHU, so ProxyJump goes through the
+# gateway; `ssh beet`, `scp`, `rsync`, `git` and VSCode Remote SSH then work directly.
+#
+# NO PASSWORDS in this file or anywhere in the repo. Set up keys once:
+#
+#   ssh-keygen -t ed25519 -C "hhu"
+#   ssh-copy-id uzziel      # gateway first
+#   ssh-copy-id beet        # then beet, through the gateway
+#   ssh beet 'hostname; nvidia-smi -L'
+
+Host uzziel
+    HostName uzziel.phil.hhu.de
+    User <your-IKM-username>
+    # No agent forwarding to the jump host: root there could use your key.
+    ForwardAgent no
+
+Host beet
+    HostName isi-8.phil.hhu.de
+    User <your-cl-hhu-username>
+    ProxyJump uzziel
+    ForwardAgent no
+
+    # A 6-hour training run must survive an idle NAT table.
+    ServerAliveInterval 60
+    ServerAliveCountMax 5
+
+    # Connection sharing; otherwise VSCode Remote SSH prompts for both passwords on each
+    # of its connections (~six prompts per folder).
+    ControlMaster auto
+    ControlPath ~/.ssh/cm-%r@%h:%p
+    ControlPersist 10m
+
+# aker: fallback if beet is booked (RTX 3090, 24 GB, Ampere; train.py settings carry over).
+# Needs its own account.
+Host aker
+    HostName isi-7.phil.hhu.de
+    User <your-cl-hhu-username>
+    ProxyJump uzziel
+    ForwardAgent no
+    ServerAliveInterval 60
+    ControlMaster auto
+    ControlPath ~/.ssh/cm-%r@%h:%p
+    ControlPersist 10m
+
+# HPC cluster: separate account (HHU Kennung). storage.hpc is the only node with internet
+# access; clone and prefetch there.
+Host hpc-storage
+    HostName storage.hpc.rz.uni-duesseldorf.de
+    User <your-HHU-Kennung>
+Host hpc
+    HostName hpc.rz.uni-duesseldorf.de
+    User <your-HHU-Kennung>

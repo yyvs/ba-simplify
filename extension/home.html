@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simplify</title>
+  <link rel="stylesheet" href="shared/layers.css" />
+  <link rel="stylesheet" href="shared/toolbar.css" />
+  <link rel="stylesheet" href="shared/status.css" />
+  <link rel="stylesheet" href="shared/home.css" />
+</head>
+<body>
+  <script src="shared/model-labels.js"></script>
+  <script src="shared/model-selection.js"></script>
+  <script src="shared/demo-pages.js"></script>
+  <script src="shared/picker.js"></script>
+  <script src="shared/toolbar.js"></script>
+  <div class="wrap">
+    <h1>Simplify</h1>
+    <p class="subtitle">Choose a page to review backend status, browse saved simplifications, or follow the setup guide.</p>
+
+    <section>
+      <h2>Backend status</h2>
+      <div class="dash-grid">
+        <div class="dash-row">
+          <span class="dash-label">Backend reachable</span>
+          <span id="dash-reachable" class="dash-value status-box status-checking">Checking…</span>
+        </div>
+        <div class="dash-row">
+          <span class="dash-label">Models loaded</span>
+          <div id="dash-models" class="dash-value dash-value-list">Checking…</div>
+        </div>
+        <div class="dash-row">
+          <span class="dash-label">Model selected</span>
+          <div id="dash-selected" class="dash-value dash-value-right">Checking…</div>
+        </div>
+        <div class="dash-row">
+          <span class="dash-label">Method</span>
+          <span id="dash-method" class="dash-value">Checking…</span>
+        </div>
+        <div class="dash-row">
+          <span class="dash-label">Vitality</span>
+          <div class="dash-value dash-value-inline">
+            <span id="dash-vitality">Checking…</span>
+            <button id="dashboard-refresh" class="status-icon-btn" type="button" aria-label="Refresh vitality check" title="Refresh vitality check">↻</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="status-divider" />
+
+    <div class="card-grid">
+      <a class="card" href="instructions.html">
+        <h2>Setup guide</h2>
+        <p>Get the backend running, choose a model, and understand how simplification works.</p>
+      </a>
+      <a class="card" href="history.html">
+        <h2>History</h2>
+        <p>Review the last 20 pages and the sentence-level outputs saved by the extension.</p>
+      </a>
+      <a class="card" href="reports.html">
+        <h2>Reports</h2>
+        <p>Runs kept out of the rolling log: their progress, their evaluation, and a JSON export.</p>
+      </a>
+    </div>
+
+    <h2>Demo fixtures</h2>
+    <p class="subtitle">Open the built-in demo pages to test the extension on real page layouts, edge cases, and document-level inputs.</p>
+    <div id="demo-links" class="demo-links"></div>
+  </div>
+  <script src="shared/status.js"></script>
+  <script src="shared/home.js"></script>
+</body>
+</html>

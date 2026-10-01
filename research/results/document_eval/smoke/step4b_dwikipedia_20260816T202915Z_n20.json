@@ -1,0 +1,79 @@
+{
+  "run": {
+    "script": "evaluate_document.py",
+    "script_version": "1.1",
+    "step": "4B",
+    "status": "complete",
+    "started_at": "2026-08-16T20:29:15.747532+00:00",
+    "finished_at": "2026-08-16T20:31:33.135707+00:00",
+    "duration_seconds": 137.4,
+    "git_commit": null,
+    "device": "cuda"
+  },
+  "models": {
+    "finetuned": {
+      "model_id": "yunvs/bart-base-dwikipedia-simplification",
+      "source": "huggingface_hub"
+    },
+    "baseline": {
+      "model_id": "facebook/bart-base",
+      "source": "huggingface_hub"
+    }
+  },
+  "dataset": {
+    "name": "D-Wikipedia",
+    "citation": "Sun, Jin & Wan (EMNLP 2021)",
+    "split": "test",
+    "references_per_document": 1,
+    "n_evaluated": 20,
+    "split_total_raw": 8000,
+    "split_total_cleaned": 8000,
+    "mojibake_dropped": 0,
+    "sampled": true,
+    "sample_seed": 42,
+    "sample_indices_sha": "e677b6b457e54ef4"
+  },
+  "decoding": {
+    "strategy": "beam_search",
+    "num_beams": 4,
+    "no_repeat_ngram_size": 3,
+    "repetition_penalty": 1.2,
+    "max_input_tokens": 512,
+    "max_output_tokens": 512,
+    "batch_size": 8
+  },
+  "scores": {
+    "finetuned": {
+      "BLEU": 17.627743548753024,
+      "SARI": 41.84006135961946,
+      "FKGL": 7.1978609913793115,
+      "D-SARI": 36.053156604774315,
+      "BERTScore": 88.84708285331726,
+      "LENS": null
+    },
+    "baseline": {
+      "BLEU": 15.225304911868621,
+      "SARI": 17.535966930885113,
+      "FKGL": 9.425719643088062,
+      "D-SARI": 13.692709407325648,
+      "BERTScore": 88.055819272995,
+      "LENS": null
+    }
+  },
+  "significance": {
+    "metric": "d_sari",
+    "test": "paired bootstrap over documents",
+    "resamples": 100,
+    "seed": 42,
+    "p_value": 0.0
+  },
+  "generation_seconds": {
+    "finetuned": 25.4,
+    "baseline": 50.6
+  },
+  "notes": [
+    "D-SARI is the headline metric here; plain SARI is reported only for continuity with the ASSET-based Step 4 numbers and does not model sentence deletion/merging/reordering.",
+    "BERTScore truncates inputs past ~510 tokens.",
+    "LENS not computed (lens-metric unavailable in this environment)."
+  ]
+}

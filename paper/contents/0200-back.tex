@@ -1,0 +1,25 @@
+%
+% references
+%
+\clearpage
+% bibintoc: unnumbered toc entry for the \chapter* bibliography
+\printbibliography[heading=bibintoc, title={References}]
+
+% -----------------------------
+
+%
+% appendices
+%
+% appendices and statements: grey toc entries below a rule
+\addtocontents{toc}{\protect\tocgreyon}
+\addtocontents{toc}{\protect\tocdivider}
+\input{contents/0201-appendix.tex}
+
+% -----------------------------
+
+%
+% statements
+%
+\input{contents/0202-statements.tex}
+
+% -----------------------------

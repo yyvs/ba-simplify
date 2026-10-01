@@ -1,0 +1,106 @@
+/* shared/reports.css - Reports page additions on top of shared/history.css (loaded
+   first; report blocks reuse history blocks): progress and evaluation. */
+
+/* full window width, as on History: comparison tables grow with the number of
+   models/methods. Prose keeps its own measure (.subtitle). */
+.wrap {
+  max-width: none;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  color: #555;
+  margin-top: 0;
+  max-width: 70ch;
+}
+
+.report-progress {
+  margin: 6px 0 2px;
+}
+
+/* shallow, so it doesn't compete with the summary lines around it */
+.report-bar {
+  height: 5px;
+  border-radius: 999px;
+  background: #e6e6e9;
+  overflow: hidden;
+  max-width: 340px;
+}
+
+.report-bar-fill {
+  height: 100%;
+  background: #4688f1;
+  border-radius: 999px;
+  transition: width 200ms ease;
+}
+
+/* complete: green, as the status dashboard's "ready"; stopped: amber */
+.report-progress-complete .report-bar-fill {
+  background: #1e8e3e;
+}
+
+.report-progress-stopped .report-bar-fill {
+  background: #f0a020;
+}
+
+.report-progress-unknown .report-bar,
+.report-progress-unknown .report-bar-fill {
+  background: #e6e6e9;
+}
+
+/* body of a report block (History blocks hold their rows table here) */
+.report-evaluation {
+  padding: 4px 8px 12px;
+  border-top: 1px solid #eee;
+}
+
+.report-evaluation-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+
+.report-evaluation .analyze-results:empty {
+  display: none;
+}
+
+/* --- comparison arms ------------------------------------------------------
+   One line per arm, starting with the letter used in the evaluation column headings. */
+.report-arms {
+  margin: 4px 0 2px;
+}
+
+.report-arm {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+/* filled badge, so the letter reads as a label rather than prose */
+.report-arm-label {
+  flex: none;
+  display: inline-block;
+  min-width: 18px;
+  margin-right: 4px;
+  border-radius: 4px;
+  background: #3c4043;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* the report the page was opened at; a persistent rule rather than a flash animation */
+.report-block-focused {
+  border-left: 3px solid #4688f1;
+}

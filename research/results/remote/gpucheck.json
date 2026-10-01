@@ -1,0 +1,45 @@
+{
+  "provenance": {
+    "recorded_at": "2026-08-21T08:42:26.952717+00:00",
+    "git_commit": "e861e98",
+    "git_dirty": true,
+    "host": {
+      "hostname": "beet",
+      "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+      "python": "3.12.13",
+      "cpu_count": 20,
+      "nvidia_driver": "535.309.01",
+      "gpu_name": "NVIDIA RTX A5000",
+      "gpu_memory_total": "24564 MiB",
+      "torch": "2.5.1+cu121",
+      "torch_cuda_build": "12.1",
+      "cuda_available": true,
+      "device_name": "NVIDIA RTX A5000",
+      "compute_capability": "8.6",
+      "device_count": 1,
+      "vram_gb": 23.7,
+      "bf16_supported": true
+    },
+    "hf_home": "/home/yunusrenz/simple-website/research/scratch/hf",
+    "profile": "beet"
+  },
+  "host": {
+    "hostname": "beet",
+    "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+    "python": "3.12.13",
+    "cpu_count": 20,
+    "nvidia_driver": "535.309.01",
+    "gpu_name": "NVIDIA RTX A5000",
+    "gpu_memory_total": "24564 MiB",
+    "torch": "2.5.1+cu121",
+    "torch_cuda_build": "12.1",
+    "cuda_available": true,
+    "device_name": "NVIDIA RTX A5000",
+    "compute_capability": "8.6",
+    "device_count": 1,
+    "vram_gb": 23.7,
+    "bf16_supported": true
+  },
+  "compute_processes": [],
+  "benchmark": null
+}

@@ -1,0 +1,66 @@
+# Main environment for the HHU GPU runs.
+#
+# PINNED EXACTLY: packages that can change a reported number (transformers, datasets;
+# easse, sacrebleu, bert-score are the metrics themselves).
+#
+# NOT PINNED: torch. The wheel must match the host driver; install it first, from the index
+# matching `nvidia-smi`'s CUDA version, then this file.
+#
+# common.py records the resolved versions in every artifact.
+#
+# STEP 1 -- torch, matched to the host driver. Check `nvidia-smi` (top right) first.
+#
+#   CUDA 12.4+ (typical on a current A5000/3090 box):
+#     pip install torch --index-url https://download.pytorch.org/whl/cu124
+#   CUDA 12.1:
+#     pip install torch --index-url https://download.pytorch.org/whl/cu121
+#   CUDA 11.8 (older driver, e.g. a Pascal box that has not been updated):
+#     pip install torch --index-url https://download.pytorch.org/whl/cu118
+#
+# On the HHU HPC cluster, prefix pip with the local mirror config instead:
+#     PIP_CONFIG_FILE=/software/python/pip.conf pip install --user torch
+#
+# STEP 2 -- this file:
+#     pip install -r remote/requirements-gpu.txt
+
+# model + data stack (pinned: these move numbers)
+transformers==5.2.0
+datasets==5.0.1
+tokenizers
+accelerate>=1.1.0
+huggingface-hub==1.4.1
+# numpy needs a marker: 2.2.6 is the last release for 3.10 (cl-hhu system python, HPC
+# Python/3.10.12 module); 3.14 wheels (the writing laptop) start at 2.3.2. common.py records
+# the resolved version.
+numpy==2.5.1; python_version >= "3.12"
+numpy==2.2.6; python_version < "3.12"
+
+# metrics (pinned: these are the numbers)
+sacrebleu==2.6.0
+bert-score==0.3.13
+nltk==3.10.3
+
+# easse provides SARI and FKGL. Not on PyPI; `@master` moves, so pin the commit you ran:
+#
+#     python -c "import json, importlib.metadata as m; \
+#         print(json.loads(m.distribution('easse').read_text('direct_url.json'))['vcs_info']['commit_id'])"
+#
+# Use pip's install metadata (PEP 610), NOT `git -C <site-packages>/..`: the venvs live
+# inside this repo, so git reports the project's HEAD (verified on beet).
+#
+# Pinned 6a4352e on 2026-08-21: the commit every number from the beet session used.
+git+https://github.com/feralvam/easse.git@6a4352ec299ed03fda8ee45445ca43d9c7673e89#egg=easse
+
+# corpus plumbing
+# D-Wikipedia ships its train split as .7z
+py7zr==1.1.3
+# evaluate_document.py imports the backend's prompting module, so backend deps are needed
+pysbd==0.3.4
+httpx==0.28.1
+beautifulsoup4==4.12.2
+
+# deliberately NOT here
+# lens-metric: its torch/transformers pins conflict with the above and break the backend;
+#   own venv via `bash remote/setup.sh --lens` (see requirements-lens.txt).
+# fastapi, uvicorn, pydantic: only needed to serve; install ../backend/requirements.txt to
+#   run the service here (e.g. to profile the extension against a GPU backend).

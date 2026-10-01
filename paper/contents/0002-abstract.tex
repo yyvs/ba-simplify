@@ -1,0 +1,22 @@
+\chapter*{Abstract}
+\label{sec:abstract}
+\Gls{ats} rewrites a text to make it easier to read while preserving its meaning.
+\Gls{ats} research, however, has been dominated by sentence-aligned Wikipedia corpora, which differ from the web pages on which readers encounter complex text.
+Web pages add a layer of complexity that no benchmark contains: continuous prose interleaved with headings, navigation and form controls.
+This thesis therefore asks what changes when simplification moves from benchmarks to a user-facing browser extension.
+
+Three approaches are compared at sentence and document level: an existing simplifier, a \glsxtrlong{seqseq} model fine-tuned in this thesis, and prompted open-weight \glspl{llm}.
+They are evaluated with automatic metrics on public benchmarks and by structured manual inspection of the outputs.
+All three are served through a browser extension backed by a local inference service, which simplifies web pages in place.
+
+After fine-tuning, the 139\gls{million}-parameter \glsxtrshort{bart}-base scores significantly higher than its untuned checkpoint on the sentence-level simplification metric \glsxtrshort{sari} and on \gls{dsari}.
+It scores similarly to the existing simplifier, three times its size, and below both prompted \glspl{llm} (3\gls{billion} and 7\gls{billion} parameters) on \glsxtrshort{sari}.
+At the document level, the 7\gls{billion} model scores higher than the fine-tuned model on \glsxtrshort{lens}, a metric trained on sentence-level human judgements and applied here out of domain.
+On \gls{dsari}, by contrast, it scores below the fine-tuned model, so no single definitive ranking emerges: at document level, the ordering depends on the metric.
+The inspection also found a factual error that no metric reflects: a checkpoint trained on less data changed the census year 2010 to 2000 in 27 of 35 affected documents.
+
+To test real-world behaviour, an exploratory site audit runs the extension on twelve authentic web pages at both levels.
+The page structure was preserved in all 24 runs: no tag, image source or link target was lost, and reverting restored the page's text and attributes.
+The audit nevertheless exposed failures invisible to benchmark scores: content selection silently withheld ordinary prose that contains a semicolon, and five sentences were served with a negation deleted, reversing their meaning without triggering any guard.
+
+Three observations plausibly transfer beyond these models: training and deployment should agree on the unit of text, benchmark and metric choice can reverse a conclusion, and reading the outputs finds failures that scores miss, such as the census-year substitution and the negation deletions.

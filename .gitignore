@@ -1,0 +1,50 @@
+# --- editors and the OS ------------------------------------------------------
+.DS_Store
+.vscode/
+
+# --- Python  -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.ipynb_checkpoints
+
+# --- Code linters ------------------------------------------------------------
+.markdownlint.yaml
+.bandit
+
+# --- virtual environments ----------------------------------------------------
+venv/
+research/venv-gpu/
+research/venv-lens/
+
+# --- Node (extension's jsdom test harness) -----------------------------------
+node_modules/
+
+# --- working documents, drafts and planning notes ----------------------------
+docs
+paper/docs
+paper/assets/static/signature.png
+
+# --- LaTeX build output ------------------------------------------------------
+paper/paper.*
+!paper/paper.tex
+!paper/paper.bib
+!paper/paper.pdf
+!paper/paper.bbl
+
+# --- research outputs --------------------------------------------------------
+research/data/*.jsonl
+
+# Fine-tuning run outputs: model checkpoints, optimizer state, tokenizer copies. ~11 GB
+# and regenerable from fine_tune.py / notebooks/train_sentence_and_document_pipeline.ipynb
+research/scratch/
+
+# Console logs from the GPU harness runs (research/results/remote/logs/).
+*.log
+
+# The CL department's own docs repo (machine specs, HPC and git tutorials), kept in the
+# tree for reference while setting the GPU boxes up.
+research/gpus-at-cl-hhu-main/

@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Simplify",
+  "version": "4.0.4",
+  "description": "Simplifies webpage text.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "storage",
+    "tabs",
+    "notifications"
+  ],
+  "host_permissions": ["http://127.0.0.1:8000/*", "http://127.0.0.1:8001/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Toggle simplification",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "shared/model-labels.js",
+        "shared/model-selection.js",
+        "shared/active-run.js",
+        "shared/picker.js",
+        "shared/compare-picker.js",
+        "content.js"
+      ]
+    }
+  ]
+}

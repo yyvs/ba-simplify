@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simplify — Instructions</title>
+  <link rel="stylesheet" href="shared/layers.css" />
+  <link rel="stylesheet" href="shared/toolbar.css" />
+  <link rel="stylesheet" href="shared/status.css" />
+  <link rel="stylesheet" href="shared/instructions.css" />
+</head>
+<body>
+  <script src="shared/model-labels.js"></script>
+  <script src="shared/model-selection.js"></script>
+  <script src="shared/demo-pages.js"></script>
+  <script src="shared/picker.js"></script>
+  <script src="shared/toolbar.js"></script>
+  <div class="wrap">
+    <h1>How Simplify works</h1>
+    <p class="subtitle">Start the backend, choose what rewrites the text, and simplify any page from the browser toolbar.</p>
+
+    <section>
+      <h2>Backend status</h2>
+      <div class="dash-grid">
+        <div class="dash-row">
+          <span class="dash-label">Backend reachable</span>
+          <span id="dash-reachable" class="dash-value status-box status-checking">Checking…</span>
+        </div>
+        <div class="dash-row">
+          <span class="dash-label">Models loaded</span>
+          <div id="dash-models" class="dash-value dash-value-list">Checking…</div>
+        </div>
+        <div class="dash-row">
+          <span class="dash-label">Model selected</span>
+          <div id="dash-selected" class="dash-value dash-value-right">Checking…</div>
+        </div>
+        <div class="dash-row">
+          <span class="dash-label">Method</span>
+          <span id="dash-method" class="dash-value">Checking…</span>
+        </div>
+        <div class="dash-row">
+          <span class="dash-label">Vitality</span>
+          <div class="dash-value dash-value-inline">
+            <span id="dash-vitality">Checking…</span>
+            <button id="dashboard-refresh" class="status-icon-btn" type="button" aria-label="Refresh vitality check" title="Refresh vitality check">↻</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="status-divider" />
+
+    <section>
+      <h2>Four things to know</h2>
+      <ol>
+        <li><strong>The backend does the rewriting, and it runs on your machine.</strong> No page text leaves your computer. Start it once with the three commands below — the panel above turns green when it is ready.</li>
+        <li><strong>Click the toolbar icon to simplify the page you are on.</strong> The text is replaced where it stands, so links, images and layout stay exactly as the author wrote them. A panel in the corner reports progress, what is doing the work, and how fast.</li>
+        <li><strong>Click the icon again to get the original text back.</strong> Nothing is saved to the page itself.</li>
+        <li><strong>You choose what rewrites the text.</strong> Press <strong>Simplifies with</strong> in the bar at the top of this page: a model, whether it reads sentence by sentence or whole sections at a time, and — for the prompted models — which audience it should write for. The same picker opens from a right-click on the toolbar icon, on any page.</li>
+      </ol>
+      <p>Two things happen on their own: every run is written to <a href="history.html">History</a> — the last 20 pages, with the text sent, what the model answered, and what the page ended up with — and if the backend is not running when you click the icon, a troubleshooting page opens with the steps to fix it.</p>
+    </section>
+
+    <section>
+      <h2>Start the backend</h2>
+      <ol>
+        <li>Open a terminal in the <code>backend/</code> folder of the project.</li>
+        <li>First time only — create the environment and install the dependencies:
+          <pre>python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt</pre>
+        </li>
+        <li>Start the server, and leave it running:
+          <pre>./run_dev.sh</pre>
+          (or directly: <code>uvicorn main:app --reload --port 8000</code>)
+        </li>
+      </ol>
+    </section>
+
+    <hr class="status-divider" />
+
+    <section class="cta">
+      <h2>Try it without leaving the extension</h2>
+      <p>The demo pages are static test pages covering the cases that are awkward on a real
+        site — bare interface labels, tables and forms, content that arrives late, and whole
+        document sections. Nothing on them is loaded from the network.</p>
+      <button id="open-demo" class="cta-btn" type="button">Open the demo pages</button>
+    </section>
+  </div>
+  <script src="shared/status.js"></script>
+  <script src="shared/instructions.js"></script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simplify — Extension Demo Pages</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 1100px;
+    margin: 40px auto;
+    line-height: 1.5;
+    padding: 0 20px 40px;
+  }
+  li { margin-bottom: 8px; }
+  code { background: #f0f0f0; padding: 2px 5px; border-radius: 3px; }
+  .demo-section {
+    margin: 28px 0 36px;
+  }
+  .demo-editor-row {
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+    margin-top: 12px;
+    width: 100%;
+  }
+  .demo-editor-row > * {
+    width: calc(50% - 8px);
+    min-width: 0;
+    flex: 0 0 calc(50% - 8px);
+  }
+  .demo-input-wrap {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .demo-clear {
+    margin-left: 12px;
+    appearance: none;
+    border: 1px solid #dc2626;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .demo-clear:hover {
+    background: #fecaca;
+  }
+  .demo-box {
+    min-height: 140px;
+    height: auto;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    overflow-wrap: anywhere;
+    margin-top: 12px;
+    text-align: left;
+    font: inherit;
+    line-height: 1.5;
+    width: 100%;
+    display: block;
+    vertical-align: top;
+    position: relative;
+    top: 0;
+  }
+  .demo-input {
+    display: block;
+    width: 100%;
+    min-height: 140px;
+    height: auto;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    font: inherit;
+    resize: none;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    line-height: 1.5;
+    margin-top: 12px;
+    flex: 1 1 auto;
+    text-align: left;
+    vertical-align: top;
+  }
+  .demo-output {
+    background: #f3f4f6;
+  }
+  #demo-output-text {
+    margin: 0;
+    text-align: left;
+    min-height: 100%;
+    line-height: 1.5;
+  }
+  @media (max-width: 760px) {
+    .demo-editor-row {
+      flex-direction: column;
+    }
+  }
+</style>
+</head>
+<body>
+<h1>Extension Demo Pages</h1>
+<p>Static test pages for manually verifying the browser extension end to end. See <code>demo/README.md</code> for setup instructions and an expected-results checklist for each page.</p>
+
+<ul>
+  <li><a href="01-basic-paragraphs.html" translate="no" class="notranslate">01 — Basic paragraphs</a>: baseline toggle/revert behaviour.</li>
+  <li><a href="02-dom-targeting.html" translate="no" class="notranslate">02 — DOM targeting</a>: headings, lists, tables, semantic sectioning tags, quotes.</li>
+  <li><a href="03-interactive-and-forms.html" translate="no" class="notranslate">03 — Interactive &amp; form elements</a>: links, buttons, labels, options, input/textarea placeholders.</li>
+  <li><a href="04-exclusions.html" translate="no" class="notranslate">04 — Exclusions</a>: code/pre/script blocks and <code>translate="no"</code>/<code>.notranslate</code> opt-outs.</li>
+  <li><a href="05-dynamic-content.html" translate="no" class="notranslate">05 — Dynamic content</a>: MutationObserver / infinite-scroll-style insertion.</li>
+  <li><a href="06-line-breaks-and-sentences.html" translate="no" class="notranslate">06 — Line breaks &amp; sentences</a>: <code>&lt;br&gt;</code> chunking and per-sentence simplification.</li>
+  <li><a href="07-document-sections.html" translate="no" class="notranslate">07 — Document sections</a>: heading-delimited sections for the document model.</li>
+  <li><a href="08-html-checker.html" translate="no" class="notranslate">08 — HTML checker</a>: paste markup, rendered twice side by side — pinned original vs. simplified copy.</li>
+</ul>
+
+<div class="demo-section">
+  <h2>Quick simplification check</h2><label for="demo-text" style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">Enter text which should be simplified, when ready toggle the simplification by pressing the browser extension icon in the toolbar<button id="demo-clear" class="demo-clear" type="button">Clear</button></label>
+  <div class="demo-editor-row">
+    <div class="demo-input-wrap">
+      <textarea id="demo-text" class="demo-box demo-input" name="text" style="height: 138px;"></textarea>
+    </div>
+
+    <div id="demo-result" class="demo-box demo-output" aria-live="polite">
+      <div id="demo-output-text" style="margin: 0; white-space: pre-wrap; text-align: left; min-height: 100%;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const input = document.getElementById('demo-text');
+  const result = document.getElementById('demo-result');
+  const outputText = document.getElementById('demo-output-text');
+  const clearButton = document.getElementById('demo-clear');
+
+  function autoResize() {
+    input.style.height = 'auto';
+    const nextHeight = Math.max(input.scrollHeight, 140);
+    input.style.height = `${nextHeight}px`;
+    result.style.height = 'auto';
+    result.style.minHeight = `${nextHeight}px`;
+  }
+
+  function readPrefillText() {
+    const hashText = window.location.hash.startsWith('#text=')
+      ? decodeURIComponent(window.location.hash.slice('#text='.length))
+      : null;
+    const queryText = new URLSearchParams(window.location.search).get('text');
+    return hashText || queryText || '';
+  }
+
+  const STORAGE_KEY = 'demo-simplification-text';
+
+  function persistInput() {
+    localStorage.setItem(STORAGE_KEY, input.value);
+  }
+
+  function syncOutput() {
+    autoResize();
+    const value = input.value;
+    outputText.textContent = value || '';
+    persistInput();
+  }
+
+  clearButton.addEventListener('click', () => {
+    input.value = '';
+    localStorage.removeItem(STORAGE_KEY);
+    syncOutput();
+    input.focus();
+  });
+
+  input.addEventListener('input', syncOutput);
+
+  const prefill = readPrefillText();
+  if (prefill) {
+    input.value = prefill;
+  } else {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved !== null) {
+      input.value = saved;
+    } else {
+      input.value = 'The quick brown fox jumps over the lazy dog.';
+    }
+  }
+
+  syncOutput();
+</script>
+</body>
+</html>

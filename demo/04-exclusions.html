@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo 04 — Exclusions</title>
+    <link rel="stylesheet" href="demo.css" />
+  </head>
+  <body>
+    <nav class="demo-nav">
+      <a href="index.html" translate="no" class="notranslate"
+        >← back to index</a
+      >
+    </nav>
+    <h1>04 — Exclusions</h1>
+    <p class="meta notranslate">
+      Everything the extension should leave untouched: code blocks, and the
+      <code>translate="no"</code>/<code>.notranslate</code> opt-outs (see
+      <code>elementSkipReason()</code> and <code>isSimplifiableChunk()</code> in
+      <code>extension/content.js</code>).
+    </p>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: skipped entirely — <code>&lt;pre&gt;</code>/<code
+          >&lt;code&gt;</code
+        >
+        are excluded via <code>closest("pre, code, script, style")</code>.
+      </p>
+      <pre><code>function simplify(text) { return text.replace(/complicated/g, "simple"); }</code></pre>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: simplifies normally — inline <code>&lt;code&gt;</code> inside
+        a paragraph is excluded from the sentence, but the surrounding prose
+        should still simplify.
+      </p>
+      <p>
+        To install the dependency, run <code>npm install</code> in the project's
+        root directory prior to initiating the development server.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: skipped entirely — <code>translate="no"</code> attribute.
+      </p>
+      <p translate="no">
+        This paragraph carries the translate="no" attribute and must remain
+        completely unchanged regardless of how many times you toggle the
+        extension.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: skipped entirely — <code>class="notranslate"</code>.
+      </p>
+      <p class="notranslate">
+        This paragraph carries class="notranslate" and must remain completely
+        unchanged regardless of how many times you toggle the extension.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: partial exclusion — the surrounding sentence simplifies, but
+        the <code>.notranslate</code> span in the middle must survive completely
+        untouched, mid-sentence.
+      </p>
+      <p>
+        The committee has resolved that the following designation,
+        <span class="notranslate">Product-Code-7743-XZ</span>, shall remain
+        unaltered under any circumstances, notwithstanding the surrounding
+        narrative.
+      </p>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,394 @@
+{
+  "run": {
+    "script": "review_document_outputs.py",
+    "script_version": "1.0",
+    "generated_at": "2026-08-23T22:02:12.095497+00:00",
+    "generations_file": "results/remote/document_eval_full/generations_n8000_seed42.json",
+    "sources_sha": "c30622d902a3288f"
+  },
+  "dataset": {
+    "split_total_raw": 8000,
+    "split_total_cleaned": 8000,
+    "mojibake_dropped": 0,
+    "sampled": false,
+    "sample_seed": null,
+    "n_reviewed": 8000
+  },
+  "corpus_shape": {
+    "source": {
+      "words_median": 87.0,
+      "words_mean": 129.2,
+      "sentences_median": 4.0,
+      "words_per_sentence_median": 22.12
+    },
+    "reference": {
+      "words_median": 54.0,
+      "words_mean": 71.1,
+      "words_per_sentence_median": 15.0
+    }
+  },
+  "systems": {
+    "finetuned": {
+      "length_ratio_vs_source_median": 0.701,
+      "sentence_ratio_vs_source_median": 0.929,
+      "words_per_sentence_median": 16.61,
+      "identical_to_source": 613,
+      "near_copy_of_source": 1456,
+      "split_a_sentence": 1526,
+      "under_half_reference_length": 1482,
+      "introduces_absent_year": 433,
+      "introduces_absent_number": 1050,
+      "repetition_loops": 0,
+      "empty": 0
+    },
+    "baseline": {
+      "length_ratio_vs_source_median": 1.0,
+      "sentence_ratio_vs_source_median": 1.0,
+      "words_per_sentence_median": 22.33,
+      "identical_to_source": 2312,
+      "near_copy_of_source": 4131,
+      "split_a_sentence": 1098,
+      "under_half_reference_length": 862,
+      "introduces_absent_year": 642,
+      "introduces_absent_number": 1301,
+      "repetition_loops": 10,
+      "empty": 0
+    },
+    "reference": {
+      "length_ratio_vs_source_median": 0.66,
+      "sentence_ratio_vs_source_median": 1.0,
+      "words_per_sentence_median": 15.0,
+      "identical_to_source": 127,
+      "near_copy_of_source": 239,
+      "split_a_sentence": 2782,
+      "under_half_reference_length": 0,
+      "introduces_absent_year": 1952,
+      "introduces_absent_number": 3485,
+      "repetition_loops": 51,
+      "empty": 0
+    }
+  },
+  "compression_by_source_length": {
+    "finetuned": [
+      {
+        "source_words": "0-60",
+        "n": 2945,
+        "prediction_length_ratio_median": 1.0,
+        "reference_length_ratio_median": 1.118
+      },
+      {
+        "source_words": "60-120",
+        "n": 1964,
+        "prediction_length_ratio_median": 0.749,
+        "reference_length_ratio_median": 0.693
+      },
+      {
+        "source_words": "120-250",
+        "n": 1872,
+        "prediction_length_ratio_median": 0.482,
+        "reference_length_ratio_median": 0.395
+      },
+      {
+        "source_words": "250-+",
+        "n": 1219,
+        "prediction_length_ratio_median": 0.297,
+        "reference_length_ratio_median": 0.247
+      }
+    ],
+    "baseline": [
+      {
+        "source_words": "0-60",
+        "n": 2945,
+        "prediction_length_ratio_median": 1.0,
+        "reference_length_ratio_median": 1.118
+      },
+      {
+        "source_words": "60-120",
+        "n": 1964,
+        "prediction_length_ratio_median": 1.0,
+        "reference_length_ratio_median": 0.693
+      },
+      {
+        "source_words": "120-250",
+        "n": 1872,
+        "prediction_length_ratio_median": 1.0,
+        "reference_length_ratio_median": 0.395
+      },
+      {
+        "source_words": "250-+",
+        "n": 1219,
+        "prediction_length_ratio_median": 1.043,
+        "reference_length_ratio_median": 0.247
+      }
+    ]
+  },
+  "census_year_probe": {
+    "sources_saying_2010_census": 576,
+    "finetuned_says_2000_census": 5,
+    "finetuned_keeps_2010_census": 248,
+    "baseline_says_2000_census": 52,
+    "references_saying_2010_census": 190,
+    "references_saying_2000_census": 21,
+    "example_indices": [
+      11,
+      12,
+      14,
+      17,
+      36,
+      41,
+      64,
+      85,
+      89,
+      91,
+      163,
+      215,
+      249,
+      267,
+      273,
+      307,
+      333,
+      334,
+      352,
+      375
+    ]
+  },
+  "corpus_pairing_probe": {
+    "disambiguation_stub_sources": 317,
+    "share_of_split_pct": 3.96,
+    "reference_is_an_expansion": 169,
+    "mispaired_share_of_split_pct": 2.11,
+    "expansion_threshold": "reference >= 20 words and >= 3x the source",
+    "median_source_words": 5,
+    "median_reference_words": 61,
+    "example_indices": [
+      15,
+      62,
+      125,
+      149,
+      204,
+      233,
+      244,
+      256,
+      319,
+      349,
+      414,
+      428,
+      494,
+      593,
+      623,
+      643,
+      647,
+      651,
+      766,
+      788
+    ]
+  },
+  "examples": {
+    "introduced_year": [
+      {
+        "index": 24,
+        "source_words": 279,
+        "source": "a riff is a repeated chord progression or refrain in music ( also known as an ostinato figure in classical music ) ; it is a pattern , or melody , often played by the rhythm section instruments or solo instrument , that forms the basis or accompaniment of a musical composition . though riffs are most often found in rock music , heavy metal music , latin , funk and jazz , classical music is also sometimes based on a riff , such as ravel 's boléro . riffs can be as simple as a tenor saxophone honking a simple , catchy rhythmic figure , or as complex as the riff-based variations in the head arrangements played by the count basie orchestra.david brackett ( 1999 ) defines riffs as `` short melodic phrases , '' while richard middleton ( 1999 ) defines them as `` short rhythmic , melodic , or harmonic figures repeated to form a structural framework '' . rikky rooksby states , `` a riff is a short , repeated , memorable musical phrase , often pitched low on the guitar , which focuses much of the energy and excitement of a rock song . `` bbc radio 2 , in compiling its list of 100 greatest guitar riffs , defined a riff as the “main hook of a song” , often beginning the song , and is “repeated throughout it , giving the song its distinctive voice”.use of the term has extended to comedy , where `` riffing '' means the verbal exploration of a particular subject , thus moving the meaning away from the original jazz sense of a repeated figure that a soloist improvises over , to instead indicate the improvisation itself—improvising on a melody or progression as one would improvise on a subject by extending a singular thought , idea or inspiration into a `` bit '' , or `` routine '' .",
+        "reference": "in music , a riff is an ostinato ; a repeated chord progression , pattern , or melody , often played by rhythmic instruments . the riff is the base of the musical composition . they are most common in rock music , funk , and jazz.some of famous riffs in rock music can be found in the following songs :",
+        "finetuned": "a riff is a repeated chord progression or refrain in music ( also known as an ostinato figure in classical music ) . it is a pattern , or melody , often played by the rhythm section instruments or solo instrument , that forms the basis or accompaniment of a musical composition . though riffs are most often found in rock music , heavy metal music , latin , funk and jazz , classical music is also sometimes based on a riff , such as ravel 's boléro . riffs can be as simple as a tenor saxophone honking a simple , catchy rhythmic figure , or as complex as the riff-based variations in the head arrangements played by a count basie orchestra.david brackett ( 1999 ) defines riffs as `` short melodic phrases , '' while richard middleton ( 1998 ) defines them as “short rhythmic , melodic , or harmonic figures repeated to form a structural framework” . rikky rooksby states , `` a riff is often pitched low on the guitar , which focuses much of the energy and excitement of a rock song . `` bbc radio 2 , in compiling its list of 100 greatest guitar riffs , defined a riff as the “main hook of a song” , often beginning the song , and is “repeated throughout it , giving the song its distinctive voice”.use of the term has extended to comedy , where `` riffing '' means the verbal exploration of a particular subject , thus moving the meaning away from the original jazz sense of a repeated figure that a soloist improvises over , to instead indicate the improvisation itself—improvising on a melody or progression as one would improvise on a subject by extending a singular thought , idea or inspiration into a `` bit '' , or `` routine '' .",
+        "baseline": "a riff is a repeated chord progression or refrain in music ( also known as an ostinato figure in classical music ) ; it is a pattern , or melody , often played by the rhythm section instruments or solo instrument , that forms the basis or accompaniment of a musical composition . though riffs are most often found in rock music , heavy metal music , latin , funk and jazz , classical music is also sometimes based on a riff , such as ravel 's boléro . riffs can be as simple as a tenor saxophone honking a simple , catchy rhythmic figure , or as complex as the riff-based variations in the head arrangements played by members of the count basie orchestra.david brackett ( 1999 ) defines riffs as `` short melodic phrases , '' while richard middleton (1999 ) defines them as `` \" short rhythmic , melodic , or harmonic figures repeated to form a structural framework '' . rikky rooksby states , `` a riff is the “main hook of a song” , often pitched low on the guitar , which focuses much of the energy and excitement of a rock song . `` bbc radio 2 , in compiling its list of 100 greatest guitar riffs , defined a riff as `` “short melodic phrase , '' , and is “repeated throughout it , giving the song its distinctive voice”.use of the term has extended to comedy , where `` riffing '' means the verbal exploration of a particular subject , thus moving the meaning away from the original jazz sense of a repeated figure that a soloist improvises over , to instead indicate the improvisation itself—improvising on a melody or progression as one would improvise on a subject by extending a singular thought , idea or inspiration into a `` bit '' , or `` routine '' ."
+      },
+      {
+        "index": 27,
+        "source_words": 67,
+        "source": "philip warren anderson ( december 13 , 1923 – march 29 , 2020 ) was an american theoretical physicist and nobel laureate . anderson made contributions to the theories of localization , antiferromagnetism , symmetry breaking ( including a paper in 1962 discussing symmetry breaking in particle physics , leading to the development of the standard model around 10 years later ) , and high-temperature superconductivity , and to the philosophy of science through his writings on emergent phenomena .",
+        "reference": "philip warren anderson ( december 13 , 1923 – march 29 , 2020 ) was an american physicist . anderson created and helped prove theories such as localization , antiferromagnetism , symmetry breaking , high-temperature superconductivity . he wrote many things about the emergent phenomena.anderson was born in indianapolis , indiana . he was raised in urbana , illinois . anderson studied at harvard university.anderson was an atheist and was one of 22 nobel laureates who signed the humanist manifesto.he was awarded the nobel prize in physics in 1977 and the national medal of science in 1982.anderson died on march 29 , 2020 in princeton , new jersey , aged 96 .",
+        "finetuned": "philip warren anderson ( december 13 , 1923 – march 29 , 2020 ) was an american theoretical physicist and nobel laureate . anderson made contributions to the theories of localization , antiferromagnetism , symmetry breaking ( including a paper in 1962 discussing symmetry breaking in particle physics , leading to the development of the standard model around 10 years later ) , and to the philosophy of science through his writings on emergent phenomena.anderson was born in new york city . he studied at the university of california , los angeles . he was married to elizabeth anderson from 1946 until his death in 2020 . they had two children . andersen died on march 29, 2020 in san francisco at the age of 96 .",
+        "baseline": "philip warren anderson ( december 13 , 1923 – march 29 , 2020 ) was an american theoretical physicist and nobel laureate . anderson made contributions to the theories of localization , antiferromagnetism , symmetry breaking ( including a paper in 1962 discussing symmetry breaking in particle physics , leading to the development of the standard model around 10 years later ) , and high-temperature superconductivity , and to the philosophy of science through his writings on emergent phenomena ."
+      },
+      {
+        "index": 30,
+        "source_words": 36,
+        "source": "anna elisabeth de bruijn ( 1 january 1920 – 3 october 2018 ) , better known by the stage name of elisabeth andersen , was a dutch actress , primarily in theatre . she was a three-time recipient of the theo d'or .",
+        "reference": "anna elisabeth de bruijn ( 1 january 1920 – 3 october 2018 ) , better known by the stage name of elisabeth andersen , was a dutch theatre actress . she was born in the hague . she was a three-time winner of the theo d'or . andersen was known for her work with .andersen died in haarlem on 3 october 2018 at age 98 .",
+        "finetuned": "elisabeth de bruijn ( 1 january 1920 – 3 october 2018 ) , better known by the stage name of elisabeth andersen , was a dutch actress , primarily in theatre . she was a three-time recipient of the theo d'or.andersen was born in amsterdam , netherlands . she studied at the university of amsterdam and at the royal academy of dramatic arts . she also worked as an actress . she appeared in many movies and television programs . her best known roles were in `` the night of the king '' ( 1953 ) , `` the day of the queen '' ( 1956 ) , and `` the last days of the joker '' ( 1958 ) .andersen died on 3october 2018 at the age of 91 .",
+        "baseline": "anna elisabeth de bruijn ( 1 january 1920 – 3 october 2018 ) , better known by the stage name of elisabet andersen , was a dutch actress , primarily in theatre . she was a three-time recipient of the theo d'or ."
+      },
+      {
+        "index": 35,
+        "source_words": 59,
+        "source": "merchtem ( ) is a municipality located in the belgian province of flemish brabant . the municipality comprises the villages of brussegem and hamme , the hamlet of ossel and peizegem , and merchtem proper . on july 9 , 2009 , merchtem had a total population of 15,298 . the total area is 36.72 km² which gives a population density of 416 inhabitants per km² .",
+        "reference": "merchtem is a municipality in the belgian province of flemish brabant.in 2007 , 15053 people lived there.it is at 50° 57 north , 04° 14 east .",
+        "finetuned": "merchtem is a municipality in the belgian province of flemish brabant.in 2007 , 15298 people lived there.it is at 50° 51 north , 04° 39 east .",
+        "baseline": "merchtem ( ) is a municipality located in the belgian province of flemish brabant . the municipality comprises the villages of brussegem and hamme , the hamlet of ossel and peizegem , and merchtem proper . on july 9 , 2009 , merchtem had a total population of 15,298 . the total area is 36.72 km² which gives a population density of 416 inhabitants per km² ."
+      },
+      {
+        "index": 54,
+        "source_words": 14,
+        "source": "roquefort-des-corbières is a commune in the aude department in southern france .",
+        "reference": "roquefort-des-corbières is a commune of 664 people ( 1999 ) . it is located in the region languedoc-roussillon in the aude department in the south of france .",
+        "finetuned": "roquefort-des-corbières is a commune of 1,924 people ( 2017 ) . it is in the region occitanie in the aude department in the south of france .",
+        "baseline": "roquefort-des-corbières is a commune in the aude department in southern france ."
+      },
+      {
+        "index": 56,
+        "source_words": 47,
+        "source": "nässjö municipality ( `` nässjö kommun '' ) is a municipality in jönköping county , southern sweden where the town nässjö is situated.the present municipality was created in 1971 when the `` city of nässjö '' ( instituted in 1914 ) was amalgamated with five surrounding municipalities .",
+        "reference": "nässjö municipality ( , nässjö kommun ) is a municipality in jönköping county in southern sweden . the seat is in nässjö .",
+        "finetuned": "nässjö municipality ( ) is a municipality in jönköping county in southern sweden . as of 31 december 2018 , 1,924 people lived there . its seat is in nässijö .",
+        "baseline": "nässjö municipality ( `` näss Jö kommun '' ) is a municipality in jönköping county , southern sweden where the town näissjö is situated.the present municipality was created in 1971 when the `` city of näsjö '' ( instituted in 1914 ) was amalgamated with five surrounding municipalities ."
+      }
+    ],
+    "returned_source_unchanged": [
+      {
+        "index": 8,
+        "source_words": 51,
+        "source": "linda marion dessau , ( born 8 may 1953 ) is an australian jurist , barrister , and the 29th and current governor of victoria since 1 july 2015 . she is the first female and the first jewish holder of the office . she was a judge of the family court of australia from 1995 to 2013 .",
+        "reference": "linda marion dessau ( born 8 may 1953 ) has been the governor of victoria since 1 july 2015 . she is the first female and the first jewish holder of the office.she was a judge of the family court of australia from 1995 to 2013 .",
+        "finetuned": "linda marion dessau , ( born 8 may 1953 ) is an australian jurist , barrister , and the 29th and current governor of victoria since 1 july 2015 . she is the first female and the first jewish holder of the office . she was a judge of the family court of australia from 1995 to 2013 .",
+        "baseline": "linda marion dessau , ( born 8 may 1953 ) is an australian jurist , barrister , and the 29th and current governor of victoria since 1 july 2015 . she is the first female and the first jewish holder of the office . she was a judge of the family court of australia from 1995 to 2013 ."
+      },
+      {
+        "index": 20,
+        "source_words": 100,
+        "source": "a bayer designation is a stellar designation in which a specific star is identified by a greek or latin letter followed by the genitive form of its parent constellation 's latin name . the original list of bayer designations contained 1,564 stars . the brighter stars were assigned their first systematic names by the german astronomer johann bayer in 1603 , in his star atlas `` uranometria '' . bayer catalogued only a few stars too far south to be seen from germany , but later astronomers ( including nicolas louis de lacaille and benjamin apthorp gould ) supplemented bayer 's catalog with entries for southern constellations .",
+        "reference": "the bayer designation for stars uses to assign names to stars . for example : it usually starts with the letter alpha ( α ) assigned to the brightest star in the constellation , then going down the to assign letters for other stars ( beta , gamma , delta , etc . ) in order of decreasing brightness .",
+        "finetuned": "a bayer designation is a stellar designation in which a specific star is identified by a greek or latin letter followed by the genitive form of its parent constellation 's latin name . the original list of bayer designations contained 1,564 stars . the brighter stars were assigned their first systematic names by the german astronomer johann bayer in 1603 , in his star atlas `` uranometria '' . bayer catalogued only a few stars too far south to be seen from germany , but later astronomers ( including nicolas louis de lacaille and benjamin apthorp gould ) supplemented bayer 's catalog with entries for southern constellations .",
+        "baseline": "a bayer designation is a stellar designation in which a specific star is identified by a greek or latin letter followed by the genitive form of its parent constellation 's latin name . the original list of bayer designations contained 1,564 stars . the brighter stars were assigned their first systematic names by the german astronomer johann bayer in 1603 , in his star atlas `` uranometria '' . bayer catalogued only a few stars too far south to be seen from germany , but later astronomers ( including nicolas louis de lacaille and benjamin apthorp gould ) supplemented bayer 's catalog with entries for southern constellations ."
+      },
+      {
+        "index": 29,
+        "source_words": 76,
+        "source": "in telecommunications networks , a node ( latin `` nodus '' , ‘knot’ ) is either a redistribution point or a communication endpoint . the definition of a node depends on the network and protocol layer referred to . a physical network node is an electronic device that is attached to a network , and is capable of creating , receiving , or transmitting information over a communications channel . a passive distribution point such as a distribution frame or patch panel is consequently not a node .",
+        "reference": "a network node is another name for a single computer in a network of other computers .",
+        "finetuned": "in telecommunications networks , a node ( latin `` nodus '' , ‘knot’ ) is either a redistribution point or a communication endpoint . the definition of a node depends on the network and protocol layer referred to . a physical network node is an electronic device that is attached to a network , and is capable of creating , receiving , or transmitting information over a communications channel . a passive distribution point such as a distribution frame or patch panel is consequently not a node .",
+        "baseline": "in telecommunications networks , a node ( latin `` nodus '' , ‘knot’ ) is either a redistribution point or a communication endpoint . the definition of a node depends on the network and protocol layer referred to . a physical network node is an electronic device that is attached to a network , and is capable of creating , receiving , or transmitting information over a communications channel . a passive distribution point such as a distribution frame or patch panel is consequently not a node ."
+      },
+      {
+        "index": 31,
+        "source_words": 63,
+        "source": "the covid-19 pandemic was confirmed to have reached latvia on 2 march 2020.on 13 march , the government closed all educational institutions and banned mass gatherings until 14 april , which was later extended to 12 may . many concerts and events were cancelled and moved to other dates . as of 20 march at least 1,600 culture and entertainment events had been disrupted .",
+        "reference": "the covid-19 pandemic was confirmed to have reached latvia on 2 march 2020.on 13 march , the government closed all educational buildings and banned mass gatherings until 14 april , which was later extended to 12 may . many concerts and events were cancelled and moved to other dates.as of 20 march at least 1,600 culture and entertainment events had been disrupted .",
+        "finetuned": "the covid-19 pandemic was confirmed to have reached latvia on 2 march 2020.on 13 march , the government closed all educational institutions and banned mass gatherings until 14 april , which was later extended to 12 may . many concerts and events were cancelled and moved to other dates . as of 20 march at least 1,600 culture and entertainment events had been disrupted .",
+        "baseline": "the covid-19 pandemic was confirmed to have reached latvia on 2 march 2020.on 13 march , the government closed all educational institutions and banned mass gatherings until 14 april , which was later extended to 12 may . many concerts and events were cancelled and moved to other dates . as of 20 march at least 1,600 culture and entertainment events had been disrupted ."
+      },
+      {
+        "index": 62,
+        "source_words": 5,
+        "source": "richard gwyn may refer to :",
+        "reference": "richard john philip jermy gwyn , ( may 26 , 1934 – august 15 , 2020 ) was a canadian journalist , author , historian , and civil servant.from 1957 to 1959 , gwyn was the parliamentary correspondent for united press international , in ottawa . later in 1959 to 1960 , he worked for thomson newspapers.from 1960 to 1962 , he was the ottawa editor for maclean-hunter business publications . from 1962 to 1968 , he worked for `` time canada '' as a parliamentary correspondent and contributing editor . from 1968 to 1970 , he was the executive assistant to the minister of communications , eric kierans.from 1970 to 1973 , he was the director-general , socio-economic planning in the department of communications.gwyn died from alzheimer 's disease on august 15 , 2020 at the age of 86 .",
+        "finetuned": "richard gwyn may refer to :",
+        "baseline": "richard gwyn may refer to :"
+      },
+      {
+        "index": 92,
+        "source_words": 6,
+        "source": "paulo gonçalves may refer to :",
+        "reference": "paulo gonçalves may refer to :",
+        "finetuned": "paulo gonçalves may refer to :",
+        "baseline": "paulo gonçalves may refer to :"
+      }
+    ],
+    "compressed_far_below_reference": [
+      {
+        "index": 21,
+        "source_words": 152,
+        "source": "thomas hitzlsperger ( ; born 5 april 1982 ) is a german director of football and former footballer who played as a midfielder . since february 2019 , he has been the head of sport of vfb stuttgart.as a player he spent the early part of his career playing for aston villa in england ( accompanied by a short loan spell at chesterfield ) , before returning to germany to play for stuttgart , where he won the bundesliga in 2007 . in 2010 , he signed for italian side lazio , before moving back to england to join west ham united later that year . he then had brief spells with wolfsburg and everton.hitzlsperger also represented the german national team , earning 52 caps and being selected for the 2006 world cup and euro 2008 . following a series of injuries , he retired from football in september 2013 . after his retirement , he came out as gay , the highest-profile male footballer to do so .",
+        "reference": "thomas hitzlsberger ( born april 5 , 1982 ) is a german football player . he plays for west ham united and germany national team . in 2014 he told `` die zeit '' that he is gay . he is the first premier league footballer to come out as gay .",
+        "finetuned": "thomas hitzlsperger ( born 5 april 1982 ) is a german football player . he has played for germany national team .",
+        "baseline": "thomas hitzlsperger ( ; born 5 april 1982 ) is a german director of football and former footballer who played as a midfielder . since february 2019 , he has been the head of sport of vfb stuttgart.as a player he spent the early part of his career playing for germany in the bundesliga , before moving to villa in england ( accompanied by a short loan spell at chesterfield ) , before returning to german, where he won the bundebesliga in 2007 . in 2010 , he signed for italian side lazio , then moving back to england to join west hamsterfield , where he made his debut in the 1.Bundesliga that same year . he then had brief spells with wolfsburg and everton.hitzlspeger also represented the german national team , earning 52 caps and being selected for the 2006 world cup and euro 2008 . following a series of injuries , he retired from football in september 2013 . after his retirement , he came out as gay , the highest-profile male footballer to do so ."
+      },
+      {
+        "index": 48,
+        "source_words": 229,
+        "source": "jens spahn ( born 16 may 1980 ) is a german politician currently serving as federal minister of health in the fourth merkel cabinet . he is a member of the lower house of the federal parliament , the bundestag ( , mdb ) for steinfurt i – borken i and is a member of the centre-right christian democratic union of germany ( cdu ) , which governs in partnership with the centre-left social democratic party of germany ( spd ) .spahn was the youngest member of the cdu in the german parliament , having been elected in 2002 at age 22 . he has since then served in the 15th , 16th and 17th bundestags and is one of the main sponsors of pension reform in germany . he is a member of the committee of health of the 17th bundestag and chair of the working group on health and health policy as well as the spokesman of the cdu/csu health parliamentary group.when chancellor angela merkel stated her intention not to seek re-election for the cdu party leadership in 2018 , spahn announced his intention to stand for election as her successor in december 2018 . he was eventually eliminated in the first round of voting ; the position instead went to annegret kramp-karrenbauer . following kramp-karrenbauer 's decision to resign in february 2020 , he announced that he would not run for the party 's leadership but instead endorse candidate armin laschet .",
+        "reference": "jens spahn ( born 16 may 1980 ) is a german politician . he is the federal minister of health since march 2018 . he is a member of the lower house of the federal parliament , the bundestag as a member of the centre-right christian democratic union of germany ( cdu ) .in october 2018 , chancellor angela merkel announced her retirement for the cdu party leadership . spahn announced his intention to stand for election as her successor in december 2018 .",
+        "finetuned": "jens spahn ( born 16 may 1980 ) is a german politician . he is the federal minister of health in the fourth merkel cabinet .",
+        "baseline": "jens spahn ( born 16 may 1980 ) is a german politician currently serving as federal minister of health in the fourth merkel cabinet . he is a member of the lower house of the federal parliament , the bundestag ( , mdb ) for steinfurt i – borken i and is a supporter of the center-right christian democratic union of germany ( cdu ) , which governs in partnership with the centre-left social democratic party of germy ( spd ) .spahn was the youngest member of Congress in the german parliament , having been elected in 2002 at age 22 . he has since then served in the 15th , 16th and 17th bundestags and is one of the main sponsors of pension reform in germania . he also serves as the chairman of the committee of health of the 17th Bundestag and chair of the working group on health and health policy as well as the spokesman of the cdu/csu health parliamentary group.when chancellor angela merkel stated her intention not to seek re-election for the cuk party leadership in 2018 , spahn announced his intention to stand for election as her successor in december 2018 . he was eventually eliminated in the first round of voting ; the position instead went to annegret kramp-karrenbauer . following kramping-karrendbauer 's decision to resign in february 2020 , he announced that he would not run for the party 's leadership but instead endorse candidate armin laschet ."
+      },
+      {
+        "index": 85,
+        "source_words": 156,
+        "source": "campti is a town in the northern part of natchitoches parish , louisiana , united states . the population was 1,056 at the 2010 census . it is part of the natchitoches micropolitan statistical area . campti is a flat area of mostly farmland . it sits on the eastern bank of the red river . considerable cattle are also raised in the general area.the town of campti is 75 percent african american in population.during the american civil war , union general a.j . smith , with two brigades , reached campti to assist admiral david dixon porter 's gunboats on the red river there . confederate general st. john richardson liddell 's scattered troops had been harassing the union fleet but quickly retreated as union general a. j. smith 's overwhelming force arrived on april 13 , 1864 . smith and his men burned what was left of campti , on april 14 , 1863 . the gunboats were returned safely upriver to grand ecore in natchitoches parish .",
+        "reference": "campti is a small town in natchitoches parish , louisiana , united states . the population was 1,057 at the 2000 census . it is part of the natchitoches micropolitan statistical area . campti is a flat area of mostly farmland . it sets on the eastern bank of the red river . considerable cattle are also raised in the general area.lakeview junior and senior high school , a modern consolidated school structure housing pre-kindergarten and grades nine through twelve , is located east of campti on louisiana highway 9 . the school is 55 percent white in enrollment , but campti itself is some 75 percent african american in population . students from as far north as ashland attend lakeview.during the american civil war , union general a.j . smith , with two brigades , reached campti to assist admiral david dixon porter 's trapped gunboats on the red river there . smith and his men burned campti , which then contained only a few buildings and houses . the gunboats were returned safely upriver to grand ecore in natchitoches parish .",
+        "finetuned": "campti is a town in natchitoches parish , louisiana , united states . the population was 1,056 at the 2010 census .",
+        "baseline": "campti is a town in the northern part of natchitoches parish , louisiana , united states . the population was 1,056 at the 2010 census . it is part of the natchitsoches micropolitan statistical area . campti has a flat area of mostly farmland . it sits on the eastern bank of the red river . considerable cattle are also raised in the general area.the town of campts is 75 percent african american in population.during the american civil war , union general a.j . smith , with two brigades , reached campta to assist admiral david dixon porter 's gunboats on the east river there . confederate general st. john richardson liddell 's scattered troops had been harassing the union fleet but quickly retreated as union General a. j. smith 's overwhelming force arrived on april 13 , 1864 . smiths and his men burned what was left of cambpti , on April 14 , 1863 . the gunboats were returned safely upriver to grand ecore in tonya ."
+      },
+      {
+        "index": 101,
+        "source_words": 443,
+        "source": "stephen crane ( november 1 , 1871 – june 5 , 1900 ) was an american poet , novelist , and short story writer . prolific throughout his short life , he wrote notable works in the realist tradition as well as early examples of american naturalism and impressionism . he is recognized by modern critics as one of the most innovative writers of his generation.the ninth surviving child of methodist parents , crane began writing at the age of four and had published several articles by the age of 16 . having little interest in university studies though he was active in a fraternity , he left syracuse university in 1891 to work as a reporter and writer . crane 's first novel was the 1893 bowery tale `` '' , generally considered by critics to be the first work of american literary naturalism . he won international acclaim in 1895 for his civil war novel `` the red badge of courage '' , which he wrote without having any battle experience.in 1896 , crane endured a highly publicized scandal after appearing as a witness in the trial of a suspected prostitute , an acquaintance named dora clark . late that year he accepted an offer to travel to cuba as a war correspondent . as he waited in jacksonville , florida for passage , he met cora taylor , with whom he began a lasting relationship . en route to cuba , crane 's vessel the ss `` commodore '' sank off the coast of florida , leaving him and others adrift for 30 hours in a dinghy . crane described the ordeal in `` the open boat '' . during the final years of his life , he covered conflicts in greece ( accompanied by cora , recognized as the first woman war correspondent ) and later lived in england with her . he was befriended by writers such as joseph conrad and h. g. wells . plagued by financial difficulties and ill health , crane died of tuberculosis in a black forest sanatorium in germany at the age of 28.at the time of his death , crane was considered an important figure in american literature . after he was nearly forgotten for two decades , critics revived interest in his life and work . crane 's writing is characterized by vivid intensity , distinctive dialects , and irony . common themes involve fear , spiritual crises and social isolation . although recognized primarily for `` the red badge of courage '' , which has become an american classic , crane is also known for his poetry , journalism , and short stories such as `` the open boat '' , `` the blue hotel '' , `` the bride comes to yellow sky '' , and `` the monster '' . his writing made a deep impression on 20th-century writers , most prominent among them ernest hemingway , and is thought to have inspired the modernists and the imagists .",
+        "reference": "stephen townley crane ( november 1 , 1871 - june 5 , 1900 ) was an american writer . he was born on november 1 , 1871 in newark , new jersey to jonathan townley crane , a clergyman , and mary helen peck crane . he attended syracuse university in syracuse , new york , but did not graduate . he moved to new york city in 1892 to write about the slum life of manhattan . his major works include the novella `` maggie : a girl of the streets '' ( 1893 ) , the war novel `` the red badge of courage '' ( 1895 ) , and the short story `` the open boat '' ( 1897 ) . after the success of `` badge '' , his literary reputation declined . his health was poor . in may 1899 , he entered a sanitarium in badenweiler , germany . on june 5 , 1900 , he died of tuberculosis . he is buried in the evergreen cemetery in hillside , new jersey .",
+        "finetuned": "stephen crane ( november 1 , 1871 – june 5 , 1900 ) was an american poet , novelist , and short story writer . he was known for his works in the realist tradition . he wrote early examples of american naturalism and impressionism . he is recognized by modern critics as one of the most innovative writers of his generation .",
+        "baseline": "stephen crane ( november 1 , 1871 – june 5 , 1900 ) was an american poet , novelist , and short story writer . prolific throughout his short life , he wrote notable works in the realist tradition as well as early examples of american naturalism and impressionism . he is recognized by modern critics as one of the most innovative writers of his generation.the ninth surviving child of methodist parents , crane began writing at the age of four and had published several articles by the time of 16 . having little interest in university studies though he was active in a fraternity , he left syracuse university in 1891 to work as a reporter and writer . crane 's first novel was the 1893 bowery tale `` '' , generally considered by critics to be the first work of america literary naturalism .he won international acclaim in 1895 for his civil war novel `` the red badge of courage '' , which he wrote without having any battle experience.in 1896 , crane endured a highly publicized scandal after appearing as a witness in the trial of a suspected prostitute , an acquaintance named dora clark . late that year he accepted an offer to travel to cuba as a war correspondent . as he waited in jacksonville , florida for passage , he met cora taylor , with whom he began a lasting relationship . en route to cubas , crane \"s vessel the ss `` commodore '' sank off the coast of florido , leaving him and others adrift for 30 hours in a dinghy . crane described the ordeal in `` the open boat '' . latethat year he received an offer from a friend named doran clark , late that same he accepted a offer to spend the year in greece . as soon as he arrived in jackmanville , lorida, floridia for passage beginning , he found himself in the midst of a long and difficult period of his life . while in cuba , crane became involved in a dispute with a man named joseph conrad . during the course of his time in germany , crane was involved in an altercation with a woman war correspondent , and later lived in england with her .during the final years of greecy , crane covered conflicts in geece ( accompanied by cora , recognized as the first womanwar correspondent ) and later died in engl with her ; he was befriended by writers such as jose ph conrad and h. g. wells . plagued by financial difficulties and ill health ,"
+      },
+      {
+        "index": 112,
+        "source_words": 246,
+        "source": "the heat index ( hi ) is an index that combines air temperature and relative humidity , in shaded areas , to posit a human-perceived equivalent temperature , as how hot it would feel if the humidity were some other value in the shade . the result is also known as the `` felt air temperature '' , `` apparent temperature '' , `` real feel '' or `` feels like '' . for example , when the temperature is with 70 % relative humidity , the heat index is .the human body normally cools itself by perspiration , or sweating . heat is removed from the body by evaporation of that sweat . however , high relative humidity reduces the evaporation rate . this results in a lower rate of heat removal from the body , hence the sensation of being overheated . this effect is subjective , with different individuals perceiving heat differently for various reasons ( such as differences in body shape , metabolic differences , differences in hydration , pregnancy , menopause , effects of drugs and/or drug withdrawal ) ; its measurement has been based on subjective descriptions of how hot subjects feel for a given temperature and humidity . this results in a heat index that relates one combination of temperature and humidity to another.because the heat index is based on temperatures in the shade , while people often move across sunny areas , the heat index can give a much lower temperature than actual conditions of typical outdoor activities . also , for people exercising or active , at the time , then the heat index could give a temperature lower than the felt conditions .",
+        "reference": "the `` heat index '' ( hi , also `` humiture '' ) is a measurement which combines air temperature and relative humidity as being the human-perceived equivalent temperature — how hot it feels . the result is also known as the `` felt air temperature '' or `` apparent temperature '' . for example , when the temperature is with very high humidity , the heat index can be about .the human body normally cools itself by perspiration , or sweating , which evaporates and carries heat away from the body . however , when the relative humidity is high , then the evaporation rate is reduced , so heat is removed from the body at a lower rate , causing it to retain more heat than it would in dry air . measurements have been taken based on subjective descriptions of how hot subjects feel for a given temperature and humidity , allowing an index to be made which relates one temperature and humidity combination , to another , at a higher temperature in drier air.the heat index was developed in 1978 by george winterling as the `` humiture '' and was adopted by the national weather service a year later . it is derived from work carried out by robert g. steadman . like the wind chill index , the heat index contains assumptions about the human body mass and height , clothing , amount of physical activity , thickness of blood , sunlight and ultraviolet radiation exposure , and the wind speed . large deviations from the typical values will result in heat-index values which do not accurately reflect the perceived temperature.in canada , the similar humidex is used in place of the heat index . the humidex differs from the heat index in using the dew point rather than the relative humidity.the heat index is defined so as to equal the actual air temperature when the partial pressure of water vapor is equal to a baseline value of 1.6 kpa . at standard atmospheric pressure ( 101.325 kpa ) , this baseline corresponds to a dew point of 14 °c ( 57 °f ) and a mixing ratio of 0.01 ( 10 g of water vapor per kilogram of dry air ) . this corresponds to an air temperature of 25°c and relative humidity of 50 % in the sea-level psychrometric chart.at high temperatures , the level of `` relative '' humidity needed to make the heat index higher than the actual temperature is lower than at cooler temperatures . for example , at approximately 27 °c ( 80 °f ) , the heat index will agree with the actual temperature if the relative humidity is 45 % , but at about 43°c ( 110°f ) , any relative-humidity reading above 17 % will make the heat index higher than 43°c ( 110 °f ) .the heat index is calculated only if the actual temperature is above 27 °c ( 80 °f ) , dew point temperatures greater than 12 °c ( 54 °f ) , and relative humidities higher than 40 % . the heat index and humidex figures are based on temperature measurements taken in the shade and not the sun , so extra care must be taken while in the sun.sometimes the heat index and the wind chill are denoted collectively by the single terms `` apparent temperature '' or `` relative outdoor temperature '' .",
+        "finetuned": "the heat index ( hi ) is an index that combines air temperature and relative humidity , in shaded areas , to posit a human-perceived equivalent temperature , as how hot it would feel if the humidity were some other value in the shade . the result is also known as the `` felt air temperature '' , `` apparent temperature '' or `` real feel '' .",
+        "baseline": "the heat index ( hi ) is an index that combines air temperature and relative humidity , in shaded areas , to posit a human-perceived equivalent temperature , as how hot it would feel if the humidity were some other value in the shade . the result is also known as the `` felt air temperature '' , `` apparent temperature'' , `` real feel '' or `` feels like '' . for example , when the temperature is with 70 % relative humidity, the heat index is .the human body normally cools itself by perspiration , or sweating . heat is removed from the body by evaporation of that sweat . however , high relative humidity reduces the evapor rate . this results in a lower rate of heat removal from the bodies , hence the sensation of being overheated . this effect is subjective , with different individuals perceiving heat differently for various reasons ( such as differences in body shape , metabolic differences , differences in hydration , pregnancy , menopause , effects of drugs and/or drug withdrawal ) ; its measurement has been based on subjective descriptions of how hot subjects feel for a given temperature and humidity . this result in a heat index that relates one combination of temperature . this can give a much lower temperature than actual conditions of typical outdoor activities , such as walking or running , or exercising or active , at the time , then the heatindex could give a temperature lower than the felt conditions . [1]The heat index [ edit ]"
+      },
+      {
+        "index": 176,
+        "source_words": 264,
+        "source": "joleon patrick lescott ( born 16 august 1982 ) is an english former professional footballer . he played as a centre back , though he occasionally played in various other positions across the defensive line , including left back . he currently works as a loanee player liaison agent for manchester city , for whom he also played for five seasons.lescott is a graduate of the wolverhampton wanderers youth academy . he made his first-team debut with wolves in 2000 and he was named the supporters ' young player of the year two years running . he was a regular player as the club won promotion to premier league in 2003 , but missed the whole season through injury and they were relegated . he was named in the championship team of the year for the 2005–06 season , and subsequently moved to premier league club everton for a total of £5 million in august 2006 . he was voted player 's player of the season by his teammates in the following two seasons . lescott moved to manchester city in august 2009 for a reported £22 million and spent five seasons at the club , winning two league titles , an fa cup and a league cup . after his release in 2014 , he joined west bromwich albion on a free transfer and aston villa a year later.internationally , lescott represented england at various youth levels before making his senior debut in 2007 against estonia in the uefa euro 2008 qualifiers . he represented the country at uefa euro 2012 , scoring england 's first goal of the tournament in their opening match , a 1–1 draw against france .",
+        "reference": "joleon patrick lescott ( born 16 august 1982 ) is an english footballer who plays for manchester city and the england national football team . he is a defender who can play on the left or in the centre.lescott was born in birmingham . at 17 he began playing for the wolverhampton wanderers . in 2006 he was named in the championship team of the season . he also got the wolves ' player of the year award.lescott was sold to everton at the start of the 2006–07 season . on 8 may 2008 , lescott was voted everton 's player of the year and players player of the year.following the end of the 2008–09 season , manchester city tried to sign lescott . everton said no . on 11 august 2009 , lescott asked to move to manchester city . again everton said no . the manager said lescott had a `` bad attitude '' and did not have him play . then on 25 august 2009 he was traded to manchester city . fans in everton are now angry at lescott for leaving . they boo when he takes the field.on 13 may 2012 lescott helped man city win their first premiership title in 44 years .",
+        "finetuned": "joleon lescott ( born 16 august 1982 ) is an english football player . he plays for aston villa and england national team .",
+        "baseline": "joleon patrick lescott ( born 16 august 1982 ) is an english former professional footballer . he played as a centre back , though he occasionally played in various other positions across the defensive line , including left back . he currently works as a loanee player liaison agent for manchester city , for whom he also played for five seasons.lescott is a graduate of the wolverhampton wanderers youth academy . he made his first-team debut with wolves in 2000 and he was named the supporters ' young player of the year two years running . he was a regular player as the club won promotion to premier league in 2003 , but missed the whole season through injury and they were relegated .he was named in the championship team of the season for the 2005–06 season , and subsequently moved to Premier league club everton for a total of £5 million in august 2006 . he won the league title by his teammates in the following two seasons . he joined the club in the summer of 2007 for a reported £22 million and spent five seasons at the club , winning two league titles , an fa cup and a league cup . after his release in 2014 , he joined west bromwich albion on a free transfer and made his debut for the club against villa a year later.internationally , lescot represented england at various youth levels before making his senior debut in 2007 against estonia in the uefa euro 2008 qualifiers . he represented the country at uefas euro 2012 , scoring england 's first goal of the tournament in their opening match , a 1–1 draw against france . after her release in2014 , he signed west bromewich albie on a trial transfer and then moved to villa in year later, signing for villa over the summer .internationally [ edit ]lescott represents englandAt various youth level before making your senior debut In 2007 against argonia en la province in the Uefa Euro 2008 qualifier . he represent the country At uefA euro 2012 beginning , scoring embland '’s first goals of the quarter in their initial match , A 1– 1 draw against France ."
+      }
+    ],
+    "high_novel_vocabulary": [
+      {
+        "index": 13,
+        "source_words": 11,
+        "source": "granada is a city in spain.granada may also refer to :",
+        "reference": "granada is a city in spain.granada might also mean :",
+        "finetuned": "granada can mean :",
+        "baseline": "granada is a city in spain.granada may also refer to :"
+      },
+      {
+        "index": 15,
+        "source_words": 6,
+        "source": "gig or gig may refer to :",
+        "reference": "a gig is a word that bands use when talking about their live shows . the `` grove dictionary of music and musicians '' defines a gig as `` a term commonly applied to a musical engagement of one night’s duration only ; to undertake such an engagement . ''",
+        "finetuned": "gig could mean :",
+        "baseline": "gig or gig may refer to :"
+      },
+      {
+        "index": 30,
+        "source_words": 36,
+        "source": "anna elisabeth de bruijn ( 1 january 1920 – 3 october 2018 ) , better known by the stage name of elisabeth andersen , was a dutch actress , primarily in theatre . she was a three-time recipient of the theo d'or .",
+        "reference": "anna elisabeth de bruijn ( 1 january 1920 – 3 october 2018 ) , better known by the stage name of elisabeth andersen , was a dutch theatre actress . she was born in the hague . she was a three-time winner of the theo d'or . andersen was known for her work with .andersen died in haarlem on 3 october 2018 at age 98 .",
+        "finetuned": "elisabeth de bruijn ( 1 january 1920 – 3 october 2018 ) , better known by the stage name of elisabeth andersen , was a dutch actress , primarily in theatre . she was a three-time recipient of the theo d'or.andersen was born in amsterdam , netherlands . she studied at the university of amsterdam and at the royal academy of dramatic arts . she also worked as an actress . she appeared in many movies and television programs . her best known roles were in `` the night of the king '' ( 1953 ) , `` the day of the queen '' ( 1956 ) , and `` the last days of the joker '' ( 1958 ) .andersen died on 3october 2018 at the age of 91 .",
+        "baseline": "anna elisabeth de bruijn ( 1 january 1920 – 3 october 2018 ) , better known by the stage name of elisabet andersen , was a dutch actress , primarily in theatre . she was a three-time recipient of the theo d'or ."
+      },
+      {
+        "index": 35,
+        "source_words": 59,
+        "source": "merchtem ( ) is a municipality located in the belgian province of flemish brabant . the municipality comprises the villages of brussegem and hamme , the hamlet of ossel and peizegem , and merchtem proper . on july 9 , 2009 , merchtem had a total population of 15,298 . the total area is 36.72 km² which gives a population density of 416 inhabitants per km² .",
+        "reference": "merchtem is a municipality in the belgian province of flemish brabant.in 2007 , 15053 people lived there.it is at 50° 57 north , 04° 14 east .",
+        "finetuned": "merchtem is a municipality in the belgian province of flemish brabant.in 2007 , 15298 people lived there.it is at 50° 51 north , 04° 39 east .",
+        "baseline": "merchtem ( ) is a municipality located in the belgian province of flemish brabant . the municipality comprises the villages of brussegem and hamme , the hamlet of ossel and peizegem , and merchtem proper . on july 9 , 2009 , merchtem had a total population of 15,298 . the total area is 36.72 km² which gives a population density of 416 inhabitants per km² ."
+      },
+      {
+        "index": 51,
+        "source_words": 19,
+        "source": "asaf `` assi '' dayan ( ; 23 november 1945 – 1 may 2014 ) was an israeli film director , actor , screenwriter , and producer .",
+        "reference": "asaf `` assi '' dayan ( 23 november 1945 – 1 may 2014 ) was an israeli movie director , actor , screenwriter and producer . by 2008 , he had acted in some 50 movies and television series episodes . he was born in nahalal.dayan died on 1 may 2014 in tel aviv . he was 68 .",
+        "finetuned": "asaf `` assi '' dayan ( ; 23 november 1945 – 1 may 2014 ) was an israeli movie director , actor , screenwriter , and producer . he was born in tel aviv , israel.dayan was known for his roles in `` the man in the white suit '' , `` the night of the devil '' , and in `` kathleen '' .dayan died on 1may 2014 in jerusalem at the age of 72 .",
+        "baseline": "asaf `` assi '' dayan ( ; 23 november 1945 – 1 may 2014 ) was an israeli film director , actor , screenwriter , and producer ."
+      },
+      {
+        "index": 54,
+        "source_words": 14,
+        "source": "roquefort-des-corbières is a commune in the aude department in southern france .",
+        "reference": "roquefort-des-corbières is a commune of 664 people ( 1999 ) . it is located in the region languedoc-roussillon in the aude department in the south of france .",
+        "finetuned": "roquefort-des-corbières is a commune of 1,924 people ( 2017 ) . it is in the region occitanie in the aude department in the south of france .",
+        "baseline": "roquefort-des-corbières is a commune in the aude department in southern france ."
+      }
+    ]
+  },
+  "notes": [
+    "Categories are surface heuristics over the cached generations, not human judgements.",
+    "'near_copy_of_source' means >98% of output tokens occur in the source and length is within 10% of it -- i.e. the system effectively declined to edit.",
+    "Reference rows are the human simplifications scored as if they were a system, to give each count a ceiling to be read against.",
+    "corpus_pairing_probe counts documents whose reference is not a simplification of their source at all -- a corpus-quality finding, not a model result."
+  ]
+}

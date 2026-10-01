@@ -1,0 +1,120 @@
+{
+  "run": {
+    "script": "evaluate_document.py",
+    "script_version": "1.1",
+    "step": "4B",
+    "status": "complete",
+    "started_at": "2026-08-21T22:47:03.724586+00:00",
+    "finished_at": "2026-08-22T00:57:24.185812+00:00",
+    "duration_seconds": 7820.5,
+    "git_commit": "cbd5ef6",
+    "device": "cuda"
+  },
+  "models": {
+    "finetuned": {
+      "model_id": "scratch/simplification_results_document/best_checkpoint",
+      "resolved_path": "/home/yunusrenz/simple-website/research/scratch/simplification_results_document/best_checkpoint",
+      "source": "local_path",
+      "weights_bytes": 557912620,
+      "weights_mtime": "2026-08-21T11:46:35.421561+00:00"
+    },
+    "baseline": {
+      "model_id": "facebook/bart-base",
+      "source": "huggingface_hub"
+    },
+    "llm": {
+      "model_id": "qwen2.5:7b-instruct-q4_K_M",
+      "kind": "ollama",
+      "granularity": "whole_sections",
+      "prompt": "document instruction (adaptation of BLESS Prompt 2, not the paper's)",
+      "fewshot_n": 0,
+      "decoding": {
+        "temperature": 1.0,
+        "top_p": 0.9,
+        "num_predict": 1024,
+        "num_ctx": 8192,
+        "stop": [
+          "\nText:",
+          "\nSimplified text:"
+        ]
+      },
+      "seed": 1
+    }
+  },
+  "dataset": {
+    "name": "D-Wikipedia",
+    "citation": "Sun, Jin & Wan (EMNLP 2021)",
+    "split": "test",
+    "references_per_document": 1,
+    "n_evaluated": 2000,
+    "split_total_raw": 8000,
+    "split_total_cleaned": 8000,
+    "mojibake_dropped": 0,
+    "sampled": true,
+    "sample_seed": 42,
+    "sample_indices_sha": "24bccff7db26692b"
+  },
+  "decoding": {
+    "strategy": "beam_search",
+    "num_beams": 4,
+    "no_repeat_ngram_size": 3,
+    "repetition_penalty": 1.2,
+    "max_input_tokens": 512,
+    "max_output_tokens": 512,
+    "batch_size": 16
+  },
+  "scores": {
+    "finetuned": {
+      "BLEU": 27.642806107738853,
+      "SARI": 41.92726284563249,
+      "FKGL": 7.938668533431475,
+      "D-SARI": 34.93317352720594,
+      "BERTScore": 90.61232209205627,
+      "LENS": null
+    },
+    "baseline": {
+      "BLEU": 17.582504328361036,
+      "SARI": 22.27641473272767,
+      "FKGL": 9.656092180367668,
+      "D-SARI": 14.423198525300496,
+      "BERTScore": 88.92617225646973,
+      "LENS": null
+    },
+    "llm": {
+      "BLEU": 13.650458018233907,
+      "SARI": 39.60122410352989,
+      "FKGL": 5.891033928837,
+      "D-SARI": 22.36789688327174,
+      "BERTScore": 88.64415884017944,
+      "LENS": null
+    }
+  },
+  "significance": {
+    "metric": "d_sari",
+    "test": "paired bootstrap over documents",
+    "resamples": 1000,
+    "seed": 42,
+    "p_value": 0.0
+  },
+  "generation_seconds": {
+    "finetuned": 1367.4,
+    "baseline": 2076.8,
+    "llm": 4217.4
+  },
+  "notes": [
+    "D-SARI is the headline metric here; plain SARI is reported only for continuity with the ASSET-based Step 4 numbers and does not model sentence deletion/merging/reordering.",
+    "BERTScore truncates inputs past ~510 tokens.",
+    "Every system's predictions are normalized into D-Wikipedia's own text convention (lowercased, PTB-pre-tokenized) before scoring, because the corpus's sources and references both use it and D-SARI/SARI/BLEU are n-gram metrics. It is NOT a no-op for the seq2seq systems -- it changed ~25% of fine-tuned and ~65% of baseline predictions at n=500 -- and it moves D-SARI by up to ~1 point; see the per-system counts logged above.",
+    "The --llm condition is prompted with the corpus's lowercased, pre-tokenized source text, which is nothing like the web prose it processes in the extension. This likely understates its quality and is not fixable here: the natural-cased original is not in the corpus.",
+    "The --llm condition samples (temperature 1.0, top_p 0.9) while the seq2seq systems use deterministic beam search, so only the former carries run-to-run variance. One seed was run; BLESS aggregates three.",
+    "LENS not computed (lens-metric unavailable in this environment)."
+  ],
+  "significance_llm": {
+    "metric": "d_sari",
+    "test": "paired bootstrap over documents",
+    "resamples": 1000,
+    "seed": 42,
+    "llm_vs_baseline_p": 0.0,
+    "llm_vs_finetuned_p": 1.0
+  }
+}

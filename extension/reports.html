@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simplify — Reports</title>
+  <link rel="stylesheet" href="shared/layers.css" />
+  <link rel="stylesheet" href="shared/toolbar.css" />
+  <!-- report blocks reuse History's page-block styles; reports.css adds the rest -->
+  <link rel="stylesheet" href="shared/history.css" />
+  <link rel="stylesheet" href="shared/reports.css" />
+</head>
+<body>
+  <script src="shared/model-labels.js"></script>
+  <script src="shared/model-selection.js"></script>
+  <script src="shared/demo-pages.js"></script>
+  <script src="shared/picker.js"></script>
+  <script src="shared/toolbar.js"></script>
+  <div class="wrap">
+    <h1>Reports</h1>
+    <p class="subtitle">Runs kept out of the rolling History log: how far each one got, what it
+      produced, and its evaluation. Save one from a run's ⋮ menu on the
+      <a href="history.html">History</a> page.</p>
+    <div class="history-actions">
+      <button id="download-all-reports" class="hist-btn">Download all (JSON)</button>
+      <button id="delete-all-reports" class="hist-btn hist-btn-danger">Delete all</button>
+    </div>
+    <div id="reports-container"></div>
+  </div>
+
+  <div id="page-notice" class="page-notice page-notice-hidden" role="status" aria-live="polite"></div>
+
+  <script src="shared/analysis.js"></script>
+  <script src="shared/report-store.js"></script>
+  <script src="shared/reports.js"></script>
+</body>
+</html>

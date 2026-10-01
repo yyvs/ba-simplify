@@ -1,0 +1,104 @@
+\chapter{Related Work}
+\label{sec:related}
+
+\section{Approaches to text simplification}
+\label{sec:related-baselines}
+
+\paragraph{The comparison simplifier} is an off-the-shelf checkpoint\footnote{\hfmodel{eilamc14/bart-large-text-simplification}} already fine-tuned for simplification, against which the model fine-tuned here is evaluated, a core objective of \cref{rq:comparison}.
+Its architecture is \gls{bart}-large \parencite[7872]{lewis-etal-2020-bart} at 406\gls{million} parameters \parencite[2]{cohen2026simplify}.
+It was fine-tuned not by \gls{bart}'s original authors but by \textcite[1, 4]{cohen2026simplify}, who released it with their comparative study.
+Its training data is the pre-cleaned WikiLarge mirror\footnote{\hfdataset{eilamc14/wikilarge-clean}} this project also trained on, with the prefix \texttt{Simplify:} added to every source sentence \parencite[3--4]{cohen2026simplify}.
+The mechanism is plain supervised fine-tuning, with no control tokens, no auxiliary objective, and no reranking.
+
+Three limitations affect the evaluation for \cref{rq:comparison}:
+Because it shares its training corpus with this project's sentence model, which additionally dropped mojibake rows (\cref{sec:corpus-preparation}), a fractional difference in \gls{sari} between the two says little about either training run (\cref{sec:rq1}).
+Because this project passes inputs without that prefix, the comparison simplifier was scored on inputs formatted differently from its training data (\cref{sec:limitations}).
+And because it was fine-tuned on isolated sentences, it has no document counterpart, so it appears at one granularity only.
+
+\paragraph{Controllable simplification with control tokens} trains a model to follow an explicit request.
+\Gls{access} \parencite[4691]{martin-etal-2020-controllable} is the canonical instance, and its successor \gls{muss} \parencite[1653]{martin-etal-2022-muss} is the baseline \gls{bless} itself uses \parencite[13293]{kew-etal-2023-bless}.
+The architecture is a \gls{seqseq} model, in \gls{muss}'s case \gls{bart}-large.
+The training setup conditions each training pair on attributes computed from the pair itself, such as compression ratio, paraphrase amount, and lexical and syntactic complexity.
+The model thus learns to follow a request instead of producing one fixed style, and at inference the attributes are set to the values the output should have.
+
+\pagebreak
+
+The limitation that matters here is that the control tokens are proxies \parencite[4691]{martin-etal-2020-controllable}: the model is conditioned on a measured attribute of the source--target pair, and nothing at inference checks that the property was achieved in the output.
+The prompted \gls{llm} approach of this thesis asks for control through the audience parameter instead of training it in.
+It inherits that limitation: nothing in this thesis tests whether the audience parameter helps the audience it names.
+
+\paragraph{Prompted \glspl{llm}} are represented here by \gls{bless} \parencite[13291]{kew-etal-2023-bless}, from which the third approach of this thesis takes its prompt.
+It evaluates 44 models, open- and closed-weight, differing in size, architecture, pretraining methods, and accessibility.
+The setup is few-shot in-context learning on three test sets from different domains, namely Wikipedia, news, and medical texts, with three stylistically distinct prompts.
+Each prompt carries three demonstrations drawn at random from the dataset's validation split \parencite[13293]{kew-etal-2023-bless}.
+Outputs are sampled (nucleus sampling with \(\text{\gls{topp}} = 0.9\), temperature~\num{1.0}, at most \num{100}~tokens) under three random seeds \parencite[13293]{kew-etal-2023-bless}.
+No model is fine-tuned; the task is given only through the prompt.
+\Gls{bless}'s best models perform comparably with dedicated trained simplification baselines \parencite[13291]{kew-etal-2023-bless}.
+A prompted model is therefore a demanding comparison for the 139\gls{million}-parameter model fine-tuned here.
+
+Two limitations of \gls{bless} matter here.
+It is sentence-only, so its results do not cover documents.
+It leaves the study of in-context learning strategies for simplification to future work \parencite[13293]{kew-etal-2023-bless}, which is why the demonstrations here are fixed (\cref{sec:method-three}).
+
+\paragraph{Document-level simplification} supplies both the corpus and the metric on which the document results rest.
+\textcite[7999]{sun-etal-2021-document} assembled D-Wikipedia from aligned English and Simple English Wikipedia articles, keeping only the lead section of each.
+The authors evaluated it with four baselines (a vanilla Transformer, the context-conditioned sentence simplifier SUC, BertSumextabs, and \gls{bart}) \parencite[8003]{sun-etal-2021-document}.
+They also introduced \gls{dsari} to score it \parencite[8002]{sun-etal-2021-document}.
+
+Like the fine-tuned document checkpoint here, SimDoc \parencite[1, 3]{vasquezrodriguez2024simple} fine-tunes a pretrained \gls{seqseq} model on document pairs.
+SimDoc uses \gls{tfive}, fine-tuned on professionally created simplification corpora extended into (complex text, simple text, readability label) triples.
+A combined loss joins simplification, readability classification, and a coherence reward, steered by task tokens in the input.
+The models fine-tuned in this thesis have no coherence objective (\cref{sec:future-work}).
+
+\pagebreak
+
+\section{Browser-based deployment}
+\label{sec:related-browser}
+
+The closest deployed system to this one is the on-device Firefox simplifier of \textcite[105]{romero-etal-2025-efficient}.
+It runs \gls{bart}-base \parencite[107]{romero-etal-2025-efficient}, quantised for in-browser execution.
+It is deployed through \texttt{transformers.js} so that inference runs inside the browser process itself.
+The model is trained on a synthetic corpus of \num{2909} examples generated by prompting \glspl{llm}, which its authors report as outperforming the \num{300}\gls{thousand}-example WikiLarge corpus on standard benchmarks \parencite[105]{romero-etal-2025-efficient}.
+A single control token sets the target reading level, in place of the multi-token \gls{access} scheme.
+However, separate models trained for one reading level each outperform that control-token model \parencite[110]{romero-etal-2025-efficient}.
+The authors find that quantisation reduces model size by up to \qty{75}{\percent} with little performance degradation \parencite[105]{romero-etal-2025-efficient}, so a simplification model may be served entirely on a user's device.
+
+Unlike the Firefox simplifier, the extension built here calls a local backend service instead of running the model in the browser process.
+Both arrangements keep inference on the user's own machine, which is the axis the privacy argument of \cref{sec:architecture} turns on.
+\textcite{romero-etal-2025-efficient} report quality on standard sentence benchmarks, so their work makes no claim about behaviour on authentic pages, which is the question \cref{rq:deployment} asks.
+
+\section{Behavioural robustness beyond held-out accuracy}
+\label{sec:related-robustness}
+
+The deployment half of this thesis takes its framing from CheckList \parencite[4902]{ribeiro-etal-2020-beyond}, a behavioural testing methodology.
+It borrows from behavioural testing in software engineering, takes as its input a task-agnostic matrix of linguistic capabilities crossed with test types, generates many test cases from templates and lexicons, and reports a failure rate per test.
+
+It distinguishes three test types \parencite[4902--4903]{ribeiro-etal-2020-beyond}: minimum functionality tests for a targeted behaviour, invariance tests for perturbations that should not change the prediction, and directional expectation tests for perturbations whose effect is known in advance.
+Held-out accuracy is the standard measure of generalisation, but it often overestimates real performance, because held-out sets often carry the same biases as the training data \parencite[4902]{ribeiro-etal-2020-beyond}.
+\textcite[4906, 4910]{ribeiro-etal-2020-beyond} present CheckList as a complement to benchmarks, not a replacement; passing its tests does not imply that a model is free of the tested failure.
+
+The site audit of \cref{sec:deployment-results} is a robustness study in that sense.
+The deployment adds a structural constraint to the linguistic ones: a simplification system that edits a live page must write text back into a document whose markup, links, attributes, and interactive elements survive the edit.
+
+\section{Research hypotheses and expectations}
+\label{sec:hypotheses}
+
+Four hypotheses follow from the work reviewed above: two on the comparisons that the design of \cref{sec:methodology-i} sets up (\Cref{hyp:finetuning}, \Cref{hyp:llm-vs-finetuned}), one on how the metrics rank the compared outputs (\Cref{hyp:metrics}), and one on the deployment (\Cref{hyp:web}).
+All four assume that findings reported for other systems carry over to the ones used here, and each is stated with the result that would refute it.
+
+\begin{hypotheses}
+	\item\label{hyp:finetuning} Fine-tuning a pretrained \gls{seqseq} model on task-matched parallel data improves simplification-specific metrics over the same checkpoint before fine-tuning, the one contrast in the grid that holds architecture and scale fixed.
+	This is the premise of the fine-tuned systems of \cref{sec:related-baselines}, among them \gls{muss}, which fine-tunes \gls{bart} on mined paraphrases and, in its supervised variant, on labelled simplification data \parencite[1652--1653]{martin-etal-2022-muss}.
+	\Cref{hyp:finetuning} fails if the paired bootstrap finds the \gls{sari} or the \gls{dsari} improvement not significant at \(\gls{pval} < 0.05\).
+	\item\label{hyp:llm-vs-finetuned} A prompted instruction-tuned \gls{llm} of a recent generation matches or exceeds a fine-tuned model, since \gls{bless} finds that its best models perform comparably with trained simplification baselines \parencite[13291]{kew-etal-2023-bless}.
+	At each granularity, \cref{hyp:llm-vs-finetuned} holds if a prompted model scores at or above the fine-tuned checkpoint on every metric compared there (\gls{sari} on ASSET at sentence level; \gls{dsari} and \gls{lens} on D-Wikipedia at document level), fails if every prompted model scores below it on all of them, and remains open if the metrics disagree.
+	\item\label{hyp:metrics} Reference-overlap and simplification-specific metrics rank the same outputs differently, because \gls{bleu} leaves latitude for matching the input while \gls{sari} scores additions, kept \glspl{ngram} and deletions against both the source and the references \parencite[404--405]{xu-etal-2016-optimizing}.
+	\Cref{hyp:metrics} fails if \gls{bleu} and \gls{sari} order the five sentence-level conditions the same way.
+	\item\label{hyp:web} Behaviour on authentic web pages diverges from benchmark behaviour, since held-out accuracy often overestimates real performance \parencite[4902]{ribeiro-etal-2020-beyond} and web pages supply units that no benchmark contains (\cref{sec:background-web}).
+	\Cref{hyp:web} is tested qualitatively: it fails if every failure class the site audit finds also appears in the benchmark evaluation.
+\end{hypotheses}
+
+\paragraph{How the hypotheses are tested.}
+\Cref{hyp:finetuning,hyp:llm-vs-finetuned} are tested across the sentence-level configurations and document-level runs detailed in \cref{sec:methodology-i}.
+\Cref{hyp:metrics} is evaluated on the five sentence-level conditions within the same chapter.
+Finally, \cref{hyp:web} is tested via the deployment site audit described in \cref{sec:methodology-ii}.

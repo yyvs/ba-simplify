@@ -1,0 +1,59 @@
+[
+  {
+    "split": "train",
+    "raw_rows": 123862,
+    "dropped_mojibake_rows": 6206,
+    "kept_rows": 117656,
+    "vocab_size": 123188,
+    "source_length_words": {
+      "mean": 26.1,
+      "median": 24.0,
+      "min": 4,
+      "max": 80
+    },
+    "target_length_words": {
+      "mean": 18.0,
+      "median": 16.0,
+      "min": 2,
+      "max": 76
+    }
+  },
+  {
+    "split": "validation",
+    "raw_rows": 417,
+    "dropped_mojibake_rows": 20,
+    "kept_rows": 397,
+    "vocab_size": 3933,
+    "source_length_words": {
+      "mean": 27.0,
+      "median": 25,
+      "min": 4,
+      "max": 75
+    },
+    "target_length_words": {
+      "mean": 19.2,
+      "median": 17,
+      "min": 2,
+      "max": 66
+    }
+  },
+  {
+    "split": "test",
+    "raw_rows": 121,
+    "dropped_mojibake_rows": 0,
+    "kept_rows": 121,
+    "vocab_size": 1328,
+    "source_length_words": {
+      "mean": 21.8,
+      "median": 21,
+      "min": 10,
+      "max": 46
+    },
+    "target_length_words": {
+      "mean": 16.6,
+      "median": 16,
+      "min": 5,
+      "max": 36
+    }
+  }
+]

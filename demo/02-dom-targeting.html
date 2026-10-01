@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo 02 — DOM targeting</title>
+    <link rel="stylesheet" href="demo.css" />
+  </head>
+  <body>
+    <nav class="demo-nav">
+      <a href="index.html" translate="no" class="notranslate"
+        >← back to index</a
+      >
+    </nav>
+    <h1>02 — DOM targeting</h1>
+    <p class="meta notranslate">
+      Covers the tag categories added 2026-07-13 (see
+      <code>shouldSimplifyElement()</code> and <code>BLOCK_TAGS</code> in
+      <code>extension/content.js</code>). Toggle the extension and check each
+      case below.
+    </p>
+
+    <section class="case">
+      <p class="meta notranslate">Expected: every heading level simplifies.</p>
+      <h2>The intricacies of municipal wastewater infrastructure</h2>
+      <h3>An examination of subterranean pipe deterioration</h3>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: each <code>&lt;li&gt;</code> simplifies independently; the
+        <code>&lt;ul&gt;</code> itself is never sent (it's structurally inert
+        once it contains list items — see the <code>BLOCK_TAGS</code> comments
+        in <code>extension/content.js</code>).
+      </p>
+      <ul>
+        <li>
+          Prospective participants must submit documentation prior to the
+          stipulated deadline.
+        </li>
+        <li>
+          Subsequent amendments to the agreement require unanimous consent of
+          all signatories.
+        </li>
+      </ul>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: each <code>&lt;td&gt;</code> simplifies independently; the
+        <code>&lt;table&gt;</code>/<code>&lt;tr&gt;</code> themselves are never
+        sent.
+      </p>
+      <table>
+        <tr>
+          <th>Category</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>Remuneration</td>
+          <td>
+            Compensation disbursed in exchange for the performance of contracted
+            duties.
+          </td>
+        </tr>
+      </table>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: semantic sectioning elements
+        (header/main/section/article/aside/footer) each get their own inner text
+        simplified via whichever leaf element they contain — here that's the
+        nested paragraphs, not the wrapper itself.
+      </p>
+      <article>
+        <header><h3>An article header</h3></header>
+        <p>
+          Notwithstanding prior communications, the committee has elected to
+          postpone deliberation until further notice.
+        </p>
+        <aside>
+          Incidentally, this tangential remark is likewise eligible for
+          simplification.
+        </aside>
+        <footer>
+          Published under the auspices of the aforementioned committee.
+        </footer>
+      </article>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: simplifies as one cohesive unit —
+        <code>&lt;blockquote&gt;</code> directly holds the text here (no nested
+        <code>&lt;p&gt;</code>), so it qualifies as its own leaf.
+      </p>
+      <blockquote>
+        Individuals who fail to prepare are, by implication, preparing to fail.
+      </blockquote>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: <code>&lt;figcaption&gt;</code> and
+        <code>&lt;summary&gt;</code> simplify like any other block leaf.
+      </p>
+      <figure>
+        <figcaption>
+          A photographic representation of the aforementioned apparatus.
+        </figcaption>
+      </figure>
+      <details>
+        <summary>Click to expand supplementary explanatory material.</summary>
+        <p>The underlying rationale is elaborated upon herein.</p>
+      </details>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: simplifies as one sentence; bold/italic/etc. formatting
+        survives on the same words after simplification (word alignment may
+        shift, but the tags themselves should still wrap real words, not
+        vanish).
+      </p>
+      <p>
+        The <strong>fundamental</strong> objective is to
+        <em>substantially</em> ameliorate the
+        <mark>overall comprehensibility</mark> of the disseminated material.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: only the innermost <code>&lt;p&gt;</code> is sent — the
+        wrapping <code>&lt;div&gt;</code>s are never separately fetched (open
+        devtools Network tab and confirm there's exactly one
+        <code>/simplify</code> request for this case, not four).
+      </p>
+      <div>
+        <div>
+          <div>
+            <p>
+              Regardless of the aforementioned constraints, the working group
+              shall reconvene at a subsequently determined juncture.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: this bare <code>&lt;div&gt;</code> (no nested block elements)
+        is itself the leaf and simplifies directly.
+      </p>
+      <div>
+        Herein lies a directly-held text node with no intervening paragraph
+        wrapper whatsoever.
+      </div>
+    </section>
+  </body>
+</html>

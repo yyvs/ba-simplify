@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simplify — History</title>
+  <link rel="stylesheet" href="shared/layers.css" />
+  <link rel="stylesheet" href="shared/toolbar.css" />
+  <link rel="stylesheet" href="shared/history.css" />
+</head>
+<body>
+  <script src="shared/model-labels.js"></script>
+  <script src="shared/model-selection.js"></script>
+  <script src="shared/demo-pages.js"></script>
+  <script src="shared/picker.js"></script>
+  <script src="shared/toolbar.js"></script>
+  <div class="wrap">
+    <h1>Simplification History</h1>
+    <p class="subtitle">Review the last 20 pages you've simplified: what ran on each page, how it went, and for every row the text sent to the backend, what the model returned, and the output the page ended up with.</p>
+    <div class="history-actions">
+      <button id="download-all" class="hist-btn">Download all (JSON)</button>
+      <button id="delete-all" class="hist-btn hist-btn-danger">Delete all</button>
+    </div>
+    <div id="history-container"></div>
+  </div>
+
+  <div id="page-notice" class="page-notice page-notice-hidden" role="status" aria-live="polite"></div>
+
+  <div id="compare-modal" class="compare-modal hidden" aria-hidden="true">
+    <div class="compare-panel" role="dialog" aria-modal="true" aria-labelledby="compare-title">
+      <div class="compare-header">
+        <h2 id="compare-title">Compare simplification</h2>
+        <button id="compare-close" class="hist-btn" type="button">Close</button>
+      </div>
+      <div class="compare-controls">
+        <label for="compare-model">Model</label>
+        <select id="compare-model"></select>
+        <button id="compare-run" class="hist-btn primary" type="button">Run comparison</button>
+      </div>
+      <div id="compare-status" class="compare-status"></div>
+      <div id="compare-results" class="compare-results"></div>
+    </div>
+  </div>
+
+  <div id="analyze-modal" class="compare-modal hidden" aria-hidden="true">
+    <div class="compare-panel" role="dialog" aria-modal="true" aria-labelledby="analyze-title">
+      <div class="compare-header">
+        <h2 id="analyze-title">Analyze simplification</h2>
+        <button id="analyze-close" class="hist-btn" type="button">Close</button>
+      </div>
+
+      <div id="analyze-summary" class="analyze-summary"></div>
+
+      <div class="compare-controls">
+        <button id="analyze-run" class="hist-btn primary" type="button">Run advanced analysis</button>
+      </div>
+
+      <div id="analyze-status" class="compare-status"></div>
+      <div id="analyze-results" class="compare-results analyze-results"></div>
+    </div>
+  </div>
+
+  <script src="shared/analysis.js"></script>
+  <script src="shared/report-store.js"></script>
+  <script src="shared/history.js"></script>
+</body>
+</html>

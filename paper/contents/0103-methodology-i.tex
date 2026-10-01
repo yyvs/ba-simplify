@@ -1,0 +1,276 @@
+\chapter{Methodology I: Simplification Approaches}
+\label{sec:methodology-i}
+
+\section{Comparison design}
+\label{sec:comparison-design}
+
+The comparison is built as a grid of three approaches against two granularities.
+The approaches are the comparison simplifier, a \gls{seqseq} model fine-tuned for this project, and an open-weight instruction-tuned \gls{llm} steered by a prompt; the granularities are the sentence and the document.
+
+To answer \cref{rq:comparison}, the trained model is compared with two checkpoints.
+\begin{enumerate}
+	\item The \textbf{untuned checkpoint} is the \gls{bart}-base model before fine-tuning.
+	\item The \textbf{comparison simplifier} is the off-the-shelf third-party fine-tuned model described in \cref{sec:related-baselines}.
+	      It is roughly three times as large and was trained on the same WikiLarge corpus.
+\end{enumerate}
+
+The fine-tuned model on sentence-level and the comparison simplifier therefore differ mainly in model size and in their fine-tuning runs, which were set up independently.
+There is no document counterpart, since the comparison simplifier was fine-tuned on single sentences (\cref{sec:related-baselines}).
+
+\section{Corpus assessment and preparation}
+\label{sec:corpus-preparation}
+
+\Cref{tab:corpora} specifies the five assessed corpora and the decision taken on each.
+
+\begin{table}[!tb]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{3pt}
+	\caption{Corpus Assessment and Selection Decisions}
+	\label{tab:corpora}
+	\begin{tabular}{@{}P{1.9cm}P{3.2cm}P{4.3cm}P{2.6cm}@{}}
+		\toprule
+		\textbf{Corpus (unit)}            & \textbf{Rows as used here}                                                                                     & \textbf{Convention and alignment}                                                                                               & \textbf{Decision}                                                           \\
+		\midrule
+		WikiLarge\newline (sent.~pairs)   & \num{121657} / 410 / 121 filtered; \num{123862} / 417 / 121 raw; source \glstext{p90} \({\approx}52\)~tokens   & natural case; doubly-encoded characters in a minority of rows; automatic, aggregates earlier collections, among them \gls{pwkp} & \textbf{Adopted} for sentence-level training                                \\
+		\addlinespace
+		WikiSmall\newline (sent.~pairs)   & \({\approx}89\text{\gls{thousand}}\) pairs in the distribution inspected; splits unused                        & named-entity placeholders throughout (\texttt{PERSON@1}); automatic, sentence-level \gls{tfidf}                                 & \textbf{Rejected} on named-entity anonymisation                             \\
+		\addlinespace
+		D-Wikipedia\newline (doc.~pairs)  & \num{131739} train (filtered); \num{8000} test; mean 180, median 120, \glstext{p95} 510, max \num{1168} tokens & lowercased, Penn-Treebank pre-tokenised, one document per line; automatic                                                       & \textbf{Adopted} for document-level training                                \\
+		\addlinespace
+		SWiPE\newline (doc.~pairs)        & \({\approx}145\text{\gls{thousand}}\) pairs; splits unused                                                     & automatic, with human edit-category annotation                                                                                  & \textbf{Rejected}; built for classifying edit types, not for plain training \\
+		\addlinespace
+		ASSET\newline (sent., multi-ref.) & no train split; validation used for demonstrations; 359 test                                                   & natural case; human rewrites, ten per source sentence                                                                           & \textbf{Adopted} for sentence-level evaluation only                         \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		All corpora are English only; counts describe the distributions used here, not the corpora as published: \textcite[589]{zhang-lapata-2017-sentence} report \num{296402} pairs for WikiLarge.
+		Lengths are source lengths in tokens; D-Wikipedia's come from a sample of \num{1500} source documents, and its validation split and the two rejected corpora were not profiled.
+		Sources, in table order: \parencites{zhang-lapata-2017-sentence}{zhu-etal-2010-monolingual}{sun-etal-2021-document}{laban-etal-2023-swipe}{alva-manchego-etal-2020-asset}.
+	}
+\end{table}
+
+\paragraph{The WikiSmall distribution\protect\footnote{\hfdataset{cestwc/adapted-wikismall}} was rejected on inspected evidence.}
+Throughout its text named entities are replaced by placeholders such as \texttt{PERSON@1} and \texttt{LOCATION@1}.
+A model trained on such pairs would learn to produce placeholders where a page has names.
+The placeholders appear to be a property of this distribution rather than of the original corpus: \textcite[1354]{zhu-etal-2010-monolingual} describe no named-entity replacement step for \gls{pwkp}, the corpus distributed as WikiSmall.
+They most likely come from the release of \textcite[588--589]{zhang-lapata-2017-sentence}, who replaced named entities with tokens such as \texttt{PER@1} and whose WikiSmall training set has \num{89042} pairs, the size of the distribution inspected here.
+
+\paragraph{SWiPE\protect\footnote{\ghrepo{salesforce/simplification}} was rejected as built for a different question.}
+It pairs English and Simple English Wikipedia pages reconstructed from their revision histories, with a subset of about \num{5000} pairs annotated for 19 categories of edits \parencite[10674--10675]{laban-etal-2023-swipe}.
+That annotation serves the classification of edit types, whereas flat document pairs were needed for the \gls{seqseq} training.
+
+\pagebreak
+
+\paragraph{A pre-cleaned WikiLarge mirror was adopted, but it required further cleaning.}
+The mirror is the one introduced in \cref{sec:related-baselines}; its curator had already deduplicated it and filtered it by token length, compression ratio, and lexical similarity \parencite[3--4]{cohen2026simplify}.
+One defect survived that filtering: mojibake, the doubly-encoded byte sequences produced when UTF-8 text is decoded as Latin-1 somewhere in an alignment pipeline.
+Affected rows are dropped rather than repaired, since the standard repair tool, \texttt{ftfy}, does not recognise this pattern: the broken byte sequences are no longer contiguous.
+
+Two filters exist (\cref{tab:corpus-rows}).
+A strict filter drops any row containing a bare \texttt{\^{a}} or \texttt{\~{A}}, while a targeted one matches seven specific broken sequences.
+The strict filter drops every row the targeted one drops, plus \num{4001} further training rows (\qty{3.3}{\percent}) that inspection identified as mojibake the targeted patterns miss.
+A spot check found legitimate accented text surviving the strict filter.
+The deployed sentence checkpoint was trained under the targeted filter, while the corpus statistics in the repository's data statement (\path{research/data/README.md} and \path{stats.json}) are those of the strict filter.
+
+\begin{table}[htbp]
+	\centering
+	\small
+	\caption{Comparison of WikiLarge Split Sizes Under the Two Mojibake Filters}
+	\label{tab:corpus-rows}
+	\begin{tabular}{@{}lrrr@{}}
+		\toprule
+		\textbf{Split} & \textbf{Raw}                          & \textbf{Strict filter}                                              & \textbf{Targeted filter}                                            \\
+		\midrule
+		train          & \({\approx}123\text{\gls{thousand}}\) & \({\approx}117\text{\gls{thousand}}\) \ (kept \qty{95.0}{\percent}) & \({\approx}121\text{\gls{thousand}}\) \ (kept \qty{98.2}{\percent}) \\
+		validation     & 417                                   & 397 \ (kept \qty{95.2}{\percent})                                   & 410 \ (kept \qty{98.3}{\percent})                                   \\
+		test           & 121                                   & 121 \ (kept \qty{100}{\percent})                                    & 121 \ (kept \qty{100}{\percent})                                    \\
+		\midrule
+		all splits     & \({\approx}124\text{\gls{thousand}}\) & \({\approx}118\text{\gls{thousand}}\) \ (kept \qty{95.0}{\percent}) & \({\approx}122\text{\gls{thousand}}\) \ (kept \qty{98.2}{\percent}) \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		Percentages are of the raw split.
+		Exact training-row counts are \num{123862} raw, \num{117656} strict and \num{121657} targeted.
+	}
+\end{table}
+
+\paragraph{D-Wikipedia needed its own loader.}
+It is distributed not through the \gls{hf} Hub but as raw files from the paper's own repository, with the training split in a compressed archive.
+The cleaning code was reused unmodified, since it operates on whole strings regardless of whether a string is one sentence or one article.
+The two granularities' corpora were therefore prepared identically, additionally they supply their pairs in the same flat source--target form.
+
+\paragraph{Three scope tiers bound the cost of each run.}
+The pipeline defines them at both granularities: \num{200} rows (\texttt{prove\_loop}), \num{20000} rows (\texttt{reduced}) and the entire cleaned split (\texttt{full}), so that every configuration runs on \num{200} rows before compute is spent on the full split.
+
+\section{Fine-tuning sequence-to-sequence models}
+\label{sec:finetuning}
+
+Both fine-tuned checkpoints start from \gls{bart}-base \parencite[7872]{lewis-etal-2020-bart} and were trained with the \texttt{Seq2SeqTrainer} of the Transformers library \parencite{wolf-etal-2020-transformers}.
+Their data collator sets \texttt{label\_pad\_token\_id=-100}, which excludes padding from the loss.
+The two granularities share the entire pipeline (tokenisation, trainer setup, decoding, and significance testing), and a single flag selects the dataset structure.
+Differences between the granularities' results should therefore come from the data, not from the implementation.
+
+Early stopping after four evaluations without improvement was enabled, as was selection of the best checkpoint by validation loss.
+The trainer evaluated every quarter epoch and saved a checkpoint once per epoch.
+The sentence-level run shows the selection working, since epoch~4 was selected over epoch~5 (\num{0.4568} against \num{0.4590}).
+Because evaluation and saving run at different intervals, the best validation loss the trainer records may fall at a step for which no checkpoint exists.
+In that case, the figure quoted is the one the selected weights record.
+Since \qty{19.02}{\percent} of the WikiLarge validation split also appears in the training data (\cref{sec:corpus-results}), the validation losses reported here are training diagnostics, not estimates of generalisation.
+Checkpoint selection is unaffected, because every checkpoint is scored on the same validation split.
+
+\paragraph{The length limits follow the training setup and the measured document lengths.}
+The sentence models generate with \texttt{max\_length=64}, the value their fine-tuning used, which aligns inference with training at the cost of cutting off any output longer than 64~tokens.
+The \gls{p90} of the source length is \({\approx}52\)~tokens.
+The document models use an input cap of \num{512}~tokens, chosen from the measured token-length distribution of the training corpus under the available memory budget (\cref{fig:doclen}).
+\Gls{bart}'s positional limit is \num{1024}~tokens.
+\Cref{sec:granularity-findings} uses the same distribution to decide whether page sections are merged into one document input.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fig_doclen_distribution.pdf}
+	\caption{Source-Document Length Distribution Relative to the \num{512}-Token Input Cap}
+	\label{fig:doclen}
+	\note{
+		The six markers are measured quantiles; the curve joining them is a monotone interpolation, not measured data.
+	}
+\end{figure}
+
+\paragraph{The training configuration depends on the device} (\cref{tab:training-config}).
+On Apple Silicon, dynamic per-batch padding let reserved memory grow past \qty{13}{\glsxtrshort{gib}} within roughly a hundred steps, against \({\approx}\qty{4.5}{\glsxtrshort{gib}}\) with fixed-length padding.
+Sentence training on Apple Silicon therefore uses fixed padding, gradient accumulation, and gradient checkpointing.
+At document level, the progress estimate of a full-scope run exceeded the session cap of the hosted Google Colab tier \parencite{google2026colabfaq}, the full-scope run therefore was completed on an RTX~A5000 in under \qty{3}{\hour}.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{4pt}
+	\caption{Training Configuration by Granularity, Scope, and Device}
+	\label{tab:training-config}
+	\begin{tabular}{@{}lccccl@{}}
+		\toprule
+		\textbf{Granularity; scope}      & \textbf{Rows}                                           & \textbf{Epochs} & \textbf{Batch} & \textbf{max\_len} & \textbf{Device} \\
+		\midrule
+		sentence; \texttt{prove\_loop}   & 200                                                     & 1               & 8              & 64                & MPS             \\
+		sentence; \texttt{reduced}       & \({\approx}20\text{\gls{thousand}}\)                    & 2               & 16             & 64                & MPS             \\
+		\textbf{sentence; \texttt{full}} & \textbf{\boldmath\({\approx}121\text{\gls{thousand}}\)} & \textbf{5}      & \textbf{16}    & \textbf{64}       & \textbf{CUDA}   \\
+		document; \texttt{reduced}       & \({\approx}20\text{\gls{thousand}}\)                    & 2               & 8              & 512               & CUDA            \\
+		\textbf{document; \texttt{full}} & \textbf{\boldmath\({\approx}131\text{\gls{thousand}}\)} & \textbf{5}      & \textbf{32}    & \textbf{512}      & \textbf{RTX}    \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		Bold marks the two deployed checkpoints (exact row counts: \Cref{tab:corpus-rows}).
+		Devices are \gls{mps} on Apple Silicon, CUDA on a hosted Google Colab T4 in \gls{fp16}, and RTX on an RTX~A5000 in \gls{bf16}.
+		All runs share a learning rate of \num{3e-5}, weight decay~\num{0.01}, seed~42, early stopping with patience~4, and best checkpoint by validation loss.
+	}
+\end{table}
+
+\paragraph{Decoding is by beam search, and the checkpoints are published.}
+All reported \gls{seqseq} numbers use beam search (\texttt{num\_beams=4}, \texttt{no\_repeat\_ngram\_size=3}, \texttt{repetition\_penalty=1.2}).
+Beam search explores several candidate continuations in parallel instead of committing to the locally most probable token at each step \parencite[224--225]{tunstall2023natural}.
+One early run was logged as \emph{greedy} but passed no decoding arguments, so it used the checkpoint's own four-beam configuration.
+A true greedy run was added afterwards, and the three runs span \num{0.26}~\gls{sari} (\cref{sec:sentence-results}).
+
+Three checkpoints are published on the \gls{hf} Hub, with model cards recording configuration, metrics, and limitations.
+At sentence level, the published checkpoint\footnote{\hfmodel{yunvs/bart-base-wikilarge-simplification}} is the deployed sentence checkpoint.
+At document level, both the reduced-scope\footnote{\hfmodel{yunvs/bart-base-dwikipedia-simplification}} and the full-scope\footnote{\hfmodel{yunvs/bart-base-dwikipedia-simplification-full}} checkpoints are published.
+The full-scope checkpoint is the one the document results report and the backend serves.
+
+\section{Prompted open-weight language models}
+\label{sec:method-three}
+
+\paragraph{Only open-weight \glspl{llm} were considered.}
+A hosted \gls{api} would void the local-processing constraint of \cref{sec:architecture}.
+The constraint has a known cost, since \textcite[13291]{kew-etal-2023-bless} report that closed-weight models provide significant gains over open-weight ones under few-shot prompting.
+A local Ollama server \parencite{ollama-docs-api} serves the model in 4-bit quantised GGUF form, a model file format Ollama imports \parencite{ollama-docs-import}.
+At roughly \qty{4.7}{\glsxtrshort{gb}}, the quantised 7\gls{billion} model fits alongside the \gls{bart} checkpoints on a \qty{16}{\glsxtrshort{gb}} machine, which the roughly \qty{14}{\glsxtrshort{gb}} half-precision version would not.
+Two instruction-tuned models of the Qwen2.5 family \parencite[1]{qwen2024qwen25} were evaluated, one with 7\gls{billion}\footnote{\ollamamodel{qwen2.5:7b-instruct-q4_K_M}} and one with 3\gls{billion}\footnote{\ollamamodel{qwen2.5:3b-instruct-q4_K_M}} parameters.
+The backend sends the prompted model one request at a time, so the prompted approach runs at a batch size of one.
+It does not use the batching the \gls{seqseq} checkpoints rely on, which may have limited its throughput (\cref{sec:runtime}).
+
+\paragraph{The sentence prompt is \gls{bless} Prompt~2 with an audience slot.}
+It reproduces the prompt verbatim \parencite[13294]{kew-etal-2023-bless}, with one change: the hard-coded audience \emph{non-native speakers of English} becomes a slot that holds one of five audience values, such as \emph{children aged 8 to 12}.
+The original phrase is the default.
+\Cref{app:prompts} gives the exact template, the audience values, and the decoding settings.
+
+ASSET's references were written under instructions for non-native speakers of English, the instructions \gls{bless}'s Prompt~2 repurposes \parencite[13294]{kew-etal-2023-bless}.
+Pairing them with an instruction to simplify for children would set the demonstrations against the instruction.
+Each audience therefore has its own demonstration pool: ASSET pairs for the default audience and hand-authored pairs for the other four (\cref{app:demos}).
+
+\paragraph{The default demonstrations are fixed and pass four selection rules.}
+\Gls{bless} samples its demonstrations at random and leaves the study of in-context learning strategies open (\cref{sec:related-baselines}).
+Here, the same three demonstrations are used in every run: ASSET validation indices 285, 1516, and 1116 (\cref{app:demos}).
+They were selected by four rules.
+The first is a random draw at seed~42; the other three are filters, each added after an observed defect:
+\begin{itemize}
+	\item the source has at least 20~words, so that at least one demonstration can show a sentence split;
+	\item the reference is well-formed, which excludes pairs with crowdworker punctuation typos;
+	\item at least half of the reference's content words occur in the source.
+\end{itemize}
+The last filter excluded an ASSET reference that is fluent and well punctuated but has a different meaning from its source, the kind of misalignment \textcite[285]{xu-etal-2015-problems} found in \qty{17}{\percent} of \num{200} sampled \gls{pwkp} pairs.
+Together, the three demonstrations show all three operations the instruction names (paraphrasing, compression, and splitting).
+None of the three demonstrations occurs in the WikiLarge training data.
+
+\paragraph{Failed outputs are classified by reason code.}
+The output check of the prompted approach, one of the guards described in \cref{sec:guards}, returns a \emph{reason code} instead of a pass or fail.
+Some codes cover failures typical of a prompted \gls{llm}, such as prompt echo and refusal.
+The others cover failures any generator can produce: empty output, output without words, degenerate repetition, over-long output, unrelated short output, timeout, and error.
+
+The counts per code feed the error categorisation directly.
+When the check fails, the original text is kept, so a bad output leaves the sentence unsimplified.
+Output identical to the input does not count as a failure: copying the source is a documented behaviour on this task \parencite[13298]{kew-etal-2023-bless}.
+Such output is therefore measured and reported per condition as the unchanged rate.
+
+\pagebreak
+
+\paragraph{The document prompt adapts the sentence prompt.}
+\Gls{bless} is sentence-only, so what carries over is the prompt's structure.
+\Cref{app:prompts} prints the adapted template beside the original.
+Three differences are recorded: merging and reordering are added to the permitted operations; the output is constrained to continuous prose with no preamble, headings, or bullet points; and the frame is \texttt{Text:}/\texttt{Simplified text:} instead of \texttt{Complex:}/\texttt{Simple:}.
+The document prompt carries no demonstrations by default: each would be a whole document pair, which would make the prompt much longer.
+Such pairs would moreover come from D-Wikipedia, which is lowercased and pre-tokenised, unlike typical web-page text.
+The prompted approach therefore does not denote the same configuration at the two granularities.
+
+Two decoding configurations are likewise reported separately: greedy decoding at temperature~0 for serving, so that re-simplifying a page is stable, and \gls{bless}'s own sampling settings \parencite[13293]{kew-etal-2023-bless} for evaluation, so that the numbers remain comparable to the paper.
+The extension and the results table therefore do not describe the same system.
+
+\section{Evaluation protocol}
+\label{sec:evaluation-protocol}
+
+\paragraph{Each granularity is scored on its own benchmark, but by the same evaluation code.}
+Sentence-level conditions are scored on the ASSET test split \parencite[4670--4671]{alva-manchego-etal-2020-asset}.
+Document-level conditions are scored on D-Wikipedia's own test split.
+
+Scoring runs in a standalone evaluation pipeline, not in the metric code built into the trainer.
+\Gls{sari} and \gls{fkgl} are computed with EASSE, a toolkit for evaluating sentence simplification \parencite[49--50]{alva-manchego-etal-2019-easse}.
+Every approach passes through the same data loader, the same reference set per benchmark, and the same metric calls, so differences between approaches cannot come from the scoring code.
+
+\paragraph{Significance is tested by paired bootstrap resampling.}
+Improvements in \gls{sari} and \gls{dsari} are tested \parencite[393]{koehn-2004-statistical} with \num{1000} resamples, applying the same resampled indices to both systems so that pairing is preserved; this provides the empirical basis for refuting Hypothesis~\cref{hyp:finetuning}.
+Where the fine-tuned system wins every resample, the bootstrap estimate is \(\gls{pval} = 0\).
+This estimate is reported as \(\gls{pval} < 0.001\), because \num{1000} resamples cannot distinguish a truly zero probability from a very small one.
+\Gls{lens} and BERTScore are reported descriptively; testing their differences for significance is outside the scope of this thesis.
+
+\pagebreak
+
+\paragraph{Metric preprocessing is part of the metric.}
+Where a metric carries structural penalties, its input preprocessing changes what it measures.
+Normalising into D-Wikipedia's convention has no effect on \gls{sari} and \gls{fkgl}, which re-tokenise their input anyway, and changes \gls{dsari}, whose sentence-count penalty reads exactly the boundaries that normalisation creates or destroys.
+\Cref{sec:document-results} measures this by rescoring cached generations under two versions of the normaliser.
+
+\paragraph{Deployment inference and benchmark inference run in different places.}
+Deployment inference runs locally, because privacy is a design constraint.
+Benchmark inference runs on an RTX~A5000 \gls{gpu} instead.
+ASSET and D-Wikipedia are public datasets that contain no user data, so the privacy constraint does not apply to them.
+Local hardware was also too slow for the full five-condition evaluation, which the \gls{gpu} completed in 42~minutes.
+
+\paragraph{Provenance is recorded, and the \gls{dsari} reimplementation is tested.}
+From the first run on the RTX~A5000 onwards, a staged runner committed to the repository produced every number on that machine, at one code revision.
+Before it spends any \gls{gpu} time, the runner executes a correctness check, which caught a metric-normalisation defect before a training run.
+Every artefact records the software environment that produced it, including the exact commit of the \gls{sari} implementation.
+
+A differential test compares the \gls{dsari} reimplementation with the reference implementation: across 66 cases drawn from real D-Wikipedia documents, the two must agree to full floating-point precision.
+Nine further invariant checks run offline.
+Since the reference implementation ships no tests of its own, this test is what makes the document scores comparable with published \gls{dsari} figures.
+The reimplementation keeps two properties of the reference implementation, so that it measures \gls{dsari} as published.
+Deletion contributes a precision term instead of an F-score, as in the definition of \gls{sari} \parencite[405]{xu-etal-2016-optimizing}, and the reference implementation computes one intermediate delete-recall term that it never uses.

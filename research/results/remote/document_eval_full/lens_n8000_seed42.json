@@ -1,0 +1,45 @@
+{
+  "provenance": {
+    "recorded_at": "2026-08-22T10:31:28.084245+00:00",
+    "git_commit": "17e8cf5",
+    "git_dirty": true,
+    "host": {
+      "hostname": "beet",
+      "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+      "python": "3.10.12",
+      "cpu_count": 20,
+      "nvidia_driver": "535.309.01",
+      "gpu_name": "NVIDIA RTX A5000",
+      "gpu_memory_total": "24564 MiB",
+      "torch": "2.5.1+cu121",
+      "torch_cuda_build": "12.1",
+      "cuda_available": true,
+      "device_name": "NVIDIA RTX A5000",
+      "compute_capability": "8.6",
+      "device_count": 1,
+      "vram_gb": 23.7,
+      "bf16_supported": true
+    },
+    "hf_home": "/home/yunusrenz/simple-website/research/scratch/hf",
+    "profile": "beet"
+  },
+  "metric": "LENS",
+  "citation": "Maddela, Dou, Heineman & Xu (ACL 2023)",
+  "checkpoint": "davidheineman/lens",
+  "rescaled_to_0_100": true,
+  "generations_file": "results/remote/document_eval_full/generations_n8000_seed42.json",
+  "sources_sha": null,
+  "n_documents": 8000,
+  "seed": 42,
+  "batch_size": 8,
+  "scores": {
+    "finetuned": 45.611062697137584,
+    "baseline": 33.41687792443087,
+    "llm": null
+  },
+  "seconds_per_system": {
+    "finetuned": 311.6,
+    "baseline": 335.9
+  },
+  "reporting": "Descriptive corpus mean per system. Deliberately not significance-tested: each score is a neural forward pass, so 1000 bootstrap resamples would cost orders of magnitude more than SARI/D-SARI's n-gram arithmetic for the same statistical payoff (thesisDraft.md §2.6)."
+}

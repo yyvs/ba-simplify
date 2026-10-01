@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo 06 — Line breaks &amp; sentence splitting</title>
+    <link rel="stylesheet" href="demo.css" />
+  </head>
+  <body>
+    <nav class="demo-nav">
+      <a href="index.html" translate="no" class="notranslate"
+        >← back to index</a
+      >
+    </nav>
+    <h1>06 — Line breaks &amp; sentence splitting</h1>
+    <p class="meta notranslate">
+      Checks the two-stage split: <code>&lt;br&gt;</code> boundaries are cut in
+      the extension (<code>collectChunkNodes()</code>) before anything is sent,
+      and each resulting chunk is the sentence-split in the backend
+      (<code>split_sentences()</code>, pysbd) so every sentence reaches the
+      model on its own. Watch the progress notice and the backend log to see how
+      many requests each case produces.
+    </p>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: <strong>one</strong> request per sentence — 3 total. A
+        multi-sentence block is split in the backend, each sentence simplified
+        independently, then rejoined. Inline links and bold are flattened for
+        the <em>request</em> only: the links and the bold are still in the page
+        afterwards, holding whatever of their own text the model kept.
+      </p>
+      <p>
+        The <b>Computer Game Designers Symposium</b>, later known as the
+        <a href="https://example.com/cgdc"
+          >Computer Game Developers Conference</a
+        >, was started in 1988 by
+        <a href="https://example.com/crawford">Chris Crawford</a>. He had
+        already been producing a bimonthly newsletter for game developers,
+        <i>The Journal of Computer Game Design</i>, since 1987. One of the
+        subscribers, game programmer Nicky Robinson, suggested that he hold a
+        gathering.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: <strong>3</strong> chunks, cut at the
+        <code>&lt;br&gt;</code>s, and the line breaks are still there after
+        simplifying. Critically, the first two facts must <em>not</em> be merged
+        into one sentence — they have no punctuation between them, so only the
+        <code>&lt;br&gt;</code> keeps them apart. The third chunk contains two
+        sentences and is additionally sentence-split in the backend, so this
+        case produces 4 requests in total.
+      </p>
+      <p>
+        they were founded in 1988<br />the headquarters is in San Jose<br />the
+        themesong changed 5 times. the original one is now forbidden.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: words stay separated. Before the <code>&lt;br&gt;</code> fix a
+        <code>&lt;br&gt;</code> contributed zero characters to
+        <code>textContent</code>, so this used to flatten into
+        "…acknowledgmentAll participating…" with the two words fused together.
+      </p>
+      <p>
+        Prior to the commencement of the undertaking, stakeholders must furnish
+        written acknowledgment<br />All participating entities are required to
+        comply with the terms herein described.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: the blank line between the two blocks survives — a
+        <code>&lt;br&gt;&lt;br&gt;</code> gap is kept as an empty chunk rather
+        than collapsed away.
+      </p>
+      <p>
+        The initial phase of the aforementioned procedure commences
+        imminently.<br /><br />Subsequent phases shall be enumerated in a
+        separate communication.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: not split after "Dr." or "U.S." — pysbd handles abbreviations,
+        which a naive split on ". " would get wrong. 2 requests, not 4.
+      </p>
+      <p>
+        Dr. Smith relocated to the U.S. in 1998 to commence his research. He
+        subsequently characterised the experience as transformative.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: only the prose chunk is sent. The short chunk ("Home page")
+        fails the 4-word minimum and the URL chunk is skipped outright, but both
+        keep their place between the line breaks after simplifying.
+      </p>
+      <p>
+        Home page<br />Despite the multiplicity of antecedent conditions, the
+        regulatory framework mandates uniform compliance.<br />see
+        https://example.com/terms for details
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: toggling off restores this exact markup — the
+        <code>&lt;br&gt;</code>s, the link, and the bold text all come back,
+        since revert replays the original HTML rather than the flattened text.
+      </p>
+      <p>
+        Pursuant to the <b>aforementioned</b> stipulations, all parties shall
+        comply.<br />Further particulars are available from the
+        <a href="https://example.com/registry">central registry</a>.
+      </p>
+    </section>
+  </body>
+</html>

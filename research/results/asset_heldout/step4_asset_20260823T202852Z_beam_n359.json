@@ -1,0 +1,236 @@
+{
+  "run": {
+    "script": "evaluate_sentence.py",
+    "script_version": "1.1",
+    "step": "4/5",
+    "started_at": "2026-08-23T20:28:52.585806+00:00",
+    "finished_at": "2026-08-23T21:17:01.904231+00:00",
+    "duration_seconds": 2889.3,
+    "git_commit": "804fd05",
+    "device": "cpu"
+  },
+  "dataset": "facebook/asset test",
+  "n_sentences": 359,
+  "excluded_indices": [],
+  "n_excluded": 0,
+  "exclusion_note": null,
+  "generations_read_from": "results/remote/sentence_eval",
+  "references_per_sentence": 10,
+  "seeds_per_sampled_condition": 3,
+  "seq2seq_decoding": {
+    "strategy": "beam",
+    "num_beams": 4,
+    "no_repeat_ngram_size": 3,
+    "repetition_penalty": 1.2,
+    "max_length": 64
+  },
+  "decoding_eval": {
+    "temperature": 1.0,
+    "top_p": 0.9,
+    "num_predict": 100,
+    "stop": [
+      "\nComplex:",
+      "\nSimple:",
+      "\n\n"
+    ]
+  },
+  "fewshot_n": 3,
+  "significance_baseline": "base",
+  "models": {
+    "base": {
+      "model_id": "facebook/bart-base",
+      "source": "huggingface_hub"
+    },
+    "online": {
+      "model_id": "eilamc14/bart-large-text-simplification",
+      "source": "huggingface_hub"
+    },
+    "local": {
+      "model_id": "yunvs/bart-base-wikilarge-simplification",
+      "source": "huggingface_hub"
+    },
+    "llm_7b": {
+      "model_id": "qwen2.5:7b-instruct-q4_K_M",
+      "source": "huggingface_hub"
+    },
+    "llm_3b": {
+      "model_id": "qwen2.5:3b-instruct-q4_K_M",
+      "source": "huggingface_hub"
+    }
+  },
+  "results": {
+    "base": {
+      "label": "BART-base zero-shot (RQ1 baseline)",
+      "model_id": "facebook/bart-base",
+      "n_runs": 1,
+      "metrics": {
+        "sari": 21.389175880744475,
+        "bleu": 91.63649067449825,
+        "fkgl": 10.022140324209833,
+        "bertscore_f1": 0.9858493804931641,
+        "unchanged_rate": 0.9387186629526463,
+        "mean_words": 19.685236768802227
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.03239131518406145,
+      "sample_outputs": [
+        "One side of the armed conflicts is composed mainly of the Sudanese military and the Janjaweed, a Sudanese militia group recruited mostly from the Afro-Arab Abbala tribes of the northern Rizeigat region in Sudan.",
+        "Jeddah is the principal gateway to Mecca, Islam's holiest city, which able-bodied Muslims are required to visit at least once in their lifetime.",
+        "The Great Dark Spot is thought to represent a hole in the methane cloud deck of Neptune.",
+        "His next work, Saturday, follows an especially eventful day in the life of a successful neurosurgeon.",
+        "The tarantula, the trickster character, spun a black cord and, attaching it to the ball, crawled away fast to the east, pulling on the cord with all his strength.",
+        "There he died six weeks later, on 13 January 888.",
+        "They are culturally akin to the coastal peoples of Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also been presented with the Colin Mears Award to the value of \u00a35000.",
+        "Following the drummers are dancers, who often play the sogo (a tiny drum that makes almost no sound) and tend to have more elaborate \u2014 even acrobatic \u2014 choreography.",
+        "The spacecraft consists of two main elements: the NASA Cassini orbiter, named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe, named for the Dutch astronomer, mathematician and physicist Christiaan Huygenens."
+      ]
+    },
+    "online": {
+      "label": "BART off-the-shelf (baseline)",
+      "model_id": "eilamc14/bart-large-text-simplification",
+      "n_runs": 1,
+      "metrics": {
+        "sari": 38.16783061488507,
+        "bleu": 88.58158068575753,
+        "fkgl": 7.845774246030405,
+        "bertscore_f1": 0.9754810333251953,
+        "unchanged_rate": 0.13370473537604458,
+        "mean_words": 16.30640668523677
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.04585715760425003,
+      "sample_outputs": [
+        "One side of the armed conflicts is composed mainly of the Sudanese military and the Janjaweed, a Sudanese militia group.",
+        "Jeddah is the main gateway to Mecca, Islam 's holiest city.",
+        "The Great Dark Spot is thought to represent a hole in the methane cloud deck of Neptune.",
+        "His next work, Saturday, follows an eventful day in the life of a successful neurosurgeon.",
+        "The tarantula spun a black cord and, attaching it to the ball, crawled away fast to the east, pulling on the cord with all his strength.",
+        "There he died on 13 January 888.",
+        "They are similar to the coastal peoples of Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also been presented with the Colin Mears Award.",
+        "Following the drummers are dancers, who often play the sogo ( a tiny drum that makes almost no sound ) and have more elaborate choreography.",
+        "The spacecraft is named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe."
+      ],
+      "vs_baseline": {
+        "baseline_condition": "base",
+        "baseline_model_id": "facebook/bart-base",
+        "mean_delta_sari": 16.78778037173565,
+        "ci_low": 15.76844387632983,
+        "ci_high": 17.822899040529933,
+        "p_value": 0.0,
+        "n_resamples": 1000
+      }
+    },
+    "local": {
+      "label": "BART fine-tuned (this project)",
+      "model_id": "yunvs/bart-base-wikilarge-simplification",
+      "n_runs": 1,
+      "metrics": {
+        "sari": 37.79715713008546,
+        "bleu": 88.30066064221708,
+        "fkgl": 8.17781742279599,
+        "bertscore_f1": 0.976455807685852,
+        "unchanged_rate": 0.116991643454039,
+        "mean_words": 16.147632311977716
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.024383024498690595,
+      "sample_outputs": [
+        "One side of the conflict is composed mainly of the Sudanese military and the Janjaweed, a Sudanese militia group.",
+        "Jeddah is the main gateway to Mecca, Islam 's holiest city.",
+        "The Great Dark Spot is a hole in the methane cloud deck of Neptune.",
+        "His next work, Saturday, follows an eventful day in the life of a successful neurosurgeon.",
+        "The tarantula spun a black cord and attached it to the ball, crawled away fast to the east, pulling on the cord with all his strength.",
+        "He died six weeks later, on 13 January 888.",
+        "They are similar to the coastal peoples of Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also been presented with the Colin Mears Award.",
+        "Following the drummers are dancers, who often play the sogo (a tiny drum that makes almost no sound ).",
+        "The spacecraft is named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe."
+      ],
+      "vs_baseline": {
+        "baseline_condition": "base",
+        "baseline_model_id": "facebook/bart-base",
+        "mean_delta_sari": 16.41763042917965,
+        "ci_low": 15.376179346681086,
+        "ci_high": 17.498552424698744,
+        "p_value": 0.0,
+        "n_resamples": 1000
+      }
+    },
+    "llm_7b": {
+      "label": "Qwen2.5-7B + BLESS Prompt 2",
+      "model_id": "qwen2.5:7b-instruct-q4_K_M",
+      "n_runs": 3,
+      "metrics": {
+        "sari": 45.95322975455241,
+        "bleu": 75.45985055737748,
+        "fkgl": 7.766008879833252,
+        "bertscore_f1": 0.9786724845568339,
+        "unchanged_rate": 0.04549675023212627,
+        "mean_words": 19.000928505106778,
+        "sari_std": 0.07337948455412015
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.4651108901025062,
+      "sample_outputs": [
+        "One side of the armed conflict is mainly composed of the Sudanese military and the Janjaweed, who are a Sudanese militia group mostly from the Afro-Arab Abbala tribes in the northern Rizeigat region of Sudan.",
+        "Jeddah is the main entrance to Mecca, Islam's most sacred city, where able-bodied Muslims must go at least once in their lifetime.",
+        "The Great Dark Spot is believed to be a hole in Neptune's methane cloud deck.",
+        "His next work, Saturday, focuses on one especially eventful day in the life of a successful neurosurgeon.",
+        "The tarantula, a trickster, spun a black cord and attached it to the ball. He then crawled away quickly to the east, pulling on the cord with all his strength.",
+        "There he died six weeks later on January 13, 888.",
+        "They share similar cultural traits with the coastal peoples of Papua New Guinea.",
+        "Since 2000, the Kate Greenaway Medal recipient also receives the Colin Mears Award worth \u00a35000.",
+        "Following the drummers are dancers who often play tiny drums called sogo and usually have more elaborate, even acrobatic, dance moves.",
+        "The spacecraft has two main parts: the NASA Cassini orbiter, named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe, named after the Dutch astronomer, mathematician, and physicist Christiaan Huygens."
+      ],
+      "vs_baseline": {
+        "baseline_condition": "base",
+        "baseline_model_id": "facebook/bart-base",
+        "mean_delta_sari": 24.626253937880975,
+        "ci_low": 23.639531206259182,
+        "ci_high": 25.698954844275963,
+        "p_value": 0.0,
+        "n_resamples": 1000
+      }
+    },
+    "llm_3b": {
+      "label": "Qwen2.5-3B + BLESS Prompt 2",
+      "model_id": "qwen2.5:3b-instruct-q4_K_M",
+      "n_runs": 3,
+      "metrics": {
+        "sari": 47.0246038965802,
+        "bleu": 68.20897565509439,
+        "fkgl": 8.218148554073355,
+        "bertscore_f1": 0.9733796715736389,
+        "unchanged_rate": 0.012070566388115135,
+        "mean_words": 19.23119777158774,
+        "sari_std": 0.05291538003774902
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.3016596422357763,
+      "sample_outputs": [
+        "One side of the armed conflicts consists mainly of the Sudanese military and the Janjaweed. The Janjaweed is a Sudanese militia group, mostly recruited from the Afro-Arab Abbala tribes in the northern Rizeigat region of Sudan.",
+        "Jeddah is the main entrance to Mecca, which is Islam's holiest city. All able-bodied Muslims are required to visit Mecca at least once in their lives.",
+        "The Great Dark Spot is believed to be an opening in Neptune's methane cloud layer.",
+        "His next work, called Saturday, is about an especially busy day in the life of a successful neurosurgeon.",
+        "The tarantula, a trickster character, spun a black string and tied it to the ball. It then crawled away quickly to the east, pulling on the string with all its strength.",
+        "He died six weeks later, on January 13, 888.",
+        "They have similar culture to coastal people in Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also received a \u00a35000 Colin Mears Award.",
+        "Following the drummers are dancers who usually play the sogo (a small drum that makes little sound) and often have more complex and sometimes acrobatic moves.",
+        "The spacecraft has two main parts: the NASA-built Cassini orbiter, named after the astronomer Giovanni Domenico Cassini, and the ESA-built Huygens probe, named after the astronomer Christiaan Huygens."
+      ],
+      "vs_baseline": {
+        "baseline_condition": "base",
+        "baseline_model_id": "facebook/bart-base",
+        "mean_delta_sari": 25.667655581830747,
+        "ci_low": 24.79599829495241,
+        "ci_high": 26.510426868638874,
+        "p_value": 0.0,
+        "n_resamples": 1000
+      }
+    }
+  }
+}

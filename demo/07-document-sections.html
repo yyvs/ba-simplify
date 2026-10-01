@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo 07 — Document-level sections</title>
+    <link rel="stylesheet" href="demo.css" />
+  </head>
+  <body>
+    <nav class="demo-nav">
+      <a href="index.html" translate="no" class="notranslate"
+        >← back to index</a
+      >
+    </nav>
+    <h1>07 — Document-level sections</h1>
+    <p class="meta notranslate">
+      Only meaninwgful with the <strong>document</strong> model selected
+      (right-click the toolbar icon → Simplifier model → "Custom fine-tuned
+      document model"). That model is trained on whole D-Wikipedia articles, so
+      the extension collects text differently here: it finds the main content
+      area, cuts it into heading-delimited sections, and sends each section as
+      one document. With any of the three sentence-granularity models this page
+      behaves like a normal page instead — a good A/B comparison.
+    </p>
+    <p class="meta notranslate">
+      Expected, in document mode: headings stay <em>exactly</em> as they are
+      (they act as dividers and are never sent), and each section still has
+      every paragraph it started with — the answer is divided back across them.
+      The model deletes, merges and reorders sentences, so its output has no
+      position-by-position correspondence to its input: a sentence can land in
+      the paragraph next to the one it came from, and a paragraph the answer had
+      nothing left for keeps its own text. What must <em>not</em> happen is a
+      paragraph, list item or link disappearing. Toggling off restores every one
+      of them exactly.
+    </p>
+
+    <main>
+      <h2>Formation</h2>
+      <p>
+        The International Game Developers Association is incorporated in the
+        United States as a not-for-profit organization. It has over twelve
+        thousand members drawn from all fields of game development, including
+        programming, visual art, audio engineering and production management.
+      </p>
+      <p>
+        In recognition of the wide-ranging, multidisciplinary nature of
+        contemporary game development, everyone who participates in any capacity
+        within the game development process is welcome to apply for membership
+        of the association.
+      </p>
+
+      <h3>Early conferences</h3>
+      <p>
+        The Computer Game Designers Symposium, subsequently known as the
+        Computer Game Developers Conference, was inaugurated in 1988. Its
+        founder had previously been producing a bimonthly newsletter for game
+        developers since 1987.
+      </p>
+
+      <h3>Subsequent expansion</h3>
+      <p>
+        Throughout the ensuing decade the organization broadened its remit
+        considerably, establishing regional chapters across multiple continents
+        and instituting a series of special interest groups devoted to
+        particular disciplines within the industry.
+      </p>
+      <p>
+        Contemporary commentators have observed that this period of
+        institutional consolidation coincided with a substantial diversification
+        of the commercial landscape in which its membership operated.
+      </p>
+    </main>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: this paragraph sits outside <code>&lt;main&gt;</code>, so in
+        document mode it is <strong>not</strong> touched at all — the document
+        scope is the main content area, not the whole page. In sentence mode it
+        is simplified as usual.
+      </p>
+      <p>
+        Notwithstanding the foregoing considerations, this paragraph resides
+        beyond the boundary of the principal content region of the document.
+      </p>
+    </section>
+  </body>
+</html>

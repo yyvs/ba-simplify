@@ -1,0 +1,120 @@
+{
+  "run": {
+    "script": "evaluate_document.py",
+    "script_version": "1.1",
+    "step": "4B",
+    "status": "complete",
+    "started_at": "2026-08-17T11:41:59.789376+00:00",
+    "finished_at": "2026-08-17T11:50:18.518187+00:00",
+    "duration_seconds": 498.7,
+    "git_commit": "2dd359a",
+    "device": "mps"
+  },
+  "models": {
+    "finetuned": {
+      "model_id": "scratch/simplification_results_document/best_checkpoint",
+      "resolved_path": "/Users/y/GitHub/simple-website/research/scratch/simplification_results_document/best_checkpoint",
+      "source": "local_path",
+      "weights_bytes": 557912620,
+      "weights_mtime": "2026-08-14T13:38:32.050251+00:00"
+    },
+    "baseline": {
+      "model_id": "facebook/bart-base",
+      "source": "huggingface_hub"
+    },
+    "llm": {
+      "model_id": "qwen2.5:7b-instruct-q4_K_M",
+      "kind": "ollama",
+      "granularity": "document",
+      "prompt": "document instruction (adaptation of BLESS Prompt 2, not the paper's)",
+      "fewshot_n": 0,
+      "decoding": {
+        "temperature": 1.0,
+        "top_p": 0.9,
+        "num_predict": 1024,
+        "num_ctx": 8192,
+        "stop": [
+          "\nText:",
+          "\nSimplified text:"
+        ]
+      },
+      "seed": 1
+    }
+  },
+  "dataset": {
+    "name": "D-Wikipedia",
+    "citation": "Sun, Jin & Wan (EMNLP 2021)",
+    "split": "test",
+    "references_per_document": 1,
+    "n_evaluated": 20,
+    "split_total_raw": 8000,
+    "split_total_cleaned": 8000,
+    "mojibake_dropped": 0,
+    "sampled": true,
+    "sample_seed": 42,
+    "sample_indices_sha": "e677b6b457e54ef4"
+  },
+  "decoding": {
+    "strategy": "beam_search",
+    "num_beams": 4,
+    "no_repeat_ngram_size": 3,
+    "repetition_penalty": 1.2,
+    "max_input_tokens": 512,
+    "max_output_tokens": 512,
+    "batch_size": 8
+  },
+  "scores": {
+    "finetuned": {
+      "BLEU": 17.509242557673872,
+      "SARI": 41.84006135961946,
+      "FKGL": 7.1978609913793115,
+      "D-SARI": 35.767017586524446,
+      "BERTScore": 88.7888252735138,
+      "LENS": null
+    },
+    "baseline": {
+      "BLEU": 15.134858700951407,
+      "SARI": 17.448490803401018,
+      "FKGL": 9.413971423652953,
+      "D-SARI": 14.188215970789075,
+      "BERTScore": 88.0034327507019,
+      "LENS": null
+    },
+    "llm": {
+      "BLEU": 10.248127448121899,
+      "SARI": 38.187713007139386,
+      "FKGL": 6.073384106986111,
+      "D-SARI": 22.622087461030855,
+      "BERTScore": 87.49288320541382,
+      "LENS": null
+    }
+  },
+  "significance": {
+    "metric": "d_sari",
+    "test": "paired bootstrap over documents",
+    "resamples": 1000,
+    "seed": 42,
+    "p_value": 0.0
+  },
+  "generation_seconds": {
+    "finetuned": 466.2,
+    "baseline": 301.4,
+    "llm": 154.4
+  },
+  "notes": [
+    "D-SARI is the headline metric here; plain SARI is reported only for continuity with the ASSET-based Step 4 numbers and does not model sentence deletion/merging/reordering.",
+    "BERTScore truncates inputs past ~510 tokens.",
+    "Every system's predictions are normalized into D-Wikipedia's own text convention (lowercased, PTB-pre-tokenized) before scoring, because the corpus's sources and references both use it and D-SARI/SARI/BLEU are n-gram metrics. Verified no-op for the seq2seq systems, whose output already satisfies it.",
+    "The --llm condition is prompted with the corpus's lowercased, pre-tokenized source text, which is nothing like the web prose it processes in the extension. This likely understates its quality and is not fixable here: the natural-cased original is not in the corpus.",
+    "The --llm condition samples (temperature 1.0, top_p 0.9) while the seq2seq systems use deterministic beam search, so only the former carries run-to-run variance. One seed was run; BLESS aggregates three.",
+    "LENS not computed (lens-metric unavailable in this environment)."
+  ],
+  "significance_llm": {
+    "metric": "d_sari",
+    "test": "paired bootstrap over documents",
+    "resamples": 1000,
+    "seed": 42,
+    "llm_vs_baseline_p": 0.0,
+    "llm_vs_finetuned_p": 1.0
+  }
+}

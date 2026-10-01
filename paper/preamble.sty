@@ -1,0 +1,356 @@
+\ProvidesPackage{preamble}
+
+% begin: preamble
+
+% -----------------------------
+
+%
+% thesis metadata, shared by the title page and the statements
+%
+\newcommand{\thesisauthor}{Yunus Oscar Renz}
+\newcommand{\thesisstudentid}{2952305}
+\newcommand{\thesistitle}{From Benchmark to Browser}
+\newcommand{\thesissubtitle}{A Comparative Evaluation of \textit{Automatic Text Simplification} Approaches for \textit{DOM-Preserving Web Deployment}}
+\newcommand{\thesistype}{Bachelor's Thesis}
+\newcommand{\thesisprogramme}{Computational Linguistics}
+\newcommand{\thesisfirstexaminer}{apl.\ Prof.\ Dr.~Wiebke Petersen}
+\newcommand{\thesissecondexaminer}{Dr.~Kilian Evang}
+\newcommand{\thesisdate}{September 30th, 2026}
+
+% -----------------------------
+
+%
+% language packages:
+%
+
+% utf8 input (the default since LaTeX 2018; kept explicit for the umlauts)
+\usepackage[utf8]{inputenc}
+
+% T1 font encoding, so accented characters hyphenate and copy correctly
+\usepackage[T1]{fontenc}
+
+% -----------------------------
+
+%
+% additional packages:
+%
+% maths: \text{} in inline expressions, and needed by tcolorbox and biblatex
+\usepackage{amsmath,amssymb}
+
+% SI units: for units used
+\usepackage{siunitx}
+% ranges keep the thesis's en dash and print the unit once (41--183 ms), a
+% \pm value prints in full rather than as 15.8(5), and a quantity in a bold
+% table header is set bold with it; \num groups thousands with a comma from four
+% digits on (8,000 and 123,862)
+\sisetup{
+	range-phrase={\text{--}}, range-units=single,
+	uncertainty-mode=separate,
+	reset-math-version=false, reset-text-series=false, text-series-to-math=true,
+	group-separator={,}, group-minimum-digits=4, group-digits=integer
+}
+
+% Latin Modern, the scalable version of the default font
+\usepackage{lmodern}
+
+% page layout: the template's article-class type area, which scrreprt's typearea
+% would otherwise recompute (wider measure, text block set higher)
+\usepackage[
+	a4paper,
+	left=118pt, textwidth=360pt,
+	top=127pt, textheight=595.80026pt,
+	headheight=12pt, headsep=25pt, footskip=30pt,
+	marginparwidth=50pt, marginparsep=10pt
+]{geometry}
+
+% internal links; plainpages=false avoids duplicate page.1 destinations from the
+% roman/arabic numbering, pdfpagelabels shows that numbering in the PDF viewer,
+% and bookmarksnumbered puts the chapter and section numbers into the outline
+\usepackage[hidelinks,plainpages=false,pdfpagelabels,bookmarksnumbered]{hyperref}
+
+% verbatim urls, breakable at any character
+\usepackage{xurl}
+
+% repository paths break only after a slash, never inside a file or directory name
+\DeclareUrlCommand\path{\urlstyle{tt}\def\UrlBreaks{\do\/}\def\UrlBigBreaks{}}
+
+% Hugging Face Hub identifiers in typewriter, linked to their Hub page; each is
+% used once, in a footnote after the first mention of the model or dataset
+\newcommand*{\hfid}[1]{\begingroup\urlstyle{tt}\nolinkurl{#1}\endgroup}
+\newcommand*{\hfmodel}[1]{\href{https://huggingface.co/#1}{\hfid{#1}}}
+\newcommand*{\hfdataset}[1]{\href{https://huggingface.co/datasets/#1}{\hfid{#1}}}
+% Ollama model tags, set the same way and linked to their library page
+\newcommand*{\ollamamodel}[1]{\href{https://ollama.com/library/#1}{\hfid{#1}}}
+% GitHub repositories (owner/name), set the same way and linked to the repository
+\newcommand*{\ghrepo}[1]{\href{https://github.com/#1}{\hfid{#1}}}
+
+% silence the font-substitution notices caused by hyphenat's htt option
+\usepackage{silence}
+\WarningFilter{latexfont}{Font shape}
+\WarningFilter{latexfont}{Some font shapes}
+\WarningFilter{hyphenat}{}
+
+% let long typewriter identifiers (model ids, paths) hyphenate at their own
+% hyphens rather than run into the margin on the template's 360pt measure
+\usepackage[htt]{hyphenat}
+
+% French spacing throughout: a full stop gets an ordinary interword space, so
+% abbreviations need no `.\ ' and sentences ending in a capital no `\@'
+\frenchspacing
+
+% colour, and tcolorbox for the appendix prompt boxes
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+
+% inline code: \texttt on a light grey ground with rounded corners, like the
+% appendix prompt boxes. The text is set as a row of boxes, split at spaces and
+% after underscores; only the row's two ends are rounded. A line may break
+% between the boxes: at a space, where grey glue joins them and is dropped at
+% the break, or after an underscore, so long identifiers need not overrun
+\colorlet{codeground}{black!6}
+\tcbset{code/.style={on line, colback=codeground, colupper=black, frame hidden,
+	boxrule=0pt, arc=1.5pt, boxsep=0pt, left=1.5pt, right=1.5pt, top=1pt, bottom=1pt,
+	before upper=\vphantom{Ag}}}
+\newcommand*{\code@boxonly}{\tcbox[code]}
+\newcommand*{\code@boxfirst}{\tcbox[code, right=0pt, sharp corners=east]}
+\newcommand*{\code@boxmid}{\tcbox[code, left=0pt, right=0pt, sharp corners]}
+\newcommand*{\code@boxlast}{\tcbox[code, left=0pt, sharp corners=west]}
+\newif\ifcode@first
+\newif\ifcode@last
+\newcommand*{\code@box}[1]{%
+	\ifcode@first
+		\ifcode@last\code@boxonly{#1}\else\code@boxfirst{#1}\fi
+	\else
+		\ifcode@last\code@boxlast{#1}\else\code@boxmid{#1}\fi
+	\fi
+	\code@firstfalse}
+\newcommand*{\code@glue}{{\setbox\z@\hbox{Ag}\color{codeground}%
+	\leaders\vrule height\dimexpr\ht\z@+1pt\relax depth\dimexpr\dp\z@+1pt\relax
+	\hskip\fontdimen2\font\relax}}
+\DeclareRobustCommand{\texttt}[1]{{\ttfamily\code@firsttrue\code@words#1 \code@end}}
+% one word per call: its pieces, then glue and the next word
+\def\code@words#1 #2\code@end{%
+	\def\code@restwords{#2}%
+	\code@pieces#1\_\code@end
+	\ifx\code@restwords\@empty\else
+		\code@glue\expandafter\code@words\code@restwords\code@end
+	\fi}
+% one piece per call: the text up to and including an underscore
+\def\code@pieces#1\_#2\code@end{%
+	\def\code@restpieces{#2}%
+	\ifx\code@restpieces\@empty
+		\ifx\code@restwords\@empty\code@lasttrue\fi
+		\code@box{#1}%
+	\else
+		\code@box{#1\_}\allowbreak\expandafter\code@pieces\code@restpieces\code@end
+	\fi}
+% the same box for verbatim code, \codeverb|...|, which cannot break
+\NewDocumentCommand{\codeverb}{v}{{\ttfamily\code@boxonly{#1}}}
+
+% tables: array for the P column type, booktabs for rules, multirow for spanned cells
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+% p-column that permits hyphenation of its first word: TeX refuses to hyphenate
+% a word that opens a paragraph, which makes narrow headers overrun their column
+\newcolumntype{P}[1]{>{\hspace{0pt}\raggedright\arraybackslash}p{#1}}
+
+% increase table row height
+\renewcommand{\arraystretch}{1.35}
+
+% graphics; figures are PDFs built by scripts/make_figures.py
+\usepackage{graphicx}
+
+% figures are kept in assets/, so they can be included by bare name
+\graphicspath{{assets/}}
+
+% float: [H] in the appendix, to hold a table exactly where it is written
+\usepackage{float}
+
+% caption and micro typography
+\usepackage{caption}
+% APA captions: bold label on its own line, italic title beneath, flush left;
+% further context goes in a \note. format=plain is required, as KOMA's default
+% format=hang cannot be combined with labelsep=newline
+\captionsetup{format=plain,font=small,labelfont=bf,textfont=it,
+	labelsep=newline,justification=raggedright,singlelinecheck=false}
+\usepackage{microtype}
+
+% \note[width]{...}: APA note below a table or figure
+\newcommand{\note}[2][\linewidth]{%
+	\par\vspace{0.4em}%
+	\noindent\begin{minipage}{#1}%
+		\footnotesize\setlength{\parindent}{0pt}\raggedright
+		\emph{Note.}\ #2%
+	\end{minipage}\par}
+
+%
+% bibliography
+%
+\usepackage[
+	style=apa, backend=biber,
+	maxcitenames=1,
+	mincitenames=1
+]{biblatex}
+\addbibresource{paper.bib}
+
+\usepackage{chngcntr}
+\counterwithin{figure}{chapter} % figures numbered by chapter (1.1, 1.2)
+\counterwithin{table}{chapter}
+
+%
+% glossary package
+%
+\usepackage[automake,toc,abbreviations,symbols]{glossaries-extra}
+\makeglossaries
+% the thesis's abbreviation, unit and symbol entries
+\usepackage{glossary-entries}
+
+%
+% hypotheses: a list labelled H_1, H_2, ..., so that \cref prints the same symbol;
+% cleveref must come after hyperref
+%
+\usepackage{enumitem}
+\usepackage[capitalise,noabbrev,nosort]{cleveref}
+
+\newlist{hypotheses}{enumerate}{1}
+\setlist[hypotheses]{label=\textbf{\boldmath$H_{\arabic*}$}, ref=\arabic*, leftmargin=*}
+\crefalias{hypothesesi}{hypothesis}
+
+\crefname{hypothesis}{hypothesis}{hypotheses}
+\Crefname{hypothesis}{Hypothesis}{Hypotheses}
+\crefformat{hypothesis}{#2$H_{#1}$#3}
+\Crefformat{hypothesis}{#2$H_{#1}$#3}
+\crefmultiformat{hypothesis}{#2$H_{#1}$#3}{ and #2$H_{#1}$#3}{, #2$H_{#1}$#3}{, and #2$H_{#1}$#3}
+\Crefmultiformat{hypothesis}{#2$H_{#1}$#3}{ and #2$H_{#1}$#3}{, #2$H_{#1}$#3}{, and #2$H_{#1}$#3}
+\crefrangeformat{hypothesis}{#3$H_{#1}$#4--#5$H_{#2}$#6}
+\Crefrangeformat{hypothesis}{#3$H_{#1}$#4--#5$H_{#2}$#6}
+
+% research questions: the same, printed RQ1, RQ2. \rqnolink{label} is for headings
+% and captions, where a \cref would nest a link inside the toc entry's own
+\usepackage{refcount}
+\newlist{researchquestions}{enumerate}{1}
+\setlist[researchquestions]{label=\textbf{RQ\arabic*}, ref=\arabic*, leftmargin=*}
+\crefalias{researchquestionsi}{rq}
+
+\crefname{rq}{research question}{research questions}
+\Crefname{rq}{Research question}{Research questions}
+\crefformat{rq}{#2RQ#1#3}
+\Crefformat{rq}{#2RQ#1#3}
+\crefmultiformat{rq}{#2RQ#1#3}{ and #2RQ#1#3}{, #2RQ#1#3}{, and #2RQ#1#3}
+\Crefmultiformat{rq}{#2RQ#1#3}{ and #2RQ#1#3}{, #2RQ#1#3}{, and #2RQ#1#3}
+\newcommand*{\rqnolink}[1]{\texorpdfstring{RQ\ref*{#1}}{RQ\getrefnumber{#1}}}
+
+
+% -----------------------------
+
+%
+% table of contents:
+%
+
+% list the lists of figures and tables in the toc (glossaries-extra adds the glossaries)
+\KOMAoptions{listof=totoc}
+
+% keep each chapter's toc entries on one page: page breaks are allowed only
+% before chapter entries, never before section or subsection entries
+\DeclareTOCStyleEntry[
+	onstarthigherlevel={\addpenalty{-\@highpenalty}},
+	onstartsamelevel={\addpenalty{-\@highpenalty}},
+	onstartlowerlevel={\addpenalty{-\@highpenalty}}
+]{tocline}{chapter}
+\DeclareTOCStyleEntry[
+	onstarthigherlevel={},
+	onstartsamelevel={},
+	onstartlowerlevel={}
+]{tocline}{section}
+\DeclareTOCStyleEntry[
+	onstarthigherlevel={},
+	onstartsamelevel={},
+	onstartlowerlevel={}
+]{tocline}{subsection}
+
+% grey for the toc divider rules and the front/back matter entries
+\colorlet{tocgrey}{black!55}
+
+% \tocgreyon / \tocgreyoff: written into a .toc or .lot stream to set the entries
+% in between in grey, with chapter-level entries styled as section entries
+% (indented, not bold, dotted leaders); the .lot has no chapter entries.
+% \default@color is redefined because KOMA resets entries and page numbers to it.
+% \toc@keepskip moves the colour whatsit behind the preceding glue, so a following
+% \addvspace can still merge with that glue instead of adding to it.
+\newcommand*{\toc@keepskip}[1]{%
+	\ifvmode
+		\ifdim\lastskip=\z@
+			#1%
+		\else
+			\edef\toc@restoreskip{\vskip\the\lastskip\relax}%
+			\vskip-\lastskip
+			#1%
+			\toc@restoreskip
+		\fi
+	\else
+		#1%
+	\fi}
+\AtBeginDocument{\let\toc@blackcolor\default@color}
+\newcommand*{\toc@styleattrs}{indent,beforeskip,entryformat,pagenumberformat,linefill}
+\newcommand*{\tocgreyon}{%
+	\toc@keepskip{\color{tocgrey}}%
+	\edef\default@color{\current@color}%
+	\@for\toc@attr:=\toc@styleattrs\do{%
+		\expandafter\let\csname toc@saved@\toc@attr\expandafter\endcsname
+		\csname scr@tso@chapter@\toc@attr\endcsname
+		\expandafter\let\csname scr@tso@chapter@\toc@attr\expandafter\endcsname
+		\csname scr@tso@section@\toc@attr\endcsname}%
+}
+\newcommand*{\tocgreyoff}{%
+	\let\default@color\toc@blackcolor
+	\toc@keepskip{\normalcolor}%
+	\@for\toc@attr:=\toc@styleattrs\do{%
+		\expandafter\let\csname scr@tso@chapter@\toc@attr\expandafter\endcsname
+		\csname toc@saved@\toc@attr\endcsname}%
+}
+
+% \tocdivider: a centred rule written into a .toc or .lot stream to separate the
+% thesis proper from the front or back matter. Set as a box, not a paragraph, so
+% \tocdividerskip is the visible gap; nothing may be written between the rule and
+% the next entry, or its \addvspace stacks instead of merging. A page break is
+% allowed before the rule; \@nobreak keeps it attached to the entry after it.
+\newcommand*{\tocdividerwidth}{.9\linewidth}
+\newcommand*{\tocdividerskip}{1em}
+\newcommand*{\tocdivider}{%
+	\par
+	\addvspace{\tocdividerskip}%
+	\penalty-\@highpenalty
+	\nointerlineskip
+	\hb@xt@\linewidth{%
+		\hss\textcolor{tocgrey}{\rule{\tocdividerwidth}{.4pt}}\hss}%
+	\nointerlineskip
+	\addvspace{\tocdividerskip}%
+	\global\@nobreaktrue
+	\everypar{\global\@nobreakfalse\everypar{}}%
+}
+
+% -----------------------------
+
+%
+% custom configuration:
+%
+
+% paragraph spacing
+\setlength{\parskip}{0.35em}
+
+% tolerate overfull boxes up to 24pt without a warning
+\hfuzz=24pt
+
+% extra stretch so lines with long identifiers and citations still break in the 360pt measure
+\setlength{\emergencystretch}{3em}
+
+% run-in \paragraph headings start the sentence, so they are followed by an
+% interword space instead of KOMA's 1em (the negative sign makes them run-in)
+\RedeclareSectionCommand[afterskip=-.333em plus -.111em minus -.111em]{paragraph}
+
+% -----------------------------
+
+% end: preamble
+\endinput

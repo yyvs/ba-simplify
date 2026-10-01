@@ -1,0 +1,92 @@
+{
+  "provenance": {
+    "recorded_at": "2026-08-21T08:50:36.531980+00:00",
+    "git_commit": "cd45e0f",
+    "git_dirty": true,
+    "host": {
+      "hostname": "beet",
+      "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+      "python": "3.12.13",
+      "cpu_count": 20,
+      "nvidia_driver": "535.309.01",
+      "gpu_name": "NVIDIA RTX A5000",
+      "gpu_memory_total": "24564 MiB",
+      "torch": "2.5.1+cu121",
+      "torch_cuda_build": "12.1",
+      "cuda_available": true,
+      "device_name": "NVIDIA RTX A5000",
+      "compute_capability": "8.6",
+      "device_count": 1,
+      "vram_gb": 23.7,
+      "bf16_supported": true
+    },
+    "hf_home": "/home/yunusrenz/simple-website/research/scratch/hf",
+    "profile": "beet"
+  },
+  "dataset": "eilamc14/wikilarge-clean",
+  "splits": {
+    "train": {
+      "raw_rows": 123862,
+      "dropped_strict": 6206,
+      "dropped_targeted": 2205,
+      "dropped_by_both": 2205,
+      "dropped_only_by_strict": 4001,
+      "dropped_only_by_targeted": 0,
+      "kept_strict": 117656,
+      "kept_targeted": 121657,
+      "examples_dropped_only_by_strict": [
+        "Simon Boccanegra is an opera with a prologue and three acts by Giuseppe Verdi to an Italian libretto by Francesco Maria Piave , based on the play SimÃ n Bocanegra ( 1843 ) by Antonio GarcÃ a GutiÃ rre",
+        "AmbÃ rieux-en-Dombes is a commune in the department of Ain in eastern France .",
+        "The French rank of field marshal should not be confused with the rank of Marshal of France , which was the highest rank of the Ancien RÃ gime and is in effect the highest French rank today ( although ",
+        "Sainte-Foy , VendÃ e is a commune in the VendÃ e department in the Pays de la Loire region in western France .",
+        "After joining them in 1942 , his younger son , PÃ ter BartÃ k , enlisted in the United States Navy .",
+        "His father 's stroke and subsequent death in 1746 interrupted his studies . Kant became a private tutor in the smaller towns surrounding KÃ nigsberg , but continued his scholarly research .",
+        "Marek Heinz ( born 4 August 1977 in Olomouc , Czechoslovakia ) is a Czech football striker who plays for Hungarian top team FerencvÃ rosi TC .",
+        "Les Ã glisottes-et-Chalaures is a commune in the Gironde department in south-western France .",
+        "JosÃ Miguel GonzÃ lez Rey , aka Josemi ( born November 15 , 1979 ) , is a Spanish footballer who plays for Iraklis Thessaloniki F.C. in the Greek first division .",
+        "However , for historical reasons districts in cantons GraubÃ 1\\/4 nden and Schwyz are their own legal entities with jurisdiction over tax and often have their own Landsgemeinde .",
+        "In the United States , a CFL has a higher purchase price than an incandescent lamp , but can save over US$ 40 in electricity costs over the lamp 's lifetime .",
+        "His election as mayor made Berlin one of three major European cities with an openly gay mayor , along with Paris , whose mayor is Bertrand DelanoÃ '' , and Hamburg , whose mayor was Ole von Beust at t"
+      ],
+      "examples_dropped_only_by_targeted": []
+    },
+    "validation": {
+      "raw_rows": 417,
+      "dropped_strict": 20,
+      "dropped_targeted": 7,
+      "dropped_by_both": 7,
+      "dropped_only_by_strict": 13,
+      "dropped_only_by_targeted": 0,
+      "kept_strict": 397,
+      "kept_targeted": 410,
+      "examples_dropped_only_by_strict": [
+        "CuÃ bris is a commune in the Alpes-Maritimes department in southeastern France .",
+        "Alfonso , winner of the wager , tells the men to forgive their fiancÃ es .",
+        "Three years later , JaurÃ s , Allemane and the possibilists founded the possibilist French Socialist Party , which supported participation in government , while Guesde and Vaillant formed the Socialis",
+        "Rodrigo studied music under Francisco Antich in Valencia and under Paul Dukas at the Ã cole Normale de Musique in Paris .",
+        "Born January 27 , 1948 in Nizhni Tagil , Russia , in the family of Austrian poet and translator , political Ã migrÃ Boris Brainin ( Sepp Ã -- sterreicher ) , who belonged to the well-known Viennese Br",
+        "Emiliano Zapata Salazar ( August 8 , 1879 -- April 10 , 1919 ) was a leading figure in the Mexican Revolution , which broke out in 1910 , and which was initially directed against the president Porfiri",
+        "Following a legal dispute with his sister-in-law , Havel decided to sell his 50 % stake in the Lucerna Palace on Wenceslas Square , a legendary dance hall built by his grandfather VÃ clav Havel .",
+        "Enrique ` Quique ' SetiÃ n Soler ( born 27 September 1958 ) is a retired Spanish footballer who played mainly as a central midfielder , and a current coach .",
+        "Engis is a Walloon municipality located in the Belgian province of LiÃ ge .",
+        "Cruzilles-l Ã s-M Ã pillat is a commune in the Ain department in eastern France .",
+        "Riel sought to preserve MÃ tis rights and culture as their homelands in the Northwest came progressively under the Canadian sphere of influence .",
+        "BÃ on is a commune in the Ain department in eastern France ."
+      ],
+      "examples_dropped_only_by_targeted": []
+    },
+    "test": {
+      "raw_rows": 121,
+      "dropped_strict": 0,
+      "dropped_targeted": 0,
+      "dropped_by_both": 0,
+      "dropped_only_by_strict": 0,
+      "dropped_only_by_targeted": 0,
+      "kept_strict": 121,
+      "kept_targeted": 121,
+      "examples_dropped_only_by_strict": [],
+      "examples_dropped_only_by_targeted": []
+    }
+  },
+  "interpretation": "prepare_data.py's strict filter produced the tracked data/stats.json and the data statement; the notebook's targeted filter is what ran during training. Rows dropped only by the strict filter are dominated by the 'Ã ' class (e.g. 'AmbÃ rieux-en-Dombes', 'VendÃ e', 'PÃ ter BartÃ k'), which is genuine mojibake the targeted patterns do not match -- so the targeted filter under-drops rather than the strict filter over-dropping. Cite whichever filter the reported run used, and say so."
+}

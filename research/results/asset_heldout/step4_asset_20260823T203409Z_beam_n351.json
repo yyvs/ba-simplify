@@ -1,0 +1,245 @@
+{
+  "run": {
+    "script": "evaluate_sentence.py",
+    "script_version": "1.1",
+    "step": "4/5",
+    "started_at": "2026-08-23T20:34:09.157202+00:00",
+    "finished_at": "2026-08-23T21:21:18.618447+00:00",
+    "duration_seconds": 2829.5,
+    "git_commit": "804fd05",
+    "device": "cpu"
+  },
+  "dataset": "facebook/asset test",
+  "n_sentences": 351,
+  "excluded_indices": [
+    60,
+    135,
+    137,
+    141,
+    144,
+    211,
+    228,
+    357
+  ],
+  "n_excluded": 8,
+  "exclusion_note": "ASSET test sentences found in WikiLarge train by remote/checks/check_overlap.py --filter targeted (results/remote/overlap_audit_targeted.json, comparisons[0].overlapping_indices); the targeted filter is the one the shipped sentence checkpoint trained under",
+  "generations_read_from": "results/remote/sentence_eval",
+  "references_per_sentence": 10,
+  "seeds_per_sampled_condition": 3,
+  "seq2seq_decoding": {
+    "strategy": "beam",
+    "num_beams": 4,
+    "no_repeat_ngram_size": 3,
+    "repetition_penalty": 1.2,
+    "max_length": 64
+  },
+  "decoding_eval": {
+    "temperature": 1.0,
+    "top_p": 0.9,
+    "num_predict": 100,
+    "stop": [
+      "\nComplex:",
+      "\nSimple:",
+      "\n\n"
+    ]
+  },
+  "fewshot_n": 3,
+  "significance_baseline": "base",
+  "models": {
+    "base": {
+      "model_id": "facebook/bart-base",
+      "source": "huggingface_hub"
+    },
+    "online": {
+      "model_id": "eilamc14/bart-large-text-simplification",
+      "source": "huggingface_hub"
+    },
+    "local": {
+      "model_id": "yunvs/bart-base-wikilarge-simplification",
+      "source": "huggingface_hub"
+    },
+    "llm_7b": {
+      "model_id": "qwen2.5:7b-instruct-q4_K_M",
+      "source": "huggingface_hub"
+    },
+    "llm_3b": {
+      "model_id": "qwen2.5:3b-instruct-q4_K_M",
+      "source": "huggingface_hub"
+    }
+  },
+  "results": {
+    "base": {
+      "label": "BART-base zero-shot (RQ1 baseline)",
+      "model_id": "facebook/bart-base",
+      "n_runs": 1,
+      "metrics": {
+        "sari": 21.29613719772519,
+        "bleu": 91.44265396245368,
+        "fkgl": 10.018594336541778,
+        "bertscore_f1": 0.9856897592544556,
+        "unchanged_rate": 0.9373219373219374,
+        "mean_words": 19.62962962962963
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.03239131518406145,
+      "sample_outputs": [
+        "One side of the armed conflicts is composed mainly of the Sudanese military and the Janjaweed, a Sudanese militia group recruited mostly from the Afro-Arab Abbala tribes of the northern Rizeigat region in Sudan.",
+        "Jeddah is the principal gateway to Mecca, Islam's holiest city, which able-bodied Muslims are required to visit at least once in their lifetime.",
+        "The Great Dark Spot is thought to represent a hole in the methane cloud deck of Neptune.",
+        "His next work, Saturday, follows an especially eventful day in the life of a successful neurosurgeon.",
+        "The tarantula, the trickster character, spun a black cord and, attaching it to the ball, crawled away fast to the east, pulling on the cord with all his strength.",
+        "There he died six weeks later, on 13 January 888.",
+        "They are culturally akin to the coastal peoples of Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also been presented with the Colin Mears Award to the value of \u00a35000.",
+        "Following the drummers are dancers, who often play the sogo (a tiny drum that makes almost no sound) and tend to have more elaborate \u2014 even acrobatic \u2014 choreography.",
+        "The spacecraft consists of two main elements: the NASA Cassini orbiter, named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe, named for the Dutch astronomer, mathematician and physicist Christiaan Huygenens."
+      ]
+    },
+    "online": {
+      "label": "BART off-the-shelf (baseline)",
+      "model_id": "eilamc14/bart-large-text-simplification",
+      "n_runs": 1,
+      "metrics": {
+        "sari": 38.055279903945525,
+        "bleu": 88.4794492550314,
+        "fkgl": 7.834882173080818,
+        "bertscore_f1": 0.9755322337150574,
+        "unchanged_rate": 0.13675213675213677,
+        "mean_words": 16.23931623931624
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.04585715760425003,
+      "sample_outputs": [
+        "One side of the armed conflicts is composed mainly of the Sudanese military and the Janjaweed, a Sudanese militia group.",
+        "Jeddah is the main gateway to Mecca, Islam 's holiest city.",
+        "The Great Dark Spot is thought to represent a hole in the methane cloud deck of Neptune.",
+        "His next work, Saturday, follows an eventful day in the life of a successful neurosurgeon.",
+        "The tarantula spun a black cord and, attaching it to the ball, crawled away fast to the east, pulling on the cord with all his strength.",
+        "There he died on 13 January 888.",
+        "They are similar to the coastal peoples of Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also been presented with the Colin Mears Award.",
+        "Following the drummers are dancers, who often play the sogo ( a tiny drum that makes almost no sound ) and have more elaborate choreography.",
+        "The spacecraft is named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe."
+      ],
+      "vs_baseline": {
+        "baseline_condition": "base",
+        "baseline_model_id": "facebook/bart-base",
+        "mean_delta_sari": 16.770842348136078,
+        "ci_low": 15.673316087532594,
+        "ci_high": 17.778656220097584,
+        "p_value": 0.0,
+        "n_resamples": 1000
+      }
+    },
+    "local": {
+      "label": "BART fine-tuned (this project)",
+      "model_id": "yunvs/bart-base-wikilarge-simplification",
+      "n_runs": 1,
+      "metrics": {
+        "sari": 37.71032256690304,
+        "bleu": 88.11416677796055,
+        "fkgl": 8.185977432440652,
+        "bertscore_f1": 0.9764848351478577,
+        "unchanged_rate": 0.11965811965811966,
+        "mean_words": 16.105413105413106
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.024383024498690595,
+      "sample_outputs": [
+        "One side of the conflict is composed mainly of the Sudanese military and the Janjaweed, a Sudanese militia group.",
+        "Jeddah is the main gateway to Mecca, Islam 's holiest city.",
+        "The Great Dark Spot is a hole in the methane cloud deck of Neptune.",
+        "His next work, Saturday, follows an eventful day in the life of a successful neurosurgeon.",
+        "The tarantula spun a black cord and attached it to the ball, crawled away fast to the east, pulling on the cord with all his strength.",
+        "He died six weeks later, on 13 January 888.",
+        "They are similar to the coastal peoples of Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also been presented with the Colin Mears Award.",
+        "Following the drummers are dancers, who often play the sogo (a tiny drum that makes almost no sound ).",
+        "The spacecraft is named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe."
+      ],
+      "vs_baseline": {
+        "baseline_condition": "base",
+        "baseline_model_id": "facebook/bart-base",
+        "mean_delta_sari": 16.40286072585739,
+        "ci_low": 15.399485085446182,
+        "ci_high": 17.443130263290804,
+        "p_value": 0.0,
+        "n_resamples": 1000
+      }
+    },
+    "llm_7b": {
+      "label": "Qwen2.5-7B + BLESS Prompt 2",
+      "model_id": "qwen2.5:7b-instruct-q4_K_M",
+      "n_runs": 3,
+      "metrics": {
+        "sari": 45.91805958233135,
+        "bleu": 75.25135921363871,
+        "fkgl": 7.782815207817957,
+        "bertscore_f1": 0.9785904884338379,
+        "unchanged_rate": 0.04653371320037986,
+        "mean_words": 18.94871794871795,
+        "sari_std": 0.06969928432475168
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.4651108901025062,
+      "sample_outputs": [
+        "One side of the armed conflict is mainly composed of the Sudanese military and the Janjaweed, who are a Sudanese militia group mostly from the Afro-Arab Abbala tribes in the northern Rizeigat region of Sudan.",
+        "Jeddah is the main entrance to Mecca, Islam's most sacred city, where able-bodied Muslims must go at least once in their lifetime.",
+        "The Great Dark Spot is believed to be a hole in Neptune's methane cloud deck.",
+        "His next work, Saturday, focuses on one especially eventful day in the life of a successful neurosurgeon.",
+        "The tarantula, a trickster, spun a black cord and attached it to the ball. He then crawled away quickly to the east, pulling on the cord with all his strength.",
+        "There he died six weeks later on January 13, 888.",
+        "They share similar cultural traits with the coastal peoples of Papua New Guinea.",
+        "Since 2000, the Kate Greenaway Medal recipient also receives the Colin Mears Award worth \u00a35000.",
+        "Following the drummers are dancers who often play tiny drums called sogo and usually have more elaborate, even acrobatic, dance moves.",
+        "The spacecraft has two main parts: the NASA Cassini orbiter, named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe, named after the Dutch astronomer, mathematician, and physicist Christiaan Huygens."
+      ],
+      "vs_baseline": {
+        "baseline_condition": "base",
+        "baseline_model_id": "facebook/bart-base",
+        "mean_delta_sari": 24.67046913422626,
+        "ci_low": 23.737483220553774,
+        "ci_high": 25.609508548566644,
+        "p_value": 0.0,
+        "n_resamples": 1000
+      }
+    },
+    "llm_3b": {
+      "label": "Qwen2.5-3B + BLESS Prompt 2",
+      "model_id": "qwen2.5:3b-instruct-q4_K_M",
+      "n_runs": 3,
+      "metrics": {
+        "sari": 47.02178139564801,
+        "bleu": 67.90092934946792,
+        "fkgl": 8.210344573040357,
+        "bertscore_f1": 0.9732494552930196,
+        "unchanged_rate": 0.007597340930674264,
+        "mean_words": 19.155745489078825,
+        "sari_std": 0.04516460823017104
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.3016596422357763,
+      "sample_outputs": [
+        "One side of the armed conflicts consists mainly of the Sudanese military and the Janjaweed. The Janjaweed is a Sudanese militia group, mostly recruited from the Afro-Arab Abbala tribes in the northern Rizeigat region of Sudan.",
+        "Jeddah is the main entrance to Mecca, which is Islam's holiest city. All able-bodied Muslims are required to visit Mecca at least once in their lives.",
+        "The Great Dark Spot is believed to be an opening in Neptune's methane cloud layer.",
+        "His next work, called Saturday, is about an especially busy day in the life of a successful neurosurgeon.",
+        "The tarantula, a trickster character, spun a black string and tied it to the ball. It then crawled away quickly to the east, pulling on the string with all its strength.",
+        "He died six weeks later, on January 13, 888.",
+        "They have similar culture to coastal people in Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also received a \u00a35000 Colin Mears Award.",
+        "Following the drummers are dancers who usually play the sogo (a small drum that makes little sound) and often have more complex and sometimes acrobatic moves.",
+        "The spacecraft has two main parts: the NASA-built Cassini orbiter, named after the astronomer Giovanni Domenico Cassini, and the ESA-built Huygens probe, named after the astronomer Christiaan Huygens."
+      ],
+      "vs_baseline": {
+        "baseline_condition": "base",
+        "baseline_model_id": "facebook/bart-base",
+        "mean_delta_sari": 25.753523166956686,
+        "ci_low": 24.961257045005375,
+        "ci_high": 26.57306949852886,
+        "p_value": 0.0,
+        "n_resamples": 1000
+      }
+    }
+  }
+}

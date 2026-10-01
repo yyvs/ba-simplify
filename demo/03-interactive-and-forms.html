@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo 03 — Interactive &amp; form elements</title>
+    <link rel="stylesheet" href="demo.css" />
+  </head>
+  <body>
+    <nav class="demo-nav">
+      <a href="index.html" translate="no" class="notranslate"
+        >← back to index</a
+      >
+    </nav>
+    <h1>03 — Interactive &amp; form elements</h1>
+    <p class="meta notranslate">
+      Covers <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code>,
+      <code>&lt;label&gt;</code>, <code>&lt;option&gt;</code>, and
+      <code>placeholder</code> attributes added 2026-07-13.
+    </p>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: simplifies as ONE sentence including the link text; the
+        <code>href</code> must be unchanged after toggling (check devtools
+        Elements panel).
+      </p>
+      <p>
+        Should you require additional clarification, please consult the
+        <a href="https://example.com/help">supplementary documentation</a> prior
+        to submission.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: each link simplifies on its own (they're "orphans" — not
+        wrapped in a paragraph or list item).
+      </p>
+      <nav>
+        <a href="#">Return to the principal navigation menu</a>
+        &nbsp;|&nbsp;
+        <a href="#">Consult our frequently asked questions</a>
+      </nav>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: simplifies as one sentence, button text included in the flow.
+      </p>
+      <p>
+        To proceed, kindly activate the
+        <button type="button">continue to the next stage</button> control below.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: a standalone button (not wrapped in a sentence) simplifies on
+        its own.
+      </p>
+      <button type="button">Submit this application for consideration</button>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: the <code>&lt;label&gt;</code> text simplifies independently
+        of the input it's attached to.
+      </p>
+      <label for="demo-input"
+        >Please furnish your complete legal appellation</label
+      >
+      <input
+        id="demo-input"
+        type="text"
+        placeholder="e.g. an example of the requested information"
+      />
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: the placeholder text changes (it's an attribute swap, not
+        visible DOM text) — click into the field to confirm it's empty, then
+        click elsewhere to see the ghost text; toggling off restores the
+        original placeholder exactly.
+      </p>
+      <textarea
+        placeholder="Kindly elaborate at length upon the circumstances surrounding your inquiry."
+      ></textarea>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: each <code>&lt;option&gt;</code> label simplifies
+        independently.
+      </p>
+      <select>
+        <option>Please make a preliminary selection</option>
+        <option>Indicative of substantial prior experience</option>
+        <option>Indicative of minimal prior experience</option>
+      </select>
+    </section>
+  </body>
+</html>

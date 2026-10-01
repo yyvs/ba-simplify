@@ -1,0 +1,27 @@
+/* shared/layers.css - z-index scale for every extension page. Floating surfaces must
+   paint above the sticky toolbar (the notice sits exactly where the bar is), so all
+   z-indexes are named here rather than picked per rule.
+
+   Lowest first:
+     toolbar  sticky bar: above page content, below everything floating.
+     modal    compare/analyze dialogs incl. backdrop; covers the bar.
+     menu     burger dropdowns; above modals, since a menu can open inside one.
+     notice   transient "copied" box; above all, since it often reports on an action
+              taken in a modal or menu.
+     picker   model picker (shared/picker.js), a viewport takeover; top everywhere,
+              and hard-coded there since web pages can't read these variables.
+
+   Steps of 100 leave room for e.g. `calc(var(--layer-modal) + 1)`.
+
+   Rules use a fallback (`var(--layer-menu, 1100)`): an undefined variable makes
+   z-index compute to `auto`, silently losing the layering on a page that doesn't link
+   this file. Keep fallbacks in step with these values. */
+:root {
+  --layer-toolbar: 100;
+  --layer-modal: 1000;
+  --layer-menu: 1100;
+  --layer-notice: 1200;
+  /* int32 max, so no host page can outrank it. Repeated as a literal in
+     shared/picker.js's shadow-root styles. */
+  --layer-picker: 2147483647;
+}

@@ -1,0 +1,42 @@
+# Dataset prep, fine-tuning and evaluation. Installs the service's requirements first,
+# because the eval scripts import the backend's own prompting.py (and document_text.py)
+# rather than keeping a copy of the BLESS templates in sync -- so the research
+# environment is a superset of the serving one, and one venv covers both.
+-r ../backend/requirements.txt
+
+datasets==5.0.1
+numpy==2.5.1
+
+# Transitive, pinned only to force the patched releases, in the same spirit as the
+# starlette/idna floors in ../backend/requirements.txt. aiohttp arrives via
+# datasets -> fsspec[http] and pillow via bert-score -> matplotlib, and neither parent
+# declares a floor, so a resolver is free to pick a version carrying published
+# advisories: aiohttp <3.14.3 (request smuggling via WebSocket upgrade, unnegotiated
+# compressed frames, OOB read in the C response parser) and pillow <12.3.0 (a long
+# run of decoder overflows and decompression-bomb bypasses). Drop these lines once
+# the parents require the patched versions themselves.
+aiohttp>=3.14.3
+pillow>=12.3.0
+
+# Metrics. easse (SARI, FKGL) is not on PyPI and installs from source.
+sacrebleu==2.6.0
+# Pinned to the same commit as remote/requirements-gpu.txt, and for the reason spelled out
+# there: `@master` is a moving target, so two installs months apart can compute different
+# SARI with nothing visible to say so. This is the commit every reported number was
+# produced with, so a local run and a GPU run score identically.
+git+https://github.com/feralvam/easse.git@6a4352ec299ed03fda8ee45445ca43d9c7673e89#egg=easse
+bert-score==0.3.13
+nltk==3.10.3 # nltk 3.11+ breaks the service's prompting.py, which imports the deprecated nltk.tokenize.api module.
+
+# D-Wikipedia ships its train split as .7z, the only split too large for GitHub's
+# inline file viewer.
+py7zr==1.1.3
+
+# Deliberately NOT installed here, despite being used by evaluate_document.py:
+#
+#   lens-metric==0.2.0
+#
+# LENS pins its own torch/transformers, which conflict with the versions the service
+# needs above -- installing it into this venv breaks the backend. Both eval scripts
+# record "LENS": null and carry on when it is missing. Compute it in
+# notebooks/colab_dwikipedia_eval.ipynb, where the runtime is disposable.

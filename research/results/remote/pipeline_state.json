@@ -1,0 +1,88 @@
+{
+  "stages": {
+    "filters": {
+      "status": "done",
+      "updated_at": "2026-08-21T08:50:37.468159+00:00",
+      "elapsed_seconds": 6.3,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python remote/dataio.py --report"
+    },
+    "overlap": {
+      "status": "done",
+      "updated_at": "2026-08-21T08:50:45.982668+00:00",
+      "elapsed_seconds": 8.5,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python remote/checks/check_overlap.py"
+    },
+    "dsari": {
+      "status": "done",
+      "updated_at": "2026-08-21T08:50:48.556604+00:00",
+      "elapsed_seconds": 2.6,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python remote/checks/test_d_sari.py --n 60"
+    },
+    "smoke": {
+      "status": "done",
+      "updated_at": "2026-08-21T08:59:52.230630+00:00",
+      "elapsed_seconds": 14.8,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python remote/train.py --structure document --scope prove_loop --filter strict --output-dir scratch/smoke_document"
+    },
+    "train_document_prove_loop": {
+      "status": "done",
+      "updated_at": "2026-08-21T08:59:51.726292+00:00",
+      "best_checkpoint": "scratch/smoke_document/best_checkpoint",
+      "elapsed_seconds": 8.7
+    },
+    "train_doc": {
+      "status": "done",
+      "updated_at": "2026-08-21T11:46:36.126757+00:00",
+      "elapsed_seconds": 9909.4,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python remote/train.py --structure document --scope full --filter strict --resume"
+    },
+    "train_document_full": {
+      "status": "done",
+      "updated_at": "2026-08-21T11:46:35.545200+00:00",
+      "best_checkpoint": "/home/yunusrenz/simple-website/research/scratch/simplification_results_document/best_checkpoint",
+      "elapsed_seconds": 9850.3
+    },
+    "smoke_eval": {
+      "status": "done",
+      "updated_at": "2026-08-21T09:01:19.948298+00:00",
+      "elapsed_seconds": 87.7,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python evaluate_document.py --model scratch/smoke_document/best_checkpoint --limit 20 --seed 42 --device cuda --batch-size 16 --llm qwen2.5:7b-instruct-q4_K_M --skip-lens --outdir results/remote/smoke"
+    },
+    "asset": {
+      "status": "done",
+      "updated_at": "2026-08-21T22:47:00.124062+00:00",
+      "elapsed_seconds": 2513.5,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python evaluate_sentence.py --conditions base,online,local,llm_7b,llm_3b --seeds 3 --decoding beam --significance-baseline base --device cuda --allow-llm-generate --outdir results/remote/sentence_eval"
+    },
+    "eval_doc": {
+      "status": "done",
+      "updated_at": "2026-08-22T00:57:24.813421+00:00",
+      "elapsed_seconds": 7821.1,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python evaluate_document.py --model scratch/simplification_results_document/best_checkpoint --limit 2000 --seed 42 --device cuda --batch-size 16 --llm qwen2.5:7b-instruct-q4_K_M --llm-seed 1 --resamples 1000 --skip-lens --outdir results/remote/document_eval"
+    },
+    "eval_doc_full": {
+      "status": "done",
+      "updated_at": "2026-08-21T15:37:43.403470+00:00",
+      "elapsed_seconds": 13742.0,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python evaluate_document.py --model scratch/simplification_results_document/best_checkpoint --baseline facebook/bart-base --limit 0 --seed 42 --device cuda --batch-size 16 --resamples 1000 --skip-lens --outdir results/remote/document_eval_full"
+    },
+    "lens": {
+      "status": "done",
+      "updated_at": "2026-08-22T08:15:55.116948+00:00",
+      "elapsed_seconds": 248.1,
+      "command": "/home/yunusrenz/simple-website/research/venv-lens/bin/python remote/lens_only.py --generations results/remote/document_eval --outdir results/remote/document_eval"
+    },
+    "review": {
+      "status": "done",
+      "updated_at": "2026-08-22T10:44:10.973712+00:00",
+      "elapsed_seconds": 5.5,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python review_document_outputs.py --generations results/remote/document_eval_full/generations_n8000_seed42.json --partial results/remote/document_eval_full/partial_finetuned_n8000_seed42.json --limit 0 --seed 42 --out results/remote/document_eval_full/qualitative_review_full.json"
+    },
+    "collect": {
+      "status": "done",
+      "updated_at": "2026-08-22T10:46:23.997830+00:00",
+      "elapsed_seconds": 0.0,
+      "command": "/home/yunusrenz/simple-website/research/venv-gpu/bin/python remote/collect_results.py"
+    }
+  }
+}

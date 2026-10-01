@@ -1,0 +1,221 @@
+\chapter{Methodology II: Browser Extension Deployment}
+\label{sec:methodology-ii}
+
+To address the deployment challenges and practical robustness queried in \cref{rq:deployment}, this chapter details the implementation of a local-processing framework.
+The resulting architecture is directly shaped by the models of \cref{sec:methodology-i}, by their granularity, their input caps, and their failure modes, as well as by the privacy constraints that ruled out hosted models.
+
+\section{Architecture and local-processing constraints}
+\label{sec:architecture}
+
+The system has three components: a Chrome Manifest~V3 extension \parencite{chrome2023serviceworker}, a FastAPI backend \parencite{fastAPI2026docs}, and the loaded models.
+The extension consists of a content script, which runs in the context of web pages \parencite{chrome2012contentscripts}, and a service worker.
+Seven selectable keys sit on five checkpoints: the sentence and document checkpoints fine-tuned here, the comparison simplifier, and the two prompted Qwen2.5 models, each offered at both granularities.
+
+\Cref{fig:architecture} gives the arrangement and \cref{fig:dataflow} one request's path through it, from collecting candidate text to writing the output back.
+The response carries the whole chain: the input, what the model produced, what was served, and why the two differ.
+This chain is what makes the History log of \cref{sec:instruments} usable as evidence in \cref{sec:sentence-failures}.
+
+\begin{figure}[p]
+	\centering
+	\includegraphics[width=0.84\textwidth]{fig_architecture.pdf}
+	\caption{System Architecture and the Local-Processing Constraint}
+	\label{fig:architecture}
+	\note{
+		All components run on-device; \glspl{llm} are served by a separate local Ollama server.
+		The comparison simplifier is a third-party checkpoint not produced in this work.
+	}
+
+	\vspace{1.5em}
+	\includegraphics[width=0.84\textwidth]{fig_dataflow.pdf}
+	\caption{The Request Path, and Where the Granularities Diverge}
+	\label{fig:dataflow}
+\end{figure}
+
+The backend writes no data to persistent logs or storage and keeps only an in-memory cache, which is cleared on restart.
+The extension does store text: the History log keeps the last twenty pages in the browser's local storage, on the user's own machine.
+The backend binds to \texttt{127.0.0.1} \parencite{fastAPI2026docs} and is reachable only from the user's own machine.
+None of the \gls{ats} approaches, including the prompted approach, sends data to a third party.
+
+\pagebreak
+
+\section{Content selection and DOM-preserving replacement}
+\label{sec:content-selection}
+
+The extension prepares a page in one of two ways, one per granularity.
+The \emph{sentence cut} (or sentence mode) sends each prose leaf, which the backend splits into sentences.
+The \emph{document cut} (or document mode) sends each heading-delimited section as one document (\cref{sec:unit-of-simplification}).
+
+\paragraph{Candidates are classified as blocks or leaves, then filtered four ways.}
+The system classifies candidate elements as block-like containers or inline leaf elements.
+A block-like element counts as a leaf only if none of its descendants is itself block-like, which prevents a wrapping \texttt{<div>}, or a table around its cells, from being sent twice.
+
+Four filters then run: a minimum word count (\texttt{MIN\_WORDS\_TO\_SIMPLIFY=4}), a requirement that the text contain letters, a skip for text that is only a \gls{url}, and a regular expression matching \codeverb+/\b(function|var|let|const|=>)\b|[{}<>;=]/+ that skips code-like text even outside \texttt{<pre>} and \texttt{<code>}.
+Elements inside \texttt{<pre>}, \texttt{<code>}, \texttt{<script>}, or \texttt{<style>} are excluded outright.
+The minimum was originally 30~characters, which would have excluded most buttons, labels and other short interactive elements.
+It was lowered to a four-word minimum.
+The lower threshold admits many more requests per page, but also increases the amount of possible candidates for simplification (\cref{sec:deployment-results}).
+
+\paragraph{Opted-out text is read as context but never rewritten.}
+The extension treats three markers as opt-outs at element and text-node level: \texttt{translate="no"} \parencite{whatwg2026html}, \texttt{class="notranslate"} \parencite{google2008notranslate} and \texttt{aria-hidden} \parencite{w3c2026aria}.
+Both cuts originally removed opted-out subtrees from the request entirely, and therefore the opted-out text wasn't sent to the backend.
+For the sentence cut this removal is valid, but not for the document cut, since the holes it left in a section's prose were filled with hallucinated content.
+Therefore, the extension now also sends opted-out text to the backend as context but doesn't run simplification on it.
+
+\paragraph{Write-back is anchored on fragments the model left verbatim.}
+A unit's output is written back into the text nodes the request was built from.
+Earlier designs preserved either formatting or sentences, but not both.
+Replacing each text node separately kept inline formatting but broke sentences into fragments; flattening an element and replacing its content kept sentences whole but removed links and formatting.
+Anchored write-back keeps both, provided that some fragments of the original survive verbatim in the rewrite, since the alignment anchors on them (\cref{sec:deployment-results}).
+
+In the document cut, the output does not line up with its input element by element, since the model may merge several elements into one.
+The output is therefore redistributed across the elements the section was built from: each sentence goes to an element by content-word overlap, or by each element's share of the input's length (\emph{pacing}).
+
+\paragraph{A page asserts structural boundaries that carry no punctuation.}
+A \texttt{<br>} is a structural break the document asserts outright, and in the extension's text extraction it contributes neither characters nor punctuation to an element's text.
+A line such as \texttt{Tickets cannot be refunded<br>Children under 12 travel free} therefore flattens into a single run, which reads as one sentence that a punctuation-based segmenter cannot split accurately.
+The rule adopted is therefore two-stage and ordered: it splits on structural boundaries first and segments linguistically within each chunk afterwards.
+The reverse order would ask a punctuation-based segmenter to recover information that no longer exists.
+A blank line inside a text node under \texttt{white-space: pre-wrap} is the same defect in a second spelling.
+
+\paragraph{Security rests on an \gls{api} property, not on sanitising a string.}
+Model output is untrusted input to the page, and it is assigned to a text node's data, which cannot create an element.
+A committed test asserts that an output containing \codeverb|<img src=x onerror='alert(1)'>| renders as visible escaped text.
+
+\paragraph{The original text is stored on the page itself.}
+Before an element is rewritten, its original content is stored in its \texttt{data-original-*} \gls{html} attributes.
+These attributes mark the element as already simplified, so that a repeated run leaves it alone, and they allow the page to be restored.
+A reload discards these attributes together with the simplification, and the page appears as its host served it.
+Simplifying it again then reuses earlier work: the backend serves its cached output for any unit it has already processed with the same model and audience.
+
+\section{Unit of simplification}
+\label{sec:unit-of-simplification}
+
+\paragraph{The originating defect was fragmentation.}
+Running the extension on an English Wikipedia article produced output in which single sentences had been broken into several independently simplified pieces: one article contributed \num{173} units, including fragments such as \texttt{") is a nonprofit "} and \texttt{", later known as the "}.
+The cause was that every text node was sent separately and any inline element terminates a text node, so a sentence with two links and a footnote marker is split into four or more fragments.
+
+Per-text-node replacement was a deliberate feature, since it is exactly what preserves inline formatting, an explicit design goal.
+The design optimised for \gls{dom} integrity and thereby destroyed linguistic integrity (\cref{sec:granularity-findings}).
+
+\paragraph{The sentence split belongs in the backend.}
+It was placed there because it is one implementation serving every client, and because the split is a property of the model and not of the page.
+The prompted approach's single-sentence template was being degraded by flattened multi-sentence paragraphs independently of anything in the \gls{dom}.
+A rule-based sentence segmenter, \texttt{pysbd}, was chosen over a single regular expression.
+A regular expression could split sentences wrongly, because a full stop can end a sentence, be used as a decimal point, or mark an abbreviation \parencite[59--60]{jm3}.
+Granularity thereby becomes an explicit per-model property that the backend's status endpoint reports, because two models can share an architecture and still require different text units.
+
+\paragraph{A paragraph is not a document.}
+The document model was trained on documents averaging roughly \num{180}~tokens, with a median of \num{120}.
+Sending it one paragraph at a time would create a fragmentation problem.
+Like a sentence model given sentence fragments, the document model would receive a smaller unit of text, which it essentially was not trained for.
+Sending a whole web page as one document was rejected as well, since it would have silently deleted the greater part of most articles at the \num{512}-token input cap.
+
+The chosen design therefore determines the page's content area and collects prose leaves in document order until it reaches the next heading or the model's input cap, which the extension reads from the backend's status endpoint.
+A section longer than the input cap is split into segments that are sent as separate requests, and their outputs are rejoined before insertion (\cref{tab:joins}).
+
+\begin{table}[htbp]
+	\centering
+	\small
+	\setlength{\tabcolsep}{4pt}
+	\caption{Segment-Join Strategies and Their Failure Modes}
+	\label{tab:joins}
+	\begin{tabular}{@{}P{5.9cm}P{6.3cm}@{}}
+		\toprule
+		\textbf{Strategy}                                                             & \textbf{Result}                                                          \\
+		\midrule
+		join with a space                                                             & adjacent segments fuse into one sentence, colliding unrelated facts      \\
+		append a full stop unconditionally, then join                                 & double punctuation after segments already ending in terminal punctuation \\
+		\textbf{append a full stop only where one is missing, then join with a space} & \textbf{adopted}; boundaries survive and no punctuation is duplicated    \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\pagebreak
+
+Headings themselves are not sent or rewritten, since including them in a section's input resulted in them being echoed at the start of the output (\cref{tab:conventions}).
+Additionally, leaving them untouched preserves the page's heading structure, which screen readers use to navigate \parencite[519]{hellbusch2018webdesign}.
+A strategy that would merge short sections up to the \num{512}-token input cap was planned but dropped, since long combined sections were not as represented in the training distribution.
+
+\begin{table}[htbp]
+	\centering
+	\small
+	\setlength{\tabcolsep}{4pt}
+	\caption{Effect of Input Convention on Document-Model Output}
+	\label{tab:conventions}
+	\begin{tabular}{@{}P{5.2cm}P{7.0cm}@{}}
+		\toprule
+		\textbf{Input convention}                                   & \textbf{Outcome}                                                                         \\
+		\midrule
+		corpus convention (lowercased, pre-tokenised, no newlines)  & two of the three facts retained, no fabrication; the adopted convention                  \\
+		ordinary mixed-case prose                                   & a factual hallucination (``northern Netherlands'' became ``northern hemisphere'')        \\
+		corpus convention with \texttt{\textbackslash n} separators & two facts were lost, and the province ``Friesland'' became ``the country of friesland''  \\
+		heading text included in the section body                   & the heading echoed back at the start of the output, which would duplicate it on the page \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		Outcomes were judged by inspecting one hand-constructed document (\(\gls{nsize} = 1\)) for hallucination and for facts retained or lost.
+		\Cref{app:conventions} gives the recorded outputs.
+	}
+\end{table}
+
+\paragraph{The corpus convention becomes an inference-time variable.}
+Because the document model both consumes and produces the corpus's lowercased, pre-tokenised convention, the fix is a matched pair: normalise on the way in, de-normalise on the way out.
+The output half is needed because raw output such as \texttt{achtkarspelen is a municipality in friesland} would otherwise reach the page in lowercase.
+
+This also matters for structural correctness: a single missing space after a full stop in the de-normaliser shifted an entire section's write-back one position out of step, mis-assigning nine consecutive paragraphs and making one sentence disappear.
+The input convention was chosen by comparing the corpus convention with alternatives on one document and reading the outputs (\cref{tab:conventions}).
+
+\pagebreak
+
+\section{Output guards and execution control}
+\label{sec:guards}
+
+Four guards check generated text before it is served; rejected outputs are skipped and replaced by their original input.
+For the sentence-level \gls{seqseq} models, a word-overlap guard treats an output as a hallucination when the input has at most three words and the output shares none of them.
+It was built after the implausible outputs for isolated fragments described in \cref{sec:motivation}.
+
+For the two prompted models, the output check of \cref{sec:method-three} assigns a reason code to each failed output, such as prompt echo, refusal, empty output or degenerate repetition.
+
+For all approaches, a change guard rejects output that differs from its input only in punctuation (e.g., a straightened quotation mark or a dropped full stop) or only by a deleted number.
+Its reason code is \texttt{no\_meaningful\_change}.
+Word-level edits are never rejected, and a punctuation-only edit is kept if it lowers the \gls{fkgl} grade by at least half a grade level.
+
+Also for all approaches, a deny-list rejects output that consists only of a known training-corpus heading; its two entries are ``other websites'' and ``other pages''.
+\Cref{sec:deployment-results} reports how often the guards fire, not whether each firing was correct.
+
+In the document cut, an output with fewer sentences than its section has elements leaves the remaining elements unchanged.
+The extension records how many elements each output covered but does not close the gap.
+
+Only one simplification run may proceed at a time, a precondition for the latency measurements.
+Two pages simplified concurrently would share the backend and its batch queue for each model, so their requests would interleave and the latency each page reports would describe neither run accurately.
+
+\section{Instruments for evaluating deployment}
+\label{sec:instruments}
+
+Three instruments produce the deployment evidence: the extension's own History log, a latency profiler and a site-audit harness.
+The profiler and the harness run the extension's content scripts.
+Like the behavioural testing of \cref{sec:related-robustness}, all three examine how the deployed system behaves on real input rather than how it scores on a held-out benchmark.
+
+The \textbf{History log} records the input, the model's output and, where one applies, the guard reason, for every unit sent to the backend.
+Each run also records the approach, model identifier, granularity, and audience.
+It was built as a transparency feature and became the diagnostic instrument that identified the fragmentation defect.
+
+The \textbf{latency profiler} runs the extension's content script under \texttt{jsdom}, a JavaScript implementation of the \gls{dom} and \gls{html} standards for Node.js \parencite{jsdom2026}, and sends its requests to the backend.
+The messaging between the content script and the service worker is replaced by a stub, so the requests are produced by the extension's own code.
+The backend runs without automatic reloading, which would restart it whenever its code changes.
+The backend is restarted before each cold run so that no outputs are cached from an earlier run over the same page.
+
+The \textbf{site-audit harness} runs every content script the extension manifest injects, under \texttt{jsdom} against the backend.
+It records the page's anchors, images, citation markers and the count of each tag before and after a run, as well as the reason an element was skipped.
+It then reverts the page and compares the result with the original.
+
+The extension also offers an \textbf{in-page multimodel comparison}, which runs one page through several models at a fixed granularity.
+It collects the page's text once and sends the same inputs to every model, so the content cannot change between models.
+It helps users to compare and choose among the served models.
+Reported metrics come from the single evaluation harness of \cref{sec:evaluation-protocol}.
+
+Committed \texttt{jsdom} and backend test suites cover the deployment path.
+They check separately that the right units are sent and that the outputs are written back correctly, since a suite covering one says nothing about the other.
+Tests that assumed the sentence cut's behaviour exposed three development defects in the document cut: it folded a section's paragraphs into one, recorded the output text as the original input, and did not correctly count the elements it passed over.
+All three were fixed.
+During development, the extension was also checked by hand in Chrome on several pages, including pages rendered entirely by client-side JavaScript.

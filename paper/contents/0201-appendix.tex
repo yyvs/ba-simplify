@@ -1,0 +1,412 @@
+\newpage
+\appendix
+% sections from here on are referenced as "Appendix A.2", not "Section A.2"
+\crefalias{section}{appendix}
+\crefalias{subsection}{appendix}
+
+% page address for Table A.3, in sans url style: tt would overrun the column
+\newcommand{\pageurl}[2]{\href{#1}{\begingroup\urlstyle{sf}\nolinkurl{#2}\endgroup}}
+
+% box for verbatim prompt text
+\newtcolorbox{promptbox}[1][]{
+	colback=black!3, colframe=black!35, boxrule=0.4pt, arc=1pt, left=6pt, right=6pt, top=6pt, bottom=6pt, fontupper=\footnotesize\ttfamily\rightskip0pt plus 1fil\relax, #1 }
+
+% one unnumbered "Appendices" chapter; \chapter* does not step the counter,
+% so it is set to 1 by hand to number the sections A.1--A.7
+\setcounter{chapter}{1}
+\clearpage
+\phantomsection
+\addcontentsline{toc}{chapter}{Appendices}
+\chapter*{Appendices}
+\label{app:appendix}
+
+\glsunsetall
+
+% keep A.1--A.7 out of the toc; written into the .toc so only later entries are affected
+\addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
+
+% appendix tables are set off in the list of tables as in the toc (no appendix figures)
+\addtocontents{lot}{\protect\tocgreyon}
+\addtocontents{lot}{\protect\tocdivider}
+
+\section{Link to data and code}
+\label{app:data-code}
+
+The source code, training and evaluation scripts, site-audit artefacts, and model cards are in the following GitHub repository:
+
+\begin{center}
+	\url{https://github.com/yyvs/ba-simplify}
+\end{center}
+
+\noindent
+The four site-audit artefacts behind \crefrange{tab:pages}{tab:inversions} share one directory and one run stamp,
+
+\begin{center}
+	\path{research/results/site_audit/site_audit_20260826T044008Z}
+\end{center}
+
+\noindent
+and differ only in their suffix:
+
+\begin{itemize}
+	\setlength{\itemsep}{0pt}
+	      \setlength{\parskip}{0pt}
+	\item \path{.json}, the twenty-four runs and their per-page totals;
+	\item \path{_items.jsonl}, one row per registered leaf, \num{11867} of them;
+	\item \path{_units.jsonl}, one row per request, \num{2571} of them;
+	\item \path{_labelling.jsonl}, the \num{130} hand-labelled items of \cref{app:codebook}.
+\end{itemize}
+
+\noindent
+The prompt templates of \cref{app:prompts} are \path{backend/prompting.py}, the demonstration sampler is \path{research/select_fewshot.py}, and the audit harness is \path{research/audit_sites.mjs}.
+
+\section{Prompt templates}
+\label{app:prompts}
+
+\subsection{Sentence granularity}
+
+The instruction below is \gls{bless} Prompt~2 \parencite[13294]{kew-etal-2023-bless} reproduced verbatim, with the single parameterisation described in \cref{sec:method-three}: the paper's hard-coded noun phrase \emph{non-native speakers of English} becomes the slot \texttt{\{target\_audience\}}.
+Rendering the slot with its default value therefore returns the published prompt character for character, which a unit test asserts.
+
+\begin{promptbox}
+	Please rewrite the following complex sentence in order to make it easier to understand by \{target\_audience\}. You can do so by replacing complex words with simpler synonyms (i.e. paraphrasing), deleting unimportant information (i.e. compression), and/or splitting a long complex sentence into several simpler ones. The final simplified sentence needs to be grammatical, fluent, and retain the main ideas of its original counterpart without altering its meaning.
+\end{promptbox}
+
+The slot accepts only a closed set of values rather than free text, so that evaluation runs stay reproducible, and the slot cannot carry injected instructions alongside the page content.
+The set has five values:
+
+\begin{promptbox}
+	non-native speakers of English \hfill (default) \\
+	children aged 8 to 12 \\
+	adult readers with low literacy skills \\
+	readers with cognitive disabilities \\
+	a general adult audience with no specialist knowledge
+\end{promptbox}
+
+The rendered prompt places the instruction first, then the three demonstrations of \cref{app:demos} as \texttt{Complex:}/\texttt{Simple:} pairs, then the input and a dangling \texttt{Simple:} prefix for the model to continue from, with a blank line between blocks:
+
+\begin{promptbox}
+	<instruction> \\
+	\\
+	Complex: <demonstration 1 source> \\
+	Simple: <demonstration 1 reference> \\
+	\\
+	Complex: <demonstration 2 source> \\
+	Simple: <demonstration 2 reference> \\
+	\\
+	Complex: <demonstration 3 source> \\
+	Simple: <demonstration 3 reference> \\
+	\\
+	Complex: <input sentence> \\
+	Simple:
+\end{promptbox}
+
+\subsection{Document granularity}
+
+The document template has no published source.
+It adapts the sentence template in the three ways recorded in \cref{sec:method-three}, with the frame \texttt{Text:}/\texttt{Simplified text:} in place of \texttt{Complex:}/\texttt{Simple:}, and carries no demonstrations by default.
+
+\begin{promptbox}
+	Please rewrite the following text in order to make it easier to understand by \{target\_audience\}. You can do so by replacing complex words with simpler synonyms (i.e. paraphrasing), deleting unimportant information (i.e. compression), splitting long complex sentences into several simpler ones, and merging or reordering sentences where that makes the whole text clearer. The result needs to be grammatical, fluent, and retain the main ideas of the original without altering its meaning. Return only the rewritten text as continuous prose -{}- no commentary, no headings, no bullet points, and no introduction such as "Here is the simplified text".
+\end{promptbox}
+
+\subsection{Decoding and stop sequences}
+
+\Cref{tab:decoding} gives the two decoding configurations.
+Serving is greedy so that re-simplifying a page produces the same text, while evaluation reproduces \gls{bless}'s own reported sampling settings \parencite[13293]{kew-etal-2023-bless} so that the numbers are comparable to the paper.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{5pt}
+	\caption{Decoding Configurations for Serving and for Evaluation}
+	\label{tab:decoding}
+	\begin{tabular}{@{}P{2.5cm}rrrP{3.8cm}@{}}
+		\toprule
+		\textbf{Configuration}          & \textbf{Temperature}          & \textbf{\Gls{topp}}                               & \textbf{Token cap} & \textbf{Stop sequences}                                      \\
+		\midrule
+		Serving, in the extension       & \num{0.0}                     & n/a                                               & 200                & \codeverb|\nComplex:|, \codeverb|\nSimple:|, \codeverb|\n\n| \\
+		\addlinespace
+		Evaluation, per BLESS           & \num{1.0}                     & \num{0.9}                                         & 100                & \codeverb|\nComplex:|, \codeverb|\nSimple:|, \codeverb|\n\n| \\
+		\addlinespace
+		Either, at document granularity & \multicolumn{3}{c}{unchanged} & \codeverb|\nText:|, \codeverb|\nSimplified text:|                                                                                     \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		The document row overrides only the stop sequences, since the sentence list's blank-line stop would cut every multi-paragraph output at its first paragraph.
+		The three evaluation seeds are supplied per run, not fixed in the template.
+	}
+\end{table}
+
+\section{In-context demonstrations}
+\label{app:demos}
+
+\Cref{tab:demos} gives the three demonstrations used for the default audience.
+They are sampled from the ASSET validation split at seed~42 under the four selection rules of \cref{sec:method-three}.
+\Cref{tab:demos-authored} gives the hand-authored demonstrations of the four other audiences.
+
+\begin{table}[H]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{4pt}
+	\caption{In-Context Demonstrations and the Operations They Cover}
+	\label{tab:demos}
+	\begin{tabular}{@{}lP{4.65cm}P{4.53cm}P{1.55cm}@{}}
+		\toprule
+		\textbf{Index} & \textbf{Complex (source)}                                                                                                                                                                      & \textbf{Simple (reference)}                                                                                                                          & \textbf{Operation} \\
+		\midrule
+		285            & To avoid adversaries from guessing the key using a brute-force attack, the key space is usually designed to be extremely large.                                                                & To keep foes from guessing the key using a brute-force attack, the key space is designed to be extremely large.                                      & paraphrase         \\
+		\addlinespace
+		1516           & She is the daughter of well-known Hong Kong singer Teresa Carpio, with whom she has performed on stage as a backup singer.                                                                     & She is the daughter of famous Hong Kong singer Teresa Carpio, with whom she performed as a backup singer.                                            & compression        \\
+		\addlinespace
+		1116           & Other Mario sports games include the Camelot-developed series Mario Golf and Mario Tennis, and, respectively, the baseball and soccer games Mario Superstar Baseball and Super Mario Strikers. & Other Mario sports games are the Mario Golf and Mario Tennis. Also, the baseball and soccer games Mario Superstar Baseball and Super Mario Strikers. & split              \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		Row~285 also drops the hedge \emph{usually}, which is a meaning change the reference makes and the instruction does not license.
+		The four non-default audiences have no parallel corpus, so their pools are hand-authored (\cref{tab:demos-authored}), rest on a weaker footing, and are not comparable to \gls{bless}.
+	}
+\end{table}
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{4pt}
+	\caption{Hand-Authored Demonstrations for the Four Non-Default Audiences}
+	\label{tab:demos-authored}
+	\begin{tabular}{@{}P{3.4cm}P{8.9cm}@{}}
+		\toprule
+		\textbf{Audience}                                     & \textbf{Simple (hand-authored)}                                                                                               \\
+		\midrule
+		\multicolumn{2}{@{}P{12.5cm}@{}}{\textbf{Source~1:} The commission subsequently determined that the allegations were unsubstantiated and dismissed the complaint in its entirety.}    \\
+		\addlinespace[2pt]
+		children aged 8 to 12                                 & The group looked at the claims. They found no proof, so they said no to the complaint.                                        \\
+		adult readers with low literacy skills                & The commission checked the claims. They found no proof. They rejected the complaint.                                          \\
+		readers with cognitive disabilities                   & A group of people checked the complaint. They found no proof. They said no to it.                                             \\
+		a general adult audience with no specialist knowledge & The commission found no evidence for the claims and threw out the complaint.                                                  \\
+		\midrule
+		\multicolumn{2}{@{}P{12.5cm}@{}}{\textbf{Source~2:} Owing to inclement weather conditions, the outdoor ceremony was relocated to an adjacent indoor venue.}                           \\
+		\addlinespace[2pt]
+		children aged 8 to 12                                 & The weather was bad. So the party moved inside to a room next door.                                                           \\
+		adult readers with low literacy skills                & The weather was bad. The ceremony moved indoors. It took place in a room next door.                                           \\
+		readers with cognitive disabilities                   & The weather was bad. The event went inside. It was in the room next door.                                                     \\
+		a general adult audience with no specialist knowledge & Bad weather forced the outdoor ceremony to move to an indoor venue next door.                                                 \\
+		\midrule
+		\multicolumn{2}{@{}P{12.5cm}@{}}{\textbf{Source~3:} He is widely regarded as one of the most influential composers of the Romantic era, a period spanning roughly from 1800 to 1910.} \\
+		\addlinespace[2pt]
+		children aged 8 to 12                                 & He wrote music a long time ago. Lots of people think he was one of the best music writers of his time.                        \\
+		adult readers with low literacy skills                & He wrote music. Many people say he was one of the best. He lived in a time called the Romantic era.                           \\
+		readers with cognitive disabilities                   & He made music. People liked his music very much. He lived long ago.                                                           \\
+		a general adult audience with no specialist knowledge & He is seen as one of the most influential composers of the Romantic era, which ran from about 1800 to 1910.                   \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		The texts are those in \path{backend/prompting.py}.
+	}
+\end{table}
+
+\section{The twelve audited pages}
+\label{app:pages}
+
+\Cref{tab:pages} identifies the pages behind \cref{sec:deployment-results}.
+They were chosen by category before any was run, two per category, and picked informally within each category, without a sampling procedure.
+Each page was captured once and both runs read the same cached copy, so the twenty-four runs are comparable and reproducible after the live pages change.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{3pt}
+	\renewcommand{\arraystretch}{1.15}
+	\caption{The Twelve Audited Pages, by Category and URL}
+	\label{tab:pages}
+	\begin{tabular}{@{}P{1.95cm}P{1.85cm}P{8.2cm}@{}}
+		\toprule
+		\textbf{Category} & \textbf{Key}        & \textbf{Page and \gls{url} as retrieved}                                                                                                                                                                                           \\
+		\midrule
+		news              & \texttt{bbc}        & BBC News article \newline \pageurl{https://www.bbc.com/news/articles/c0k3700zljjo}{bbc.com/news/articles/c0k3700zljjo}                                                                                                             \\
+		news              & \texttt{tagesschau} & tagesschau news article (German) \newline \pageurl{https://www.tagesschau.de/ausland/asien/gaza-wiederaufbau-100.html}{tagesschau.de/ausland/asien/gaza-wiederaufbau-100.html}                                                     \\
+		\addlinespace
+		encyclopedic      & \texttt{wikipedia}  & Wikipedia: Photosynthesis, as served by the article \gls{html} \gls{api} \newline \pageurl{https://en.wikipedia.org/api/rest_v1/page/html/Photosynthesis}{en.wikipedia.org/api/rest\_v1/page/html/Photosynthesis}                  \\
+		encyclopedic      & \texttt{sep}        & Stanford Encyclopedia of Philosophy: Consciousness \newline \pageurl{https://plato.stanford.edu/entries/consciousness/}{plato.stanford.edu/entries/consciousness/}                                                                 \\
+		\addlinespace
+		government        & \texttt{govuk}      & GOV.UK guidance: Living in Germany \newline \pageurl{https://www.gov.uk/guidance/living-in-germany}{gov.uk/guidance/living-in-germany}                                                                                             \\
+		government        & \texttt{europa}     & Your Europe: entry and exit rules for EU citizens \newline \pageurl{https://europa.eu/youreurope/citizens/travel/entry-exit/eu-citizen/index_en.htm}{europa.eu/youreurope/citizens/travel/entry-exit/eu-citizen/index\_en.htm}     \\
+		\addlinespace
+		e-commerce        & \texttt{ikea}       & IKEA product page: BILLY bookcase \newline \pageurl{https://www.ikea.com/gb/en/p/billy-bookcase-white-00263850/}{ikea.com/gb/en/p/billy-bookcase-white-00263850/}                                                                  \\
+		e-commerce        & \texttt{allbirds}   & Allbirds storefront, redirected from a product page \newline \pageurl{https://www.allbirds.com/collections/mens}{allbirds.com/collections/mens}                                                                                    \\
+		\addlinespace
+		documentation     & \texttt{mdn}        & MDN reference for the \gls{css} \texttt{flex} shorthand property \newline \pageurl{https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex}{developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex} \\
+		documentation     & \texttt{pydocs}     & Python documentation: coroutines and asyncio tasks \newline \pageurl{https://docs.python.org/3/library/asyncio-task.html}{docs.python.org/3/library/asyncio-task.html}                                                             \\
+		\addlinespace
+		single-page app   & \texttt{reactdev}   & react.dev tutorial: Thinking in React \newline \pageurl{https://react.dev/learn/thinking-in-react}{react.dev/learn/thinking-in-react}                                                                                              \\
+		single-page app   & \texttt{nextjs}     & Next.js documentation: Installation \newline \pageurl{https://nextjs.org/docs/app/getting-started/installation}{nextjs.org/docs/app/getting-started/installation}                                                                  \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		All twelve were fetched on 26~August 2026 between 03:34 and 03:39~UTC, cached with the SHA-256 of their \gls{html} truncated to 16 hexadecimal digits, and audited against those copies at commit \texttt{5989ab4}.
+		\Glspl{url} are shown without their scheme and \texttt{www} prefix; the links carry the full address.
+		Two \glspl{url} resolved elsewhere than requested: MDN served the same \texttt{flex} page under a \path{Reference/Properties} path, and Allbirds redirected the requested product page to a collection listing.
+		Most large shops answered the scripted fetch with a bot challenge, so the two audited shops need not be typical of e-commerce sites.
+		The two single-page apps were audited as the \gls{html} the server delivers, since \texttt{jsdom} runs no page JavaScript by default \parencite{jsdom2026}.
+	}
+\end{table}
+
+\section{Per-page coverage counts}
+\label{app:coverage}
+
+\Cref{fig:skipshare} plots skip shares; \cref{tab:coverage} gives the counts underneath them.
+The same \qty{95}{\percent} skip share means far more withheld leaves on a page registering \num{1749} than on one registering 39, a difference the aggregate totals of \cref{sec:deployment-results} cannot show.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{2pt}
+	\caption{Per-Page Coverage Counts in Both Cuts}
+	\label{tab:coverage}
+	\begin{tabular}{@{}l rrrr rrrr@{}}
+		\toprule
+		                                    & \multicolumn{4}{c}{\textbf{Sentence cut}} & \multicolumn{4}{c}{\textbf{Document cut}}                                                                                                                       \\
+		\cmidrule(lr){2-5}\cmidrule(l){6-9}
+		\textbf{Category (page)}            & Found                                     & Sent                                      & Changed             & Skip\%              & Found               & Sent         & Changed      & Skip\%              \\
+		\midrule
+		news (\texttt{bbc})                 & 384                                       & 85                                        & 64                  & \num{77.9}          & 42                  & 11           & 9            & \num{73.8}          \\
+		news (\texttt{tagesschau})          & 290                                       & 65                                        & 42                  & \num{77.6}          & 41                  & 6            & 3            & \num{85.4}          \\
+		\addlinespace
+		encyclopedic (\texttt{wikipedia})   & \num{1220}                                & 278                                       & 249                 & \num{77.2}          & 995                 & 46           & 45           & \num{95.4}          \\
+		encyclopedic (\texttt{sep})         & 612                                       & 480                                       & 405                 & \textbf{\num{21.6}} & 214                 & 99           & 93           & \textbf{\num{53.7}} \\
+		\addlinespace
+		government (\texttt{govuk})         & 463                                       & 311                                       & 206                 & \num{32.8}          & 172                 & 58           & 39           & \num{66.3}          \\
+		government (\texttt{europa})        & 562                                       & 246                                       & 139                 & \num{56.2}          & 39                  & 12           & 8            & \num{69.2}          \\
+		\addlinespace
+		e-commerce (\texttt{ikea})          & 416                                       & 53                                        & 34                  & \num{87.3}          & 275                 & 10           & 4            & \num{96.4}          \\
+		e-commerce (\texttt{allbirds})      & 845                                       & 213                                       & 172                 & \num{74.8}          & 330                 & 3            & 3            & \textbf{\num{99.1}} \\
+		\addlinespace
+		documentation (\texttt{mdn})        & \num{1749}                                & 85                                        & 44                  & \textbf{\num{95.1}} & 226                 & 11           & 6            & \num{95.1}          \\
+		documentation (\texttt{pydocs})     & 956                                       & 230                                       & 148                 & \num{75.9}          & 754                 & 29           & 23           & \num{96.2}          \\
+		\addlinespace
+		single-page app (\texttt{reactdev}) & 354                                       & 82                                        & 59                  & \num{76.8}          & 130                 & 11           & 10           & \num{91.5}          \\
+		single-page app (\texttt{nextjs})   & 926                                       & 96                                        & 60                  & \num{89.6}          & 194                 & 15           & 15           & \num{92.3}          \\
+		\midrule
+		\textbf{Total}                      & \textbf{\num{8777}}                       & \textbf{\num{2224}}                       & \textbf{\num{1622}} & \textbf{\num{74.7}} & \textbf{\num{3412}} & \textbf{311} & \textbf{258} & \textbf{\num{90.9}} \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		\emph{Found} is registered candidates, \emph{Sent} those that passed the filters and reached the backend, and \emph{Changed} those the model altered.
+		Skip\% is \emph{Found} minus \emph{Sent} over \emph{Found}; in the total row it is computed from the summed counts, so it is weighted by page size.
+		Within the body, bold marks the extreme skip share at each end of each cut's range.
+		The two cuts' skip shares are not comparable with each other (\cref{sec:deployment-results}).
+		The two \emph{Found} columns sum to \num{12189} against \num{11867} rows in the item artefact, because a leaf registered in both cuts is one row there and two registrations here.
+	}
+\end{table}
+
+\section{Hand-labelling codebook}
+\label{app:codebook}
+
+The \num{130} items behind \cref{fig:verdicts} were sampled and labelled under the scheme below.
+The sample is stratified by page rather than drawn from the pool, three items per page per cut, because the question is how the filters behave across page types.
+A flat draw from the skipped pool would be mostly Wikipedia and MDN.
+Each item's rank is the SHA-256 of its own text, so the sample is deterministic without a random seed and each label stays attached to its item.
+
+The skipped side is restricted to items the filters actually decided about, meaning prose-length text of at least eight words inside the page's own content area.
+Section headings are excluded because the document cut skips those by design.
+A sample of skipped navigation labels would be labelled correct almost everywhere and measure nothing.
+The unchanged side draws from every unit the model was given and handed back unaltered.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{4pt}
+	\caption{Hand-Labelling Codebook: Verdict Criteria and Counts}
+	\label{tab:codebook}
+	\begin{tabular}{@{}lP{7.8cm}r@{}}
+		\toprule
+		\textbf{Verdict}            & \textbf{Criterion applied}                                                                                                                               & \(\boldsymbol{n}\) \\
+		\midrule
+		\multicolumn{3}{@{}l}{\emph{Skipped items} (\(\gls{nsize} = 69\)): text the filters withheld from the model}                                                                                                \\
+		\addlinespace[2pt]
+		correct                     & Withholding was right: the text is not prose, or is boilerplate, or is actual code                                                                       & 48                 \\
+		should-have-been-sent       & Running prose with no code in it, withheld anyway                                                                                                        & 15                 \\
+		correct-but-costly          & Prose inside a subtree the page itself opted out of translation; the extension honours the opt-out correctly and the reader loses the content regardless & 6                  \\
+		\midrule
+		\multicolumn{3}{@{}l}{\emph{Unchanged items} (\(\gls{nsize} = 61\)): text the model received and left unchanged}                                                                                            \\
+		\addlinespace[2pt]
+		already-simple              & The text was already plain, so leaving it unaltered is the correct behaviour                                                                             & 49                 \\
+		should-have-been-simplified & Complex prose left essentially unchanged                                                                                                                 & 9                  \\
+		language-unsupported        & German text sent to an English-only checkpoint, with no language gate to stop it                                                                         & 3                  \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		Both sides carried an \texttt{unclear} option, which no item received.
+		\texttt{correct-but-costly} and \texttt{language-unsupported} were added during labelling, for items that were neither correct nor a defect of the filter.
+		All six \texttt{correct-but-costly} items are on one page.
+		One annotator, the author, labelled all \num{130} items, so there is no agreement statistic (\cref{sec:limitations}).
+	}
+\end{table}
+
+\section{Unguarded meaning inversions}
+\label{app:inversions}
+
+\Cref{tab:inversions} gives the five cases \cref{sec:deployment-results} reports: output that repeats the input with a negation deleted.
+No guard fired on any of them.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{5pt}
+	\caption{Unguarded Meaning Inversions in the Sentence Cut}
+	\label{tab:inversions}
+	\begin{tabular}{@{}lP{5.2cm}P{5.0cm}@{}}
+		\toprule
+		\textbf{Page}       & \textbf{Input}                                                                                                                                            & \textbf{Output}                                                                                                                              \\
+		\midrule
+		\texttt{allbirds}   & Final Sale items, or returns that do not comply with our terms and conditions \textbf{cannot} be returned or exchanged.                                   & Final Sale items or returns that do not comply with our terms and conditions \textbf{can} be returned or exchanged.                          \\
+		\addlinespace
+		\texttt{allbirds}   & If you decide \textbf{not} to buy return coverage you can still return your items, but you will be responsible for the cost of the return shipping label. & If you decide to buy return coverage you can still return your items, but you will be responsible for the cost of the return shipping label. \\
+		\addlinespace
+		\texttt{pydocs}     & The aws iterable must \textbf{not} be empty.                                                                                                              & The aws iterable must be empty.                                                                                                              \\
+		\addlinespace
+		\texttt{tagesschau} & Ein koordinierter Wiederaufbau ist \textbf{nicht} in Sicht.                                                                                               & Ein koordinierter Wiederaufbau ist in Sicht.                                                                                                 \\
+		\addlinespace
+		\texttt{tagesschau} & Der Weg hin zu den eigenen vier Wänden war \textbf{nicht} einfach.                                                                                        & Der Weg hin zu den eigenen vier Wänden war einfach.                                                                                          \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		Bold marks the deleted negation (emphasis added).
+		Each sentence is quoted from the unit that contained it; in two cases the rest of the unit was also edited.
+		Detection required the output sentence to equal the input minus exactly one negation token, so five is a lower bound (\cref{sec:deployment-results}).
+		The German rows read ``A coordinated reconstruction is not in sight'' and ``The road to a home of one's own was not easy''.
+	}
+\end{table}
+
+\section{Recorded outputs of the input-convention comparison}
+\label{app:conventions}
+
+\Cref{tab:convention-outputs} gives the outputs behind \cref{tab:conventions}, in the document model's lowercased, pre-tokenised output convention.
+The input was one hand-constructed three-fact document, which was not kept.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{4pt}
+	\caption{Recorded Outputs of the Document Model Under Five Input Conventions}
+	\label{tab:convention-outputs}
+	\begin{tabular}{@{}P{3.2cm}P{5.3cm}P{3.4cm}@{}}
+		\toprule
+		\textbf{Input convention}                                   & \textbf{Recorded output}                                                                                                         & \textbf{Assessment}                                                 \\
+		\midrule
+		corpus convention (lowercased, pre-tokenised, no newlines)  & \texttt{achtkarspelen is a municipality in friesland in the northern netherlands . it has a population of about 28,000 people .} & faithful; two of the three facts kept                               \\
+		\addlinespace
+		ordinary mixed-case prose                                   & \texttt{achtkarspelen is a municipality in the province of friesland in the northern hemisphere .}                               & factual hallucination (\emph{Netherlands} became \emph{hemisphere}) \\
+		\addlinespace
+		corpus convention with \texttt{\textbackslash n} separators & \texttt{achtkarspelen is a municipality in the northern part of the country of friesland .}                                      & two facts lost, and Friesland, a province, called a country         \\
+		\addlinespace
+		ordinary prose normalised to the corpus convention          & identical to the first row                                                                                                       & the convention, not the content, changes the output                 \\
+		\addlinespace
+		heading text included in the section body                   & begins with \texttt{history .}; only the opening was recorded                                                                    & the heading echoed into the body                                    \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		\(\gls{nsize} = 1\), one checkpoint, one set of decoding settings; judged by inspection.
+		Source: the project's working notes at the time of the comparison.
+	}
+\end{table}

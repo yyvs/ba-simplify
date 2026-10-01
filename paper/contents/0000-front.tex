@@ -1,0 +1,79 @@
+\pagenumbering{roman}
+
+%
+% title page
+%
+\thispagestyle{empty}
+\input{contents/0001-title}
+
+% -----------------------------
+
+%
+% abstract
+%
+\input{contents/0002-abstract}
+
+% -----------------------------
+
+%
+% acknowledgements
+%
+\input{contents/0003-acknowledgements}
+
+% -----------------------------
+
+%
+% table of contents
+%
+\clearpage
+\tableofcontents
+\setcounter{tocdepth}{2}
+
+% -----------------------------
+
+%
+% list of figures
+%
+% the four lists are front matter: grey toc entries, closed off by a rule
+\addtocontents{toc}{\protect\tocgreyon}
+\clearpage
+\listoffigures
+
+% -----------------------------
+
+%
+% list of tables
+%
+\clearpage
+\listoftables
+
+% -----------------------------
+
+%
+% list of abbreviations
+%
+\clearpage
+\printglossary[type=\acronymtype, title={List of Abbreviations}]
+
+% -----------------------------
+
+%
+% list of symbols
+%
+\clearpage
+\printglossary[type=symbols, title={List of Symbols}]
+
+\addtocontents{toc}{\protect\tocgreyoff}
+\addtocontents{toc}{\protect\tocdivider}
+
+% -----------------------------
+
+%
+% main content configuration
+%
+\clearpage
+\pagestyle{plain}
+\pagenumbering{arabic}
+\glsresetall
+
+% -----------------------------

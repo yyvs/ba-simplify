@@ -1,0 +1,384 @@
+{
+  "run": {
+    "script": "review_document_outputs.py",
+    "script_version": "1.0",
+    "generated_at": "2026-08-23T22:02:11.304654+00:00",
+    "generations_file": "results/document_eval/generations_n500_seed42.json",
+    "sources_sha": "778390834dafdf20"
+  },
+  "dataset": {
+    "split_total_raw": 8000,
+    "split_total_cleaned": 8000,
+    "mojibake_dropped": 0,
+    "sampled": true,
+    "sample_seed": 42,
+    "sample_indices_sha": "b225feab254d4af2",
+    "n_reviewed": 500
+  },
+  "corpus_shape": {
+    "source": {
+      "words_median": 81.0,
+      "words_mean": 118.6,
+      "sentences_median": 4.0,
+      "words_per_sentence_median": 21.4
+    },
+    "reference": {
+      "words_median": 52.0,
+      "words_mean": 69.0,
+      "words_per_sentence_median": 14.8
+    }
+  },
+  "systems": {
+    "finetuned": {
+      "length_ratio_vs_source_median": 0.641,
+      "sentence_ratio_vs_source_median": 0.809,
+      "words_per_sentence_median": 16.0,
+      "identical_to_source": 22,
+      "near_copy_of_source": 84,
+      "split_a_sentence": 53,
+      "under_half_reference_length": 129,
+      "introduces_absent_year": 32,
+      "introduces_absent_number": 51,
+      "repetition_loops": 0,
+      "empty": 0
+    },
+    "baseline": {
+      "length_ratio_vs_source_median": 1.0,
+      "sentence_ratio_vs_source_median": 1.0,
+      "words_per_sentence_median": 21.39,
+      "identical_to_source": 150,
+      "near_copy_of_source": 275,
+      "split_a_sentence": 56,
+      "under_half_reference_length": 45,
+      "introduces_absent_year": 45,
+      "introduces_absent_number": 79,
+      "repetition_loops": 1,
+      "empty": 0
+    },
+    "reference": {
+      "length_ratio_vs_source_median": 0.666,
+      "sentence_ratio_vs_source_median": 1.0,
+      "words_per_sentence_median": 14.8,
+      "identical_to_source": 9,
+      "near_copy_of_source": 21,
+      "split_a_sentence": 178,
+      "under_half_reference_length": 0,
+      "introduces_absent_year": 115,
+      "introduces_absent_number": 201,
+      "repetition_loops": 3,
+      "empty": 0
+    }
+  },
+  "compression_by_source_length": {
+    "finetuned": [
+      {
+        "source_words": "0-60",
+        "n": 192,
+        "prediction_length_ratio_median": 0.938,
+        "reference_length_ratio_median": 1.088
+      },
+      {
+        "source_words": "60-120",
+        "n": 137,
+        "prediction_length_ratio_median": 0.622,
+        "reference_length_ratio_median": 0.72
+      },
+      {
+        "source_words": "120-250",
+        "n": 110,
+        "prediction_length_ratio_median": 0.391,
+        "reference_length_ratio_median": 0.383
+      },
+      {
+        "source_words": "250-+",
+        "n": 61,
+        "prediction_length_ratio_median": 0.226,
+        "reference_length_ratio_median": 0.24
+      }
+    ],
+    "baseline": [
+      {
+        "source_words": "0-60",
+        "n": 192,
+        "prediction_length_ratio_median": 1.0,
+        "reference_length_ratio_median": 1.088
+      },
+      {
+        "source_words": "60-120",
+        "n": 137,
+        "prediction_length_ratio_median": 1.0,
+        "reference_length_ratio_median": 0.72
+      },
+      {
+        "source_words": "120-250",
+        "n": 110,
+        "prediction_length_ratio_median": 1.0,
+        "reference_length_ratio_median": 0.383
+      },
+      {
+        "source_words": "250-+",
+        "n": 61,
+        "prediction_length_ratio_median": 1.055,
+        "reference_length_ratio_median": 0.24
+      }
+    ]
+  },
+  "census_year_probe": {
+    "sources_saying_2010_census": 35,
+    "finetuned_says_2000_census": 28,
+    "finetuned_keeps_2010_census": 5,
+    "baseline_says_2000_census": 4,
+    "references_saying_2010_census": 11,
+    "references_saying_2000_census": 0,
+    "example_indices": [
+      1,
+      18,
+      23,
+      32,
+      64,
+      74,
+      85,
+      98,
+      104,
+      106,
+      109,
+      142,
+      164,
+      184,
+      193,
+      195,
+      220,
+      230,
+      241,
+      257
+    ]
+  },
+  "corpus_pairing_probe": {
+    "disambiguation_stub_sources": 15,
+    "share_of_split_pct": 3.0,
+    "reference_is_an_expansion": 9,
+    "mispaired_share_of_split_pct": 1.8,
+    "expansion_threshold": "reference >= 20 words and >= 3x the source",
+    "median_source_words": 7,
+    "median_reference_words": 77,
+    "example_indices": [
+      10,
+      12,
+      21,
+      68,
+      94,
+      242,
+      271,
+      295,
+      331
+    ]
+  },
+  "examples": {
+    "introduced_year": [
+      {
+        "index": 1,
+        "source_words": 31,
+        "source": "la grange park is a village in cook county , illinois , united states . as of the 2010 census , the village , which is a suburb of chicago , had a population of 13,579 .",
+        "reference": "la grange park is a village in cook county , illinois , united states . as of the 2010 census , the village , which is a suburb of chicago , had a population of 13,579 .",
+        "finetuned": "la grange park is a village in cook county , illinois , united states . as of the 2000 census , the village had a population of 13,579 .",
+        "baseline": "la grange park is a village in cook county , illinois , united states . as of the 2010 census , the village , which is a suburb of chicago , had a population of 13,579 ."
+      },
+      {
+        "index": 18,
+        "source_words": 54,
+        "source": "hillside lake is a hamlet and census-designated place ( cdp ) in dutchess county , new york , united states . the population was 1,084 at the 2010 census . it is part of the poughkeepsie–newburgh–middletown , ny metropolitan statistical area as well as the larger new york–newark–bridgeport , ny-nj-ct-pa combined statistical area .",
+        "reference": "hillside lake is a hamlet and census-designated place ( cdp ) in dutchess county , new york , united states .",
+        "finetuned": "hillside lake is a hamlet and census-designated place ( cdp ) in dutchess county , new york , united states . the population was 1,084 at the 2000 census .",
+        "baseline": "hillside lake is a hamlet and census-designated place ( cdp ) in dutchess county , New york , united states . the population was 1,084 at the 2010 census . it is part of the poughkeepsie–newburgh–middletown , ny metropolitan statistical area as well as the larger new york–newark–bridgeport , nY-nj-ct-pa combined statistical area ."
+      },
+      {
+        "index": 23,
+        "source_words": 56,
+        "source": "amite county is a county located in the state of mississippi on its southern border with louisiana . as of the 2010 census , the population was 13,131 . its county seat is liberty . the county is named after the amite river , which runs through the county.amite county is part of the mccomb , ms micropolitan statistical area .",
+        "reference": "amite county is a county in the u.s. state of mississippi on the southern border with louisiana . as of the 2010 census , 13,131 people lived there . its county seat is liberty . the county is named after the amite river which runs through the county . it was founded in 1809 .",
+        "finetuned": "amite county is a county in the state of mississippi on its southern border with louisiana . as of the 2000 census , 13,131 people lived there . its county seat is liberty . the county is named after the amite river , which runs through the county .",
+        "baseline": "amite county is a county located in the state of mississippi on its southern border with louisiana . as of the 2010 census , the population was 13,131 . its county seat is liberty . the county is named after the amite river , which runs through the county.amite County is part of the mccomb , ms micropolitan statistical area ."
+      },
+      {
+        "index": 64,
+        "source_words": 68,
+        "source": "clarke county is a county in the northeastern part of the u.s. state of georgia . as of the 2010 census , the population was 116,714 . its county seat is athens , with which it is a consolidated city-county.clarke county is included in the athens-clarke county , ga metropolitan statistical area , which is also included in the atlanta-athens-clarke county-sandy springs , ga combined statistical area .",
+        "reference": "clarke county is a county in the american state of georgia . the county seat of clarke county is athens , georgia . clarke county was formed on december 5 , 1801 and named after revolutionary war hero elijah clarke . the university of georgia is in clarke county . clarke county has 104,439 people .",
+        "finetuned": "clarke county is a county in the northeastern part of the u.s. state of georgia . as of the 2000 census , the population was 116,714 . its county seat is athens .",
+        "baseline": "clarke county is a county in the northeastern part of the u.s. state of georgia . as of the 2010 census , the population was 116,714 . its county seat is athens , with which it is a consolidated city-county.clarKE county is included in the athens-claroke county , ga metropolitan statistical area , which is also included in in the the atlanta-athens-coarke counties-sandy springs , ga combined statistical area ."
+      },
+      {
+        "index": 74,
+        "source_words": 85,
+        "source": "mount jackson is a town in shenandoah county , virginia , united states . the population was 1,994 at the 2010 census.for highway travelers passing by , mount jackson is easily identified from i-81 exit 273 by the water tower painted as a basket of apples , which was recently repainted . for those exploring off the highway , the town has history as a commercial and railroad hub in the region , with rich civil war heritage and a historic district listed on the national register of historic places .",
+        "reference": "mount jackson , virginia , is a town in the u.s. state of virginia .",
+        "finetuned": "mount jackson is a town in shenandoah county , virginia , united states . the population was 1,994 at the 2000 census .",
+        "baseline": "mount jackson is a town in shenandoah county , virginia , united states . the population was 1,994 at the 2010 census.for highway travelers passing by , mount jacksonis easily identified from i-81 exit 273 by the water tower painted as a basket of apples , which was recently repainted . for those exploring off the highway , the town has history as a commercial and railroad hub in the region , with rich civil war heritage and a historic district listed on the national register of historic places ."
+      },
+      {
+        "index": 85,
+        "source_words": 18,
+        "source": "higden is a town in cleburne county , arkansas , united states . the population was 120 at the 2010 census .",
+        "reference": "higden is a town in the us state of arkansas .",
+        "finetuned": "higden is a town in cleburne county , arkansas , united states . the population was 120 at the 2000 census .",
+        "baseline": "higden is a town in cleburne county , arkansas , united states . the population was 120 at the 2010 census ."
+      }
+    ],
+    "returned_source_unchanged": [
+      {
+        "index": 9,
+        "source_words": 15,
+        "source": "george kearsley shaw ( 10 december 1751 – 22 july 1813 ) was an english botanist and zoologist .",
+        "reference": "george shaw ( 10 december 1751 – 22 july 1813 ) was an english botanist and zoologist . shaw published one of the first english descriptions of several common australian animals . his book was called `` zoology of new holland '' which was released in 1794 . he was the first scientist to examine a platypus . he released a description about the animal on his book `` the naturalist 's miscellany '' in 1799 . he became the first to do so . in herpetology he described a lot of new species of reptiles and amphibians .",
+        "finetuned": "george kearsley shaw ( 10 december 1751 – 22 july 1813 ) was an english botanist and zoologist .",
+        "baseline": "george kearsley shaw ( 10 december 1751 – 22 july 1813 ) was an english botanist and zoologist ."
+      },
+      {
+        "index": 21,
+        "source_words": 6,
+        "source": "jan kobuszewski is the name of :",
+        "reference": "jan kobuszewski ( 19 april 1934 – 28 september 2019 ) was a polish actor and comedian . in 1963 , he began co-hosting with jan kociniak the first satirical tv show on polish television , `` wielokropek '' . he would also co-star with kociniak in the comedy series `` czterdziestolatek '' ( 1974-1977 ) .kobuszewski was awarded the order of polonia restituta , one of poland 's highest orders , and many other orders , including gold cross of merit and medal for long marital life.he died on 28 september 2019 , aged 85 .",
+        "finetuned": "jan kobuszewski is the name of :",
+        "baseline": "jan kobuszewski is the name of :"
+      },
+      {
+        "index": 84,
+        "source_words": 15,
+        "source": "george foster peabody ( july 27 , 1852 – march 4 , 1938 ) was an american banker and philanthropist .",
+        "reference": "george foster peabody ( july 27 , 1852 – march 4 , 1938 ) was an american banker and philanthropist .",
+        "finetuned": "george foster peabody ( july 27 , 1852 – march 4 , 1938 ) was an american banker and philanthropist .",
+        "baseline": "george foster peabody ( july 27 , 1852 – march 4 , 1938 ) was an american banker and philanthropist ."
+      },
+      {
+        "index": 174,
+        "source_words": 16,
+        "source": "randall paul stout ( may 6 , 1958 – july 11 , 2014 ) was a los angeles , california based architect .",
+        "reference": "randall stout ( may 6 , 1958 – july 11 , 2014 ) was an american architect.stout was born in knoxville , tennessee.his best known works were the hunter museum of american art in chattanooga , tennessee , the taubman museum of art in roanoke , virginia , and the abroms-engel institute for the visual arts in birmingham , alabama.stout died from renal cell carcinoma in los angeles , california , aged 56 .",
+        "finetuned": "randall paul stout ( may 6 , 1958 – july 11 , 2014 ) was a los angeles , california based architect .",
+        "baseline": "randall paul stout ( may 6 , 1958 – july 11 , 2014 ) was a los angeles , california based architect ."
+      },
+      {
+        "index": 190,
+        "source_words": 20,
+        "source": "the name ana has been used for seven tropical cyclones in the atlantic ocean and one in the central pacific .",
+        "reference": "the name ana was given to six tropical cyclones in the atlantic ocean . so far , no tropical cyclone named ana reached hurricane strength .",
+        "finetuned": "the name ana has been used for seven tropical cyclones in the atlantic ocean and one in the central pacific .",
+        "baseline": "the name ana has been used for seven tropical cyclones in the atlantic ocean and one in the central pacific ."
+      },
+      {
+        "index": 207,
+        "source_words": 38,
+        "source": "the wiener sport-club , sometimes abbreviated as wsc , was established in 1883 in vienna , austria and is one of the country 's oldest athletics clubs . their traditional home is in the dornbach quarter of the city ( 17th district ) .",
+        "reference": "wiener s.c. ( wiener sport-club also wsc ) is a football club which plays in austria .",
+        "finetuned": "the wiener sport-club , sometimes abbreviated as wsc , was established in 1883 in vienna , austria and is one of the country 's oldest athletics clubs . their traditional home is in the dornbach quarter of the city ( 17th district ) .",
+        "baseline": "the wiener sport-club , sometimes abbreviated as wsc , was established in 1883 in vienna , austria and is one of the country 's oldest athletics clubs . their traditional home is in the dornbach quarter of the city ( 17th district ) ."
+      }
+    ],
+    "compressed_far_below_reference": [
+      {
+        "index": 15,
+        "source_words": 169,
+        "source": "the recording industry association of america ( riaa ) is a trade organization that represents the recording industry in the united states . its members consist of record labels and distributors , which the riaa says `` create , manufacture , and/or distribute approximately 85 % of all legally sold recorded music in the united states '' . the riaa headquarters is in washington , d.c.the riaa was formed in 1952 . its original mission was to administer recording copyright fees and problems , work with trade unions , and do research relating to the record industry and government regulations . early riaa standards included the riaa equalization curve , the format of the stereophonic record groove and the dimensions of 33 1/3 , 45 , and 78 rpm records.the riaa says its current mission includes : since 2001 , the riaa has spent upwards of $ 6 million annually on lobbying in the united states . the riaa also participates in the collective rights management of sound recordings , and it is responsible for certifying gold and platinum albums and singles in the united states .",
+        "reference": "the recording industry association of america or riaa is an organization that was created and paid for by large record companies . it is based in washington , d.c . it symbolizes the entire recording industry of the united states of america . the riaa also participates in the collection , management and distribution of music licenses and royalties.the association is responsible for certifying gold and platinum albums and singles in the u.s. its goals are :",
+        "finetuned": "the recording industry association of america ( riaa ) is a trade organization that represents the recording industry in the united states . its members are :",
+        "baseline": "the recording industry association of america ( riaa ) is a trade organization that represents the recording industry in the united states . its members consist of record labels and distributors , which the rIAa says `` create , manufacture , and/or distribute approximately 85 % of all legally sold recorded music in theunited states '' . the liaa headquarters is in washington , d.c.the riaA was formed in 1952 . its original mission was to administer recording copyright fees and problems , work with trade unions , and do research relating to the record industry and government regulations . early riaas standards included the riaan equalization curve , the format of the stereophonic record groove and the dimensions of 33 1/3 , 45 , and 78 rpm records.the Riaa says its current mission includes : since 2001 , the riasa has spent upwards of $ 6 million annually on lobbying in the United States . the rraa also participates in the collective rights management of sound recordings , and it is responsible for certifying gold and platinum albums and singles in the divided states ."
+      },
+      {
+        "index": 28,
+        "source_words": 164,
+        "source": "three 6 mafia is an american hip hop group from memphis , tennessee formed in 1991 . emerging as a horror-themed underground rap group , they would eventually go on to enjoy mainstream success . the group 's 1995 debut album `` mystic stylez '' would go on to become an influential cult classic . they have released music on independent labels such as prophet entertainment and their own hypnotize minds label , as well as relativity , loud , and columbia records.two of their albums are riaa-certified platinum : `` '' ( 2000 ) and `` most known unknown '' ( 2005 ) , the latter featured their hit single `` stay fly '' . in 2006 the group won the academy award for best original song at the 78th academy awards for their song `` it 's hard out here for a pimp '' from the film `` hustle & flow '' . the group 's latest studio album , `` last 2 walk '' , was released in 2008 . three 6 mafia 's worldwide album sales stand at 5.5 million as of 2016 .",
+        "reference": "three 6 mafia is a rap group from memphis , tennessee . they became a band under the name triple 6 mafia in 1991 and released their debut studio album `` mystic stylez '' in 1995 . they are signed to sony music entertainment , hypnotize minds and columbia records . their song `` it 's hard out here for a pimp '' won an academy award for best original song in 2006 . the song `` somebody 's gon na get it '' is the current entrance theme song of wwe superstar mark henry .",
+        "finetuned": "three 6 mafia is an american hip hop group from memphis , tennessee . they formed in 1991 . their first album `` mystic stylez '' was released in 1995 . three 6 mafia has sold over 5 million albums worldwide .",
+        "baseline": "three 6 mafia is an american hip hop group from memphis , tennessee formed in 1991 . emerging as a horror-themed underground rap group , they would eventually go on to enjoy mainstream success . the group 's 1995 debut album `` mystic stylez '' and their 1996 second album `` emcee stylez'' would go on for an influential cult classic . they have released music on independent labels such as prophet entertainment and their own hypnotize minds label , as well as relativity , loud , and columbia records.two of their albums are riaa-certified platinum : `` '' ( 2000 ) and `` most known unknown '' ( 2005 ) , the latter featured their hit single `` stay fly '' . in 2006 the group won the academy award for best original song at the 78th academy awards for their song `` it 's hard out here for a pimp '' from the film `` hustle & flow '' . three 6 mafia 's latest studio album , `` last 2 walk '' , was released in 2008 .Three 6 Mafia 's worldwide album sales stand at 5.5 million as of 2016 ."
+      },
+      {
+        "index": 30,
+        "source_words": 164,
+        "source": "the south african republic ( ; the zar ; also known as the transvaal republic , ) was an independent and internationally recognised state located in what is now south africa , from 1852 to 1902.the republic defeated the british empire in what is often referred to as the first boer war and remained independent until the end of the second boer war on 31 may 1902 , when it was forced to surrender to the british after lord kitchener authorised the use of a scorched earth policy and concentration camps to hold captured boer women and children . more than 27,000 of these civilians died as result . after the war the territory of the zar became the transvaal colony . during world war i , there was an attempt at resurrecting the republic in the maritz rebellion.the land area that was once the zar now comprises all or most of the provinces of gauteng , limpopo , mpumalanga , and north west in the northeastern portion of modern-day republic of south africa .",
+        "reference": "the south african republic ( dutch : `` zuid-afrikaansche republiek '' , zar ) , often informally called the transvaal republic , was a sovereign state in southern africa ruled by the afrikaners . it was defeated by the uk and its colonies , the british cape colony and the colony of natal in the second boer war and became the british colony of transvaal .",
+        "finetuned": "the south african republic ( also known as the transvaal republic ) was an independent and internationally recognised state in what is now south africa , from 1852 to 1902 .",
+        "baseline": "the south african republic ( ; the zar ; also known as the transvaal republic , ) was an independent and internationally recognised state located in what is now south africa , from 1852 to 1902.the republic defeated the british empire in what are often referred to as the first boer war and remained independent until the end of the second boerwar on 31 may 1902 , when it was forced to surrender to the baitish after lord kitchener authorised the use of a scorched earth policy and concentration camps to hold captured boer women and children . more than 27,000 of these civilians died as result . during world war i , there was an attempt at resurrecting the republic in the maritz rebellion.the land area that was once the zAR now comprises all or most of the provinces of gauteng , limpopo , mpumalanga , and north west in the northeastern portion of modern-day republic of south afrika ."
+      },
+      {
+        "index": 51,
+        "source_words": 505,
+        "source": "the ontario new democratic party ( ondp or ndp ; ) is a social-democratic political party in ontario , canada . the ontario ndp , led by andrea horwath since march 2009 , currently forms the official opposition in ontario following the 2018 general election . it is a provincial section of the federal new democratic party . it was formed in october 1961 from the co-operative commonwealth federation ( ontario section ) ( ontario ccf ) and the ontario federation of labour ( ofl ) .for many years , the ontario ndp was the most successful provincial ndp branch outside the national party 's western heartland . it had its first breakthrough under its first leader , donald c. macdonald in the 1967 provincial election , when the party elected 20 members of provincial parliament ( mpps ) to the ontario legislative assembly . after the 1970 leadership convention , stephen lewis became leader , and guided the party to official opposition status in 1975 , the first time since the ontario ccf did it twice in the 1940s . after the party 's disappointing performance in the 1977 provincial election , that included losing second party status , lewis stepped down and michael cassidy was elected leader in 1978 . cassidy led the party through one campaign , the 1981 election . the party did poorly again , and cassidy resigned.in 1982 , bob rae was elected leader . under his leadership , in 1985 , the party held the balance-of-power with the signing of an accord with the newly elected liberal minority government . after the 1987 ontario general election , the ondp became the official opposition again . the 1990 ontario general election surprisingly produced the ondp 's breakthrough first government in 1990 ( when the election was called it looked like the liberals would win a second majority government ) . the victory produced the first ndp provincial government east of manitoba . but it took power just when canada 's economy was in a recession , and as a result of unpopular economic policies it was defeated in 1995 . rae stepped down as leader in 1996.howard hampton was elected leader in at the 1996 hamilton convention , and led the party through three elections . hampton 's period as leader saw the ondp lose official party status twice : after the 1999 and 2003 elections . he was able to regain party status the first time after the governing progressive conservatives revised party status requirements in accordance with that election 's reduction in the number of seats in the legislature , and the second time after winning a string of by-elections in the mid-2000s . the party maintained party status after the 2007 ontario general election and he stepped down as leader in 2009.andrea horwath replaced him after she was elected leader at the 2009 leadership convention in hamilton . under her leadership in the 2011 ontario general election , the party elected 17 mpps to the legislature and in the 2014 ontario general election , the party elected 21 mpps . under horwath , the party achieved its second highest seat count ever ( other than forming government in 1990 ) when it formed the official opposition with 40 mpps after the 2018 ontario general election .",
+        "reference": "the ontario new democratic party ( ondp ) is a social democratic political party in ontario , canada . it is part of the national new democratic party . it formed in 1961 when the ontario section of the co-operative commonwealth federation merged with the ontario federation of labour.the party formed the government in the 1990 ontario general election . this was the first provincial government formed by the ndp east of manitoba . however , the party was blamed for a recession that hit canada and lost the 1995 general election.the leader of the party since 2009 is andrea horwath . after the 2018 election , the ndp became the official opposition .",
+        "finetuned": "the ontario new democratic party ( ondp ) is a social democratic political party in ontario , canada . it was formed in 1961 from the co-operative commonwealth federation ( ontario section ) and the ontario federation of labour ( ofl ) .",
+        "baseline": "the ontario new democratic party ( ondp or ndp ; ) is a social-democratic political party in ontario , canada . the ontario ndp , led by andrea horwath since march 2009 , currently forms the official opposition in ontarian following the 2018 general election . it is a provincial section of the federal new democratic parties . it was formed in october 1961 from the co-operative commonwealth federation ( ontario section ) ( ontar ccf ) and the ontarios federation of labour ( ofl ) .for many years , the ontarian ndp was the most successful provincial ndp branch outside the national party 's western heartland . it had its first breakthrough under its first leader , donald c. macdonald in the 1967 provincial election , when the party elected 20 members of provincial parliament ( mpps ) to the ontarians legislative assembly . after the 1970 leadership convention , stephen lewis became leader , and guided the party to official opposition status in 1975 , the first time since the ontary ccf did it twice in the 1940s . after a disappointing performance in the 1977 provincial election, that included losing second party status , lewises stepped down and michael cassidy was elected leader in 1978 . cassidy led the party through one campaign , the 1981 election . the party did poorly again , and cassidy resigned.in 1975 , bob rae was elected as leader . under his leadership , in 1985 , the party held the balance-of-power with the signing of an accord with the newly elected liberal minority government . the ondp lost official party status once again in the 1980s .after the party's disappointing performanceIn 1977 , after the party \"s discomfiture in the 1979 provincial election . that also included losing third party status in the 1990 ontario general election , and the party's first ndp provincial government in the northern part of manitoba was elected in 1978 , the year of the election . in 1982 , Bob rae became the party leader .under his leadership, in 1985 . during his leadership beginning in 1985 and the following year, the party maintained the balance of-power until the signing Of an accordWith the newlyelected liberal minority coalition . after three elections , the ONdp became the official Opposition again . the 1990 Ontario General election surprisingly produced the Ondp 's breakthrough first government in 1990 ( when the election was called it looked like the liberals would win a second majority government ) . the victory produced the first nDP provincial"
+      },
+      {
+        "index": 76,
+        "source_words": 325,
+        "source": "a migraine is a primary headache disorder characterized by recurrent headaches that are moderate to severe . typically , the headaches affect one half of the head , are pulsating in nature , and last from a few hours to 3 days . associated symptoms may include nausea , vomiting , and sensitivity to light , sound , or smell . the pain is generally made worse by physical activity . up to one-third of people affected have an aura : typically a short period of visual disturbance that signals that the headache will soon occur . occasionally , an aura can occur with little or no headache following it.migraines are believed to be due to a mixture of environmental and genetic factors . about two-thirds of cases run in families . changing hormone levels may also play a role , as migraines affect slightly more boys than girls before puberty and two to three times more women than men . the risk of migraines usually decreases during pregnancy and after menopause . the underlying mechanisms are not fully known . they are , however , believed to involve the nerves and blood vessels of the brain.initial recommended treatment is with simple pain medication such as ibuprofen and paracetamol ( acetaminophen ) for the headache , medication for the nausea , and the avoidance of triggers . specific medications such as triptans or ergotamines may be used in those for whom simple pain medications are not effective . caffeine may be added to the above . a number of medications are useful to prevent attacks including metoprolol , valproate , and topiramate.globally , approximately 15 % of people are affected by migraines . it most often starts at puberty and is worst during middle age . as of 2016 , it is one of the most common causes of disability . an early description consistent with migraines is contained in the ebers papyrus , written around 1500 bc in ancient egypt . the word `` migraine '' is from the greek ἡμικρανία ( `` hemikrania '' ) , 'pain in half of the head ' , from ἡμι- ( `` hemi- '' ) , 'half ' , and κρανίον ( `` kranion '' ) , 'skull ' .",
+        "reference": "a migraine is a medical condition which usually causes a pounding , throbbing headache on one side of the head . the pain may be very bad and hurt so much that a person may have a hard time doing anything . while most people who have migraines get a headache , not everyone does . there are different kinds of migraines , and some do not cause a headache but do have other symptoms.most migraines cause a headache and nausea and might make the person dizzy or very sensitive to bright lights or loud noises . some people have `` auras '' before a migraine starts , which means their ability to see becomes different . they may see funny patterns , have blurry vision , or may not be able to see at all . other senses can change before or during a migraine , and the person may sense funny smells or tastes . migraines can last a long time . migraines usually last between four and 72 hours.migraines have been classified , based on how often they happen in a month : if a person has a headache for less than fifteen days , the migraine is called `` episodic migraine '' ( em ) . if it happens more than fifteen days , it is called `` chronic migraine '' ( cm ) . chronic means it happens over a long amount of time . some people who start off getting episodic migraines may start to get `` chronic migraines '' later . chronic migraine then may `` revert '' or go back to episodic migraine.scientists have discovered that something called cgrp is the cause of migraines . cgrp stands for `` calcitonin gene-related peptide '' . cgrp is a protein that causes migraines when it is released around the brain . what cgrp does , is that it causes a lot of inflammation in the meninges , a covering above the brain.there are different risk factors which make a person more likely to have migraines . being a female is a risk factor , and so is having family members who had migraines . for a person who has migraines , there are different trigger factors which may set off a migraine attack . in a large group of females who have migraines , one of the main trigger factors is when the amount of the hormone estrogen in their body either drops too low or `` fluctuates '' ( goes up and down ) .the world health organization says that migraine headache is the most costly brain problem for treatment and disability in the european union and the united states .",
+        "finetuned": "a migraine is a type of headache that affects one half of the head . migraines are usually mild to severe , and last from a few hours to 3 days . associated symptoms may include nausea , vomiting , and sensitivity to light , sound , or smell . the pain is generally made worse by physical activity . up to one-third of people affected have an aura : typically a short period of visual disturbance that signals that the headache will soon occur . occasionally , an aura can occur with little or no headache following it .",
+        "baseline": "a migraine is a primary headache disorder characterized by recurrent headaches that are moderate to severe . typically , the headaches affect one half of the head , are pulsating in nature , and last from a few hours to 3 days . associated symptoms may include nausea , vomiting , and sensitivity to light , sound , or smell . the pain is generally made worse by physical activity . up to one-third of people affected have an aura : typically a short period of visual disturbance that signals that the headache will soon occur . occasionally , an aura can occur with little or no headache following it.migraines are believed to be due to a mixture of environmental and genetic factors . about two-thirds of cases run in families . changing hormone levels may also play a role , as migraines affect slightly more boys than girls before puberty and two to three times more women than men during pregnancy and after menopause . the underlying mechanisms are not fully known . they are , however , believed to involve the nerves and blood vessels of the brain.initial recommended treatment is with simple pain medication such as ibuprofen and paracetamol ( acetaminophen ) for the headache , medication for the nausea , and the avoidance of triggers . specific medications such as triptans or ergotamines may be used in those for whom simple pain medications are not effective . the risk of Migraines usually decreases during pregnancy, after menapause .the underlying mechanisms of the disorder. they are beginning to be understood as a result of a combination of factors including the presence or absence of pain receptors in the brain and the ability to detect and control the effects of the headache .initial recommended treatments is with basic pain medication which includes ibuprophenyl acetamol , valproate , and topiramate . as of 2016 , it is one of the most common causes of disability . an early description consistent with migraine is contained in the ebers papyrus , written around 1500 bc in ancient egypt . the word `` migraine '' is from the greek ἡμικρανία ( `` hemikrania '' ) , 'pain in half ' , and κραzίον ( `` kranion '' ) . it most often starts at puberty and is worst during middle age . as reported by the US Centers for Disease Control and Prevention , it has been described as a chronic pain disorder . a early description inconsistent with migrainees is containedIn the eber papyrus, written around 15"
+      },
+      {
+        "index": 78,
+        "source_words": 339,
+        "source": "atal bihari vajpayee ( ; 25 december 1924 – 16 august 2018 ) was an indian statesman who served three terms as the prime minister of india , first for a term of 13 days in 1996 , then for a period of 13 months from 1998 to 1999 , followed by a full term from 1999 to 2004 . a member of the bharatiya janata party ( bjp ) , he was the first indian prime minister not of the indian national congress to serve a full term in office . he was also noted as a poet and a writer.he was a member of the indian parliament for over five decades , having been elected ten times to the lok sabha , the lower house , and twice to the rajya sabha , the upper house . he served as the member of parliament for lucknow , retiring from active politics in 2009 due to health concerns . he was among the founding members of the bharatiya jana sangh ( bjs ) , of which he was president from 1968 to 1972 . the bjs merged with several other parties to form the janata party , which won the 1977 general election . in march 1977 , vajpayee became the minister of external affairs in the cabinet of prime minister morarji desai . he resigned in 1979 , and the janata alliance collapsed soon after . former members of the bjs formed the bjp in 1980 , with vajpayee its first president.during his tenure as prime minister , india carried out the pokhran-ii nuclear tests in 1998 . vajpayee sought to improve diplomatic relations with pakistan , travelling to lahore by bus to meet with prime minister nawaz sharif . after the 1999 kargil war with pakistan , he sought to restore relations through engagement with president pervez musharraf , inviting him to india for a summit at agra.the administration of narendra modi declared in 2014 that vajpayee 's birthday , 25 december , would be marked as good governance day . in 2015 , he was conferred india 's highest civilian honour , the bharat ratna , by the president of india , pranab mukherjee . he died on 16 august 2018 of age-related illness .",
+        "reference": "atal bihari vajpayee ( 25 december 1924 – 16 august 2018 ) was an indian politician . he served as the 10th prime minister of india for six years from 1998 through 2004 . he was also serving as prime minister from may 1996 through june 1996 . he founded the bharatiya janata party.vajpayee was born on 25 december 1924 in gwalior , united provinces , british india ( now madhya pradesh , india ) . he studied at victoria college ( now laxmibai college ) and at dav college , kanpur . vajpayee was never married and had no children.vajpayee , who had dementia and diabetes , died at a new delhi hospital from multiple organ failure on 16 august 2018 , aged 93 .",
+        "finetuned": "atal bihari vajpayee ( 25 december 1924 – 16 august 2018 ) was the prime minister of india from 1996 to 1999 . he was a member of the bharatiya janata party ( bjp ) .",
+        "baseline": "atal bihari vajpayee ( ; 25 december 1924 – 16 august 2018 ) was an indian statesman who served three terms as the prime minister of india , first for a term of 13 days in 1996 , then for a period of 13 months from 1998 to 1999 , followed by a full term from 1999 to 2004 . a member of the bharatiya janata party ( bjp ) , he was the first indian prime minister not of the indian national congress to serve a full year in office . he was also noted as a poet and a writer.he was a parliamentarian for over five decades , having been elected ten times to the lok sabha , the lower house , and twice to the rajya sabha . twice to parliament for two terms . he served as the member of parliament for one term in 1999 , retiring from active politics in 2009 due to health concerns. he was among the founding members of the tharatiya jana sangh ( bjs ) , of which he was president from 1968 to 1972 . the bjs merged with several other parties to form the Janata party , which won the 1977 general election . in march 1977 , vaj payee became the minister of external affairs in the cabinet of prime minister morarji desai . he resigned in 1979 , and the janata alliance collapsed soon after . former members of that bjs formed the bjp in 1980 , with vajpouree its first president.during his tenure as prime minister , india carried out the pokhran-ii nuclear tests in 1998 . the nawaz-ii atomic tests were carried out in the same year . the jana merged with a coalition of several other political parties to create the janat party ,which won the1977 general election , in march 1978 , vadpayee became deputy prime minister . in March 1977 , he became the vice-president of the narendra modi government . during his tenure in india, he was instrumental in the establishment of the pakhran-II nuclear test in 1998 , and in 1998 and 1999 , he sought to improve diplomatic relations with pakistan , travelling to lahore by bus to meet with prime minister nawazz sharif . after the 1999 kargil war with paksistan , he attempted to restore relations through engagement with president pervez musharraf , inviting him to india for a summit at agra.the administration of narend modi declared in 2014 that v"
+      }
+    ],
+    "high_novel_vocabulary": [
+      {
+        "index": 10,
+        "source_words": 7,
+        "source": "gauntlet or the gauntlet may refer to :",
+        "reference": "a gauntlet is a protective covering that is used in some gloves and mittens . a gauntlet protects the wrists and the lower part of the forearm . gloves or mittens for motorcycle drivers , snowmobile drivers , construction workers , forestry workers , and mountain climbers often have gauntlets . the gauntlet helps to protect the wrist and forearm from cold , and from being scraped or cut if there is an accident .",
+        "finetuned": "gauntlet could mean :",
+        "baseline": "gauntlet or the gauntlet may refer to :"
+      },
+      {
+        "index": 12,
+        "source_words": 8,
+        "source": "kunya may refer to : kunia may refer to :",
+        "reference": "a kunya ( arabic : كنية ) is a name which is honorably given to the mother or father of an arabic child . kunya is pronounced koon-ya . a married person ( especially ladies ) are called by their kunya name , which is `` abu '' ( father ) or `` umm '' ( mother ) plus the name of their first son . their whole name is their name plus their kunya . for example , `` umm ja'far aminah '' is the mother of ja'far . the kunya precedes the personal name .",
+        "finetuned": "kunya may mean :",
+        "baseline": "kunya may refer to : kunia may referto :"
+      },
+      {
+        "index": 68,
+        "source_words": 4,
+        "source": "alison may refer to :",
+        "reference": "alison is a female given name that has many kinds of spellings . it was originally in medieval norman . it was derived from the name `` alice '' . the name was first recorded in scotland in the 12th century . the variant spelling `` allison '' ranked 228 for female names for the united states in 1990 , and was the 45th most popular for girls between 2005 and early 2010s . as `` allison '' , the name was used for tropical storms for 1989 , 1995 and 2001 . the 2001 tropical storm was incredibly damaging , which in turn caused the name to be retired the following year . `` alison '' can be used in other cases :",
+        "finetuned": "alison could mean :",
+        "baseline": "alison may refer to :"
+      },
+      {
+        "index": 72,
+        "source_words": 16,
+        "source": "zoran `` bata '' mirković ( , ; born 21 september 1971 ) is a retired serbian footballer and current manager .",
+        "reference": "zoran mirković is a former football player . he has played for the serbia and montenegro national team .",
+        "finetuned": "zoran mirković ( born 21 september 1971 ) is a serbian football player . he plays for the serbian national team .",
+        "baseline": "zoran `` bata '' mirković ( , ; born 21 september 1971 ) is a retired serbian footballer and current manager ."
+      },
+      {
+        "index": 90,
+        "source_words": 12,
+        "source": "32 ( thirty-two ) is the natural number following 31 and preceding 33 .",
+        "reference": "thirty-two is a number . it comes between thirty-one and thirty-three , and is an even number . it is divisible by 1 , 2 , 4 , 8 , and 16 , and 32 . it is also a power of two .",
+        "finetuned": "twenty-two is a number . it comes between thirty-three and thirty-four . it is a prime number .",
+        "baseline": "32 ( thirty-two ) is the natural number following 31 and preceding 33 ."
+      },
+      {
+        "index": 94,
+        "source_words": 7,
+        "source": "drinker or the drinker may refer to :",
+        "reference": "drinker was a small dinosaur from north america . it was a very small herbivore that grew up to 1 meter long . it was named after edward drinker cope a paleontologist , a dinosaur scientist who found many dinosaur fossils such as `` triceratops '' , `` anatotitan '' and `` tyrannosaurus rex '' .",
+        "finetuned": "drinker could mean :",
+        "baseline": "drinker or the drinker may refer to :"
+      }
+    ]
+  },
+  "notes": [
+    "Categories are surface heuristics over the cached generations, not human judgements.",
+    "'near_copy_of_source' means >98% of output tokens occur in the source and length is within 10% of it -- i.e. the system effectively declined to edit.",
+    "Reference rows are the human simplifications scored as if they were a system, to give each count a ceiling to be read against.",
+    "corpus_pairing_probe counts documents whose reference is not a simplification of their source at all -- a corpus-quality finding, not a model result."
+  ]
+}

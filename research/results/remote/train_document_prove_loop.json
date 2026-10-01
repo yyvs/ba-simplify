@@ -1,0 +1,164 @@
+{
+  "provenance": {
+    "recorded_at": "2026-08-21T08:59:51.677301+00:00",
+    "git_commit": "041f88d",
+    "git_dirty": true,
+    "host": {
+      "hostname": "beet",
+      "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+      "python": "3.12.13",
+      "cpu_count": 20,
+      "nvidia_driver": "535.309.01",
+      "gpu_name": "NVIDIA RTX A5000",
+      "gpu_memory_total": "24564 MiB",
+      "torch": "2.6.0+cu124",
+      "torch_cuda_build": "12.4",
+      "cuda_available": true,
+      "device_name": "NVIDIA RTX A5000",
+      "compute_capability": "8.6",
+      "device_count": 1,
+      "vram_gb": 23.7,
+      "bf16_supported": true
+    },
+    "hf_home": "/home/yunusrenz/simple-website/research/scratch/hf",
+    "profile": "beet"
+  },
+  "run": {
+    "tag": "document_prove_loop",
+    "structure": "document",
+    "scope": "prove_loop",
+    "natural_case": false,
+    "base_model": "facebook/bart-base",
+    "seed": 42,
+    "elapsed_seconds": 8.7,
+    "elapsed_human": "8s",
+    "resumed_from": null
+  },
+  "corpus": {
+    "mojibake_filter": "strict",
+    "split_stats": {
+      "train": {
+        "raw_rows": 200,
+        "dropped_mojibake_rows": 0,
+        "kept_rows": 200
+      },
+      "validation": {
+        "raw_rows": 50,
+        "dropped_mojibake_rows": 0,
+        "kept_rows": 50
+      },
+      "test": {
+        "raw_rows": 20,
+        "dropped_mojibake_rows": 0,
+        "kept_rows": 20
+      }
+    },
+    "note": "kept_rows here is the corpus this checkpoint actually trained on. Quote it in the thesis rather than data/stats.json, which was produced by prepare_data.py and may use a different filter -- see results/remote/corpus_filter_divergence.json."
+  },
+  "hyperparameters": {
+    "max_length": 512,
+    "epochs": 1,
+    "per_device_batch_size": 2,
+    "gradient_accumulation_steps": 1,
+    "effective_batch_size": 2,
+    "learning_rate": 3e-05,
+    "weight_decay": 0.01,
+    "precision": "bf16",
+    "gradient_checkpointing": false,
+    "steps_per_epoch": 100,
+    "eval_steps": 25,
+    "save_steps": 100,
+    "save_total_limit": 3,
+    "early_stopping_patience": 4,
+    "predict_with_generate": false,
+    "tf32": true
+  },
+  "selection": {
+    "metric_for_best_model": "loss",
+    "best_model_checkpoint": "scratch/smoke_document/checkpoint-100",
+    "best_metric": 2.8435134887695312,
+    "global_step": 100,
+    "epoch": 1.0,
+    "best_checkpoint_dir": "scratch/smoke_document/best_checkpoint",
+    "caveat": "Validation loss is measured on the corpus's own validation split. For WikiLarge, 71 of 397 validation sources (17.9%) also appear in the train split, so absolute validation losses are optimistically biased; the relative comparison between checkpoints is unaffected because every checkpoint faces the same set. See results/remote/overlap_audit.json."
+  },
+  "packages": {
+    "torch": "2.6.0+cu124",
+    "transformers": "5.2.0",
+    "datasets": "5.0.0",
+    "tokenizers": "0.22.2",
+    "accelerate": "1.14.0",
+    "numpy": "2.5.1"
+  },
+  "log_history": [
+    {
+      "loss": 8.630215454101563,
+      "grad_norm": 32.877410888671875,
+      "learning_rate": 2.2800000000000002e-05,
+      "epoch": 0.25,
+      "step": 25
+    },
+    {
+      "eval_loss": 5.707517147064209,
+      "eval_runtime": 0.3734,
+      "eval_samples_per_second": 133.896,
+      "eval_steps_per_second": 66.948,
+      "epoch": 0.25,
+      "step": 25
+    },
+    {
+      "loss": 4.920113525390625,
+      "grad_norm": 43.82075119018555,
+      "learning_rate": 1.53e-05,
+      "epoch": 0.5,
+      "step": 50
+    },
+    {
+      "eval_loss": 3.6993138790130615,
+      "eval_runtime": 0.3606,
+      "eval_samples_per_second": 138.675,
+      "eval_steps_per_second": 69.338,
+      "epoch": 0.5,
+      "step": 50
+    },
+    {
+      "loss": 3.9771966552734375,
+      "grad_norm": 28.08823585510254,
+      "learning_rate": 7.8e-06,
+      "epoch": 0.75,
+      "step": 75
+    },
+    {
+      "eval_loss": 3.0562524795532227,
+      "eval_runtime": 0.3677,
+      "eval_samples_per_second": 135.981,
+      "eval_steps_per_second": 67.99,
+      "epoch": 0.75,
+      "step": 75
+    },
+    {
+      "loss": 3.6453155517578124,
+      "grad_norm": 48.038143157958984,
+      "learning_rate": 3.0000000000000004e-07,
+      "epoch": 1.0,
+      "step": 100
+    },
+    {
+      "eval_loss": 2.8435134887695312,
+      "eval_runtime": 0.3583,
+      "eval_samples_per_second": 139.539,
+      "eval_steps_per_second": 69.77,
+      "epoch": 1.0,
+      "step": 100
+    },
+    {
+      "train_runtime": 8.6402,
+      "train_samples_per_second": 23.148,
+      "train_steps_per_second": 11.574,
+      "total_flos": 60973645824000.0,
+      "train_loss": 5.29321029663086,
+      "epoch": 1.0,
+      "step": 100
+    }
+  ]
+}

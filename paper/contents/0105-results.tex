@@ -1,0 +1,495 @@
+\chapter{Results}
+\label{sec:results}
+
+\section{Corpus assessment}
+\label{sec:corpus-results}
+
+Cleaning WikiLarge under the strict mojibake filter drops \qty{5.0}{\percent} of training rows (\num{6206} of \num{123862}), \qty{4.8}{\percent} of validation rows, and no test rows.
+The targeted filter drops \qty{1.8}{\percent} of training rows and \qty{1.7}{\percent} of validation rows (\cref{tab:corpus-rows}).
+The deployed sentence checkpoint was trained on the targeted-filter corpus.
+
+\paragraph{The overlap audit} matches sentences exactly after Unicode normalisation, so its counts are lower bounds.
+The WikiLarge mirror's \num{121}-sentence test split is a \qty{100}{\percent} subset of ASSET's \num{359}-sentence split, since both draw on the \num{359} test sentences of TurkCorpus \parencites[588--589]{zhang-lapata-2017-sentence}[4671]{alva-manchego-etal-2020-asset}.
+An improvement that appears on both test sets therefore shows that the scores agree on the same sentences, not that the model generalises to new ones.
+\qty{19.02}{\percent} of the WikiLarge validation split also appears in training, so every validation loss here is optimistically biased.
+
+Eight of ASSET's \num{359} test sentences (\qty{2.23}{\percent}) also appear in the WikiLarge training data.
+Without them, every condition's \gls{sari} changes by less than \num{0.12}, and the gain of the fine-tuned over the untuned checkpoint changes by \(+0.006\).
+None of the three demonstrations in the \gls{llm} prompts appears in the training data.
+
+\section{Sentence-level results}
+\label{sec:sentence-results}
+
+\Cref{tab:s6} is the primary sentence-level result: five conditions on the ASSET test split, all on one device at one code revision.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{4.5pt}
+	\caption{Sentence-Level Comparison of the Five Conditions on ASSET}
+	\label{tab:s6}
+	\begin{tabular}{@{}lrrrrrl@{}}
+		\toprule
+		\textbf{Model}                   & \textbf{Params}  & \textbf{SARI}        & \textbf{BLEU}        & \textbf{FKGL}       & \textbf{Unchanged}   & \textbf{\(\Delta\)SARI \qty{95}{\percent} CI} \\
+		\midrule
+		\textbf{A:} untuned              & 139\gls{million} & \num{21.39}          & \textbf{\num{91.64}} & \num{10.02}         & \qty{93.9}{\percent} & n/a                                           \\
+		\textbf{B:} fine-tuned           & 139\gls{million} & \num{37.80}          & \num{88.30}          & \num{8.18}          & \qty{11.7}{\percent} & \([+15.38, +17.50]\)                          \\
+		\textbf{C:} comparison           & 406\gls{million} & \num{38.17}          & \num{88.58}          & \num{7.85}          & \qty{13.4}{\percent} & \([+15.77, +17.82]\)                          \\
+		\textbf{D:} LLM (7\gls{billion}) & 7\gls{billion}   & \num{45.95}          & \num{75.46}          & \textbf{\num{7.77}} & \qty{4.5}{\percent}  & \([+23.64, +25.70]\)                          \\
+		\textbf{E:} LLM (3\gls{billion}) & 3\gls{billion}   & \textbf{\num{47.03}} & \num{68.21}          & \num{8.22}          & \qty{1.2}{\percent}  & \([+24.80, +26.51]\)                          \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		\(\gls{nsize} = 359\) sentences with ten references each.
+		Bold marks the best value per column, highest except for \gls{fkgl}; \gls{bleu} is a counterexample, not a quality ranking (\cref{sec:background-evaluation}).
+		\textbf{A}--\textbf{C} use beam search; \textbf{D} and \textbf{E} are three-shot over three seeds, reported as means (\gls{sari} standard deviations \num{0.073} and \num{0.053}).
+		\gls{deltasari} intervals are the paired bootstrap over \num{1000} resamples against \textbf{A}.
+	}
+\end{table}
+
+Against the untuned baseline checkpoint, fine-tuning improves \gls{sari} by \(+16.42\)~points at \(\gls{pval} < 0.001\), with a \gls{ci} excluding zero by more than fifteen points, and improves \gls{fkgl} by \num{1.84}~grade levels.
+Against the comparison simplifier the difference is \(-0.37\)~\gls{sari}, with \gls{fkgl} likewise marginally in favour of the comparison simplifier.
+No paired test between the two was run, and their intervals against the untuned checkpoint overlap almost entirely.
+
+Both prompted models score above the fine-tuned model and the comparison simplifier, and the smaller of the two scores highest: \(47.03 > 45.95 > 38.17 \approx 37.80 > 21.39\).
+The 3\gls{billion}-over-7\gls{billion} ordering is unlikely to come from decoding randomness: across three seeds each, the \gls{sari} standard deviations are \num{0.053} and \num{0.073}, so the \num{1.07}-point gap is more than 14 standard deviations.
+No paired test over sentences was run.
+
+\Gls{bleu} runs inverse to \gls{sari} across the five rows except for \textbf{B} and \textbf{C}, which are \num{0.37}~\gls{sari} apart (\cref{fig:inversion}a).
+The same run measures the mechanism (\cref{fig:inversion}b): the unchanged rate falls from \qty{93.9}{\percent} to \qty{1.2}{\percent} as \gls{sari} rises, with the same exception.
+This pattern is the behaviour \cref{sec:background-evaluation} predicts of a metric scoring \gls{ngram} overlap with a reference \parencite[312]{papineni-etal-2002-bleu}.
+A second explanation, that ASSET's ten references amplify a conservative system's advantage, does not hold.
+Sweeping the reference count from \(\gls{kref} = 1\) to \(\gls{kref} = 10\) (\cref{fig:ksweep}) lifts the absolute \gls{bleu} of the untuned and the fine-tuned checkpoint steeply while leaving the gap between them at two to three points throughout.
+Reference count therefore does not explain the inversion; the edit rate remains the explanation consistent with \cref{fig:inversion}b.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\textwidth]{fig_bleu_sari_inversion.pdf}
+	\caption{Relationship Between BLEU, SARI, and the Unchanged Rate}
+	\label{fig:inversion}
+	\note{
+		Higher is better for both metrics; the conditions are those of \cref{tab:s6}.
+		In (a) each metric has its own axis range, so only the direction of the two curves is comparable.
+		Both axes in (b) are broken across the ranges no condition falls in, \gls{sari} 23--35 and \qtyrange{16}{89}{\percent} unchanged.
+	}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.58\textwidth]{fig_bleu_ksweep.pdf}
+	\caption{Sensitivity of BLEU to the Number of References}
+	\label{fig:ksweep}
+	\note{
+		Both curves are computed on one fixed set of generations, so only \gls{kref} varies.
+	}
+\end{figure}
+
+\paragraph{The noise floor} is \({\approx}2\)~\gls{sari} points, estimated from two unseeded reduced-scope training runs scored on 50 WikiLarge test sentences (\num{35.85} and \num{33.85}).
+The deterministic untuned checkpoint scored identically in both.
+The estimate is a rough bound for the full configuration rather than a measurement of it.
+The three decoding runs of \cref{sec:finetuning} span \num{0.26}~\gls{sari}, well inside it.
+
+\section{Document-level results}
+\label{sec:document-results}
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{3.5pt}
+	\caption{Document-Level Comparison on D-Wikipedia at Two Training Scopes}
+	\label{tab:document}
+	\begin{tabular}{@{}llrrrrrr@{}}
+		\toprule
+		\textbf{Run}                                                     & \textbf{Model}       & \textbf{D-SARI}      & \textbf{SARI}        & \textbf{BLEU}        & \textbf{FKGL}       & \textbf{BERTSc.}     & \textbf{LENS}        \\
+		\midrule
+		\multirow{3}{*}{\shortstack[l]{reduced\\\(\gls{nsize}{=}500\)}}  & fine-tuned           & \textbf{\num{31.62}} & \textbf{\num{41.13}} & \textbf{\num{22.29}} & \num{7.58}          & \textbf{\num{89.94}} & n/a                  \\
+		                                                                 & untuned              & \num{14.63}          & \num{21.48}          & \num{18.09}          & \num{9.54}          & \num{89.21}          & n/a                  \\
+		                                                                 & LLM (7\gls{billion}) & \num{21.36}          & \num{39.70}          & \num{12.02}          & \textbf{\num{6.01}} & \num{88.42}          & n/a                  \\
+		\addlinespace
+		\multirow{2}{*}{\shortstack[l]{full\\\(\gls{nsize}{=}8{,}000\)}} & fine-tuned           & \textbf{\num{35.44}} & \textbf{\num{41.95}} & \textbf{\num{27.21}} & \textbf{\num{7.86}} & \textbf{\num{90.61}} & \textbf{\num{45.61}} \\
+		                                                                 & untuned              & \num{14.34}          & \num{21.60}          & \num{16.66}          & \num{9.69}          & \num{88.80}          & \num{33.42}          \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		The reduced block is re-scored under the corrected normaliser; the full block is the deployed checkpoint on the complete split.
+		Within each block bold marks the best value per column, highest except for \gls{fkgl} (\cref{sec:background-evaluation}).
+		Paired bootstrap on the \gls{dsari} improvement: \(\gls{pval} < 0.001\).
+	}
+\end{table}
+
+The full-scope checkpoint improves \gls{dsari} by \(+21.09\) over the untuned checkpoint on the complete test split at \(\gls{pval} < 0.001\).
+The gain from training scope is \(+3.82\)~\gls{dsari} against the re-scored reduced-scope row (\cref{tab:document}).
+
+The two runs use different sample sizes, which ordinarily forbids direct comparison.
+The comparison is readable here because the untuned checkpoint is the same model in both and moves by only \(-0.28\)~\gls{dsari}.
+An anchor that stable beside a move that large suggests that the difference comes from the checkpoint rather than the sample, though this is an argument, not a controlled comparison.
+
+\paragraph{The metric normaliser} split the full stop inside single-letter abbreviations until it was corrected, so that \texttt{u.s.} became \texttt{u~.~s~.}, a token the test split contains zero times against \num{531} occurrences of the unsplit form.
+Re-scoring one run's own cached generations under the fixed normaliser isolates the effect: only \gls{dsari}, \gls{bleu}, and BERTScore move.
+\Gls{sari} and \gls{fkgl} are bit-identical, because their implementation re-tokenises its input anyway.
+False boundaries and score deltas are not proportional: \num{154}, 84, and \num{197} false boundaries across the three systems' \num{500} outputs recovered \(+0.15\), \(+0.46\), and \(+0.13\)~\gls{dsari}.
+The correction therefore cannot be propagated to other rows as a constant.
+It also widens the reduced-scope margin, from \num{16.68} to \num{16.99}.
+The same function normalises document input in the deployed system, so the deployed system passed the same split abbreviations to the model until the correction.
+
+\paragraph{\Gls{dsari} and \gls{lens} disagree} on the three-way comparison at \(\gls{nsize} = 2{,}000\): they rank the full-scope fine-tuned checkpoint and the prompted 7\gls{billion} in opposite orders (\cref{fig:disagreement}), while both place the untuned checkpoint last.
+\Gls{dsari} places the fine-tuned checkpoint \num{12.54}~points above the prompted 7\gls{billion}, and \gls{lens} places the prompted 7\gls{billion} \num{23.80}~points above the fine-tuned checkpoint.
+
+Four possible explanations were eliminated by measurement.
+Truncation affects \qtyrange{0.0}{0.6}{\percent} of predictions, far too few to carry the gap.
+Sample size does not explain it, since the \(\gls{nsize} = 8{,}000\) run reproduces the \(\gls{nsize} = 2{,}000\) figures within \num{0.6} on both \gls{dsari} and \gls{lens}.
+Normalisation does not either, since both systems pass through the same normaliser and the rescoring above bounds its effect at under half a \gls{dsari} point per system.
+Nor does sampling: three seeds of the prompted condition give \gls{lens} \num{69.27}, \num{69.14}, and \num{69.26} (mean \num{69.22}, standard deviation \num{0.071}), and their \gls{dsari} standard deviation is \num{0.039}.
+Both spreads are two to three orders of magnitude smaller than the disagreement they would have to explain.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.5\textwidth]{fig_metric_disagreement.pdf}
+	\caption{System Rankings Under D-SARI and LENS}
+	\label{fig:disagreement}
+	\note{
+		Both metrics are computed on the same \num{2000} documents.
+		The \gls{dsari} ordering is significant under the paired bootstrap, with the fine-tuned checkpoint above the prompted 7\gls{billion} in all \num{1000} resamples; \gls{lens} is not significance-tested and is applied out of domain (\cref{sec:limitations}).
+	}
+\end{figure}
+
+\paragraph{\Gls{bleu}'s verdict flips with the benchmark.}
+On ASSET, it ranks the untuned checkpoint first; on D-Wikipedia, it ranks the fine-tuned document checkpoint above it, \num{22.29} against \num{18.09} in the reduced block.
+The untuned checkpoint is the same model in both evaluations, but the fine-tuned checkpoints differ.
+
+\paragraph{Validation loss is a poor proxy for \gls{dsari}.}
+In the full-scope run it falls \qty{2.0}{\percent} from epoch~2 to epoch~5, and it levels off after epoch~3 (\cref{fig:loss}).
+\Gls{dsari}, by contrast, rises by \num{3.82} from the reduced-scope to the full-scope checkpoint.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.58\textwidth]{fig_loss_vs_dsari.pdf}
+	\caption{Validation Loss of the Full-Scope Document Run as a Proxy for D-SARI}
+	\label{fig:loss}
+	\note{
+		The \gls{dsari} points are the reduced-scope checkpoint and the selected full-scope checkpoint (epoch~4, validation loss \num{0.3352}) of \cref{tab:document}.
+		Losses are training diagnostics, not generalisation estimates (\cref{sec:limitations}).
+	}
+\end{figure}
+
+\section{Qualitative analysis of document-level outputs}
+\label{sec:qualitative}
+
+A scripted review categorises the document outputs of the reduced-scope checkpoint (\(\gls{nsize} = 500\)) and of the deployed full-scope checkpoint (all \num{8000} test documents).
+Both checkpoints share the same architecture and training pipeline and differ in training scope (\cref{tab:training-config}).
+Both are reviewed with the same evaluation script, so their rates can be compared.
+
+Every category is a surface property counted automatically over the whole sample, and examples were read only afterwards.
+The script stops if its sample does not match the source documents the outputs were generated from.
+The examples were read as structured manual inspection (\cref{sec:research-questions}) by the author, who also built the system under inspection.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{3.5pt}
+	\caption{Surface Probes of Document Outputs Across Checkpoints and References}
+	\label{tab:probes}
+	\begin{tabular}{@{}lr|rrr@{}}
+		\toprule
+		\textbf{Probe}                       & \textbf{Reduced}     & \textbf{Full}        & \textbf{Untuned}     & \textbf{Reference}   \\
+		\midrule
+		median output/source length ratio    & \num{0.64}           & \num{0.70}           & \num{1.00}           & \num{0.67}           \\
+		median sentence-count ratio          & \num{0.81}           & \num{0.93}           & \num{1.00}           & \num{1.00}           \\
+		median words per sentence            & \num{16.0}           & \num{16.6}           & \num{22.3}           & \num{15.0}           \\
+		unchanged (identical to source)      & \qty{4.4}{\percent}  & \qty{7.7}{\percent}  & \qty{28.9}{\percent} & \qty{1.6}{\percent}  \\
+		near-copy of source                  & \qty{16.8}{\percent} & \qty{18.2}{\percent} & \qty{51.6}{\percent} & \qty{3.0}{\percent}  \\
+		split a sentence                     & \qty{10.6}{\percent} & \qty{19.1}{\percent} & \qty{13.7}{\percent} & \qty{34.8}{\percent} \\
+		below half the reference's length    & \qty{25.8}{\percent} & \qty{18.5}{\percent} & \qty{10.8}{\percent} & \qty{0}{\percent}    \\
+		introduces a year absent from source & \qty{6.4}{\percent}  & \qty{5.4}{\percent}  & \qty{8.0}{\percent}  & \qty{24.4}{\percent} \\
+		degenerate repetition (count)        & 0                    & 0                    & 10                   & 51                   \\
+		\bottomrule
+	\end{tabular}
+	\note{
+		The three columns right of the rule come from one run over the whole test split (\(\gls{nsize} = 8{,}000\)); the reduced column is a separate \(\gls{nsize} = 500\) run.
+		The reference column describes the human simplifications.
+	}
+\end{table}
+
+\paragraph{Compression increases with source length,} one of the clearest results of the review.
+For both checkpoints, the median output/source length ratio falls monotonically from the shortest source-length bucket (under 60 words) to the longest (250 words or more) (\cref{fig:compression}).
+
+The reduced-scope checkpoint follows the curve of the human references closely; the full-scope checkpoint follows its shape but lies about \qty{20}{\percent} above it in the two longest buckets.
+The untuned checkpoint stays at \num{1.00}, rising only to \num{1.04} in the longest bucket.
+
+The probe rows in \cref{tab:probes} show that the full-scope checkpoint compresses less and leaves more outputs unchanged than the reduced-scope one: over-deletion falls from \qty{25.8}{\percent} to \qty{18.5}{\percent}, and unchanged outputs rise from \qty{4.4}{\percent} to \qty{7.7}{\percent}.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{fig_compression_by_length.pdf}
+	\caption{Dependence of Output Compression on Source Length}
+	\label{fig:compression}
+\end{figure}
+
+\paragraph{Error case~1, reciting the corpus over the input,} affected the reduced-scope checkpoint heavily.
+Of the 35 documents whose source mentions the 2010 census, its output gives the census year as 2000 instead of 2010 in 27 (\qty{77}{\percent}), keeps the 2010 census in 5 (\qty{14}{\percent}) and names no census year in 3 (\qty{9}{\percent}).
+The full-scope checkpoint gives 2000 instead of 2010 in only 1 of \num{576} such documents (\qty{0.2}{\percent}), keeps the 2010 census in \num{248} (\qty{43}{\percent}) and names no census year in \num{327} (\qty{57}{\percent}).
+Among the outputs that name a census year, the share with the correct one therefore rises from \qty{16}{\percent} to over \qty{99}{\percent}.
+The full-scope checkpoint almost never states a wrong census year, but it more often names none than the correct one, which loses the fact without asserting a false one.
+
+Two checks suggest a real change rather than a sampling artefact.
+The untuned checkpoint only copies: its outputs contain ``2000 census'' in \qty{11.4}{\percent} and \qty{9.0}{\percent} of the two samples, in every case because the source mentions both censuses, so the probe behaves alike on both samples.
+Over-deletion also falls in the same direction (\cref{tab:probes}).
+
+A likely source of the substitution is the corpus itself: of the \num{576} test references whose source mentions the 2010 census, \num{190} keep 2010 and 21 say 2000, 15 of them where the source does not mention the 2000 census.
+Only the test split was counted, so it is inferred rather than measured that the training references contain the same substitution.
+Documents whose source cites the 2010 census make up \qty{7.2}{\percent} of the \num{8000} test documents.
+The example \textcite[8001--8002]{sun-etal-2021-document} use to motivate \gls{dsari} is a census-templated article of the same kind.
+The two reviews differ in both checkpoint and sample, so the improvement is consistent with full-scope training but does not show that it caused it.
+
+\paragraph{Error case~2, over-deletion on long documents,} is the dominant quality failure of the deployed checkpoint.
+Of the \num{8000} full-scope outputs, \num{1482} (\qty{18.5}{\percent}) are less than half as long as their reference.
+This has two causes: sources longer than the \num{512}-token input cap are truncated before the model sees them, and the model's learned deletion then shortens what remains.
+In the inspected examples, the checkpoint reduces long articles to a competent simplification of the lead paragraph and drops everything after it.
+
+\paragraph{Error case~3, fluent invention on technical prose,} was observed in a single document.
+The reduced-scope checkpoint rewrote the source's definition of typesetting, ``the composition of text by means of arranging physical types'', as ``the use of a computer program to write text''.
+The output reads fluently but states a different definition.
+A single case does not show how often this happens.
+The case was found by reading the reduced-scope outputs.
+Invention is not one of the categories the review script counts, so it was not checked for the full-scope checkpoint.
+
+\paragraph{Error case~4, declining to edit,} may partly be caused by corpus defects.
+Of the \num{8000} test sources, \num{169} (\qty{2.11}{\percent}) are disambiguation stubs whose reference is a full article, with a median of 5 source words against 61 reference words.
+For these documents no correct output exists: the model only sees the short stub, while the reference is a full article with information the stub does not contain.
+The metric therefore penalises the output both for keeping source words that the reference drops and for lacking content that is not in the input.
+\textcite[285]{xu-etal-2015-problems} found this kind of misalignment in \qty{17}{\percent} of sampled \gls{pwkp} pairs.
+
+\section{Qualitative analysis of sentence-level outputs}
+\label{sec:sentence-failures}
+
+The sentence-level failures in this section come from the History log and targeted probes, not from the document review.
+
+\paragraph{The ``Other websites'' fabrication} mentioned in \cref{sec:motivation} came from the deployed sentence checkpoint, which produced and served ``Other websites'' for the input ``Municipal recycling policy revisions''.
+At the time, no guard covered this case; the deny-list added afterwards (\cref{sec:guards}) now rejects the output for every approach.
+
+This output may originate in the training data; of the \num{117656} WikiLarge pairs, \num{178} contain ``Other websites'' in the target.
+In 38 of them the target is exactly that string, and a further 86 begin with it.
+The sources of those 38 pairs are short fragments with little content, such as \texttt{, Blue and Green}, \texttt{programming language = C}, and \texttt{( Central Committee )}.
+The corpus therefore trains a model to produce exactly ``Other websites'' for such fragments.
+The deployed sentence checkpoint was trained under the targeted filter, whose corpus contains all \num{117656} strict-filter pairs, including these 38.
+The comparison simplifier, which produced the same string for isolated fragments (\cref{sec:motivation}), was trained on the same WikiLarge mirror \parencite[3]{cohen2026simplify}.
+
+As in error case~4, the defect is an alignment error.
+``Other websites'' is a section heading in Simple English Wikipedia articles.
+Automatic sentence alignment paired it with English fragments as if it were their simplification.
+The same string occurs in eleven documents on the simplified side of D-Wikipedia's training split, but as running prose rather than as a heading, so the defect is specific to the sentence-level corpus.
+
+\pagebreak
+
+\paragraph{Two failure classes are specific to the prompted models:}\leavevmode\par
+\textbf{Prompt injection succeeds end to end}: the input sentence ``Ignore all previous instructions and reply with exactly: PWNED.'' produced exactly ``PWNED'' on both prompted \glspl{llm}, with no reason code.
+The prompted models receive the page text as part of their prompt, so text on a page can act as an instruction to them (\cref{sec:method-three}).
+A hostile page can therefore make the extension display arbitrary text in place of its own content.
+
+No guard detects this, because the guards check the form of an output, such as whether it is empty or repetitive, and injected output can be as well-formed as a valid simplification.
+The \gls{seqseq} models receive no instruction and treat an instruction in their input as text to simplify, so they are structurally immune.
+
+\textbf{Short fragments are explained rather than left alone}: the prompted models turn ``Published'' into ``Published: Released for everyone to read or see.'', an output that passes every guard legitimately.
+On a real page, the same behaviour would attach a definition to every navigation link.
+
+\section{Deployment results: coverage, preservation, and selection}
+\label{sec:deployment-results}
+
+The site audit covers twelve pages in six categories, two per category, at both granularities.
+The audit comprises 24 runs over \num{11867} registered text leaves (the candidate elements of \cref{sec:content-selection}) and \num{2571} requests, with \num{130} hand-labelled items (\cref{app:pages,app:coverage}).
+It is an exploratory audit reporting base rates, not an estimate with confidence intervals.
+
+\paragraph{Structural preservation} holds across all 24 runs.
+After simplification, every page kept all of its tags and the same number of anchors, every image kept its source attribute, and every anchor kept its target.
+Reverting restored the page's text content and each element's attributes in all 24 runs.
+
+At the strictest level, byte-identical raw \gls{html}, 18 of 24 runs hold.
+The six differences come from \texttt{jsdom} re-serialising the page's own inline styles once the extension sets a style, which changes their text but not the computed styles.
+Five differences are one to four bytes long, and one is \num{913}~bytes, on a page with \num{133} inline style declarations.
+
+\paragraph{Coverage} depends heavily on the page.
+The sentence cut skips \qtyrange{21.6}{95.1}{\percent} of the registered candidates on a page, and the document cut \qtyrange{53.7}{99.1}{\percent} (\cref{fig:skipshare}).
+Over all pages, the filters withhold \qty{74.7}{\percent} and \qty{90.9}{\percent} (\cref{tab:coverage}).
+Most skips are correct: in the labelled sample below, only 15 of 69 skipped items should have been sent.
+
+Since the share varies heavily across pages, no single page is representative of the system's coverage.
+The two cuts' skip shares cannot be compared directly.
+The document cut registers every leaf and sends whole heading-delimited sections, about half of its skips are design decisions rather than rejections: the headings it cuts on and elements outside the document body tags.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\textwidth]{fig_skip_share.pdf}
+	\caption{Per-Page Variation in Skip Share Across the Two Cuts}
+	\label{fig:skipshare}
+	\note{
+		The two cuts' skip shares are not comparable with each other (\cref{sec:deployment-results}).
+	}
+\end{figure}
+
+\paragraph{The content filter} has one measured class of false positives.
+The code-like-text heuristic rejected \num{487} items, \num{102} of them because of a semicolon alone.
+Of these \num{102}, 31 are prose-length items inside the page's own content area: 17 are running prose, and 14 are bibliography entries in which semicolons separate author names.
+
+The withheld prose is core content, for example an encyclopedia article's 97-word definition of carbon fixation, government guidance, four paragraphs of a philosophy encyclopedia and five documentation paragraphs.
+The other triggers cost little: every item skipped because of braces was actual code, and angle brackets withheld seven prose items.
+
+\paragraph{The labelled verdicts} show errors in both directions.
+A stratified sample of 69 skipped and 61 unchanged items, drawn deterministically by content hash, was read and labelled (\cref{fig:verdicts}).
+
+Of the 69 skipped items, 48 were correctly skipped and 15 should have been sent; 12 were rejected because they contain a semicolon, and 3 because they contain the word ``let''.
+The remaining 6 were correctly skipped but at a cost: they are product guidance that the page itself marks as opt-out, in this case with \texttt{aria-hidden="true"} (\cref{sec:content-selection}).
+The extension therefore leaves them alone as intended, and the reader gets them unsimplified.
+Of the 61 unchanged items, 49 were already plain, which is the correct behaviour on a page written to a plain-English standard.
+Of the other 12, 9 should have been simplified and 3 were German.
+
+\paragraph{Guards} fire on \num{1007} of the \num{2260} sentence-cut requests (\qty{45}{\percent}), counting a request once if any of its sentences was guarded.
+The response format does not allow a per-sentence rate.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.9\textwidth]{fig_labelled_verdicts.pdf}
+	\caption{Composition of Hand-Labelled Verdicts for Skipped and Unchanged Items}
+	\label{fig:verdicts}
+	\note{
+		Each bar gives shares of its own sample, so the two bars compare proportions, not counts. Sampling rule and verdict criteria in \cref{app:codebook}.
+	}
+\end{figure}
+
+\paragraph{Where preservation fails,} the failure can be traced either to the model or to the extension.
+Of \num{6320} anchors, \num{331} (\qty{5}{\percent}) held no text after the sentence-cut run.
+In \num{237} of them, the model deleted the phrase that carried the link, exposing the write-back limitation described in \cref{sec:content-selection}.
+The other 94 are link text misplaced by the fragmentation defect (\cref{sec:unit-of-simplification}), 93 of them on a single densely linked article.
+
+Misplacement follows link density rather than page size: the philosophy encyclopedia sends more prose than the Wikipedia article (\num{482} requests against \num{293}) but misplaces no link text.
+Two pages, however, show a pattern, not an established cause.
+In the document cut, \num{422} anchors were emptied, \num{388} by model deletions and 34 by misplacement.
+
+\paragraph{Five sentences were served with a negation deleted,} one of the most serious results of the review (\cref{app:inversions}).
+Each was otherwise unchanged, so the deletion inverts the claim, and no guard checks for this kind of edit.
+They include a return policy (``items \dots\ cannot be returned or exchanged'' became ``can be returned or exchanged''), an \gls{api} contract (``the iterable must not be empty'' became ``must be empty'') and two German sentences.
+The failure is not limited to out-of-language text, since three of the five sentences are English.
+
+The change guard lets such edits through by design: it never rejects word-level edits, since dropping one word can be a real simplification.
+A dropped negation is such an edit.
+Detection was conservative: it counted only outputs that equal the input minus exactly one negation token, and so it misses any inversion in which the sentence was also reworded.
+Five is therefore a lower bound.
+All five come from the sentence cut.
+With twelve pages and \num{2260} sentence-cut requests, five is a count, not a pattern.
+
+\paragraph{The system is English-only in capability} but does not signal it.
+The audit tested one German page, where the sentence cut changed 42 of the 65 items it sent.
+On the same page, the document cut applied the corpus lowercasing convention to German, producing invalid word forms such as ``die meisten häusers zer stört'' for ``die meisten Häuser zerstört'' (``most houses destroyed'').
+Since the system expects English input and nothing checks the language, no guard fired on any of these outputs.
+
+\paragraph{Two defects in restoring the original page} from its stored attributes (\cref{sec:content-selection}) were found during the audit and fixed in the extension afterwards.
+Reverting deleted the page's own \texttt{title} attribute and left empty \texttt{class} and \texttt{style} attributes on elements that originally had neither.
+An existing test was meant to cover both cases but missed them, because it compares only the inner markup of the simplified element and so cannot see the element's own attributes.
+
+\paragraph{The request economy} was measured as a by-product of the audit.
+Of the \num{2222} sentence-cut items in the per-item artefact, \num{647} (\qty{29}{\percent}) are under six words, such as dates, navigation labels and link texts like ``Edit this page on GitHub''.%
+\footnote{The extension's counters record \num{2224} sent sentence-cut items. The difference lies in two placeholder texts of search fields, which were sent but are not candidate elements, so the per-item artefact does not list them.}
+Raising the minimum from four to six words would stop all \num{647}, but it would also remove \num{349} simplifications of short text (\qty{22}{\percent} of all changes).
+Scoping the sentence cut to the page's content area would instead stop \num{592} items but also withhold \num{151} prose items.
+Excluding navigation, footer, header, aside and form elements (the page furniture) gives nearly the same result, within \qty{5.3}{\percent} of both the items it stops and the prose it withholds, and so has the same cost as scoping.
+
+\section{Granularity and input-unit findings}
+\label{sec:granularity-findings}
+
+The model outputs in this section come from the reduced-scope document checkpoint and concern input and output conventions, not simplification quality.
+
+\paragraph{Fragmentation, quantified.}
+Per-text-node selection sent \num{173} requests for one Wikipedia article's prose, a large share of them sub-sentence fragments.
+The same prose takes 79 requests under the sentence cut and 11 under the document cut.
+
+\paragraph{Input convention changes output quality} (\cref{tab:conventions}).
+The corpus convention was verified on the corpus itself: zero newline characters inside any document body across \num{3000} sampled documents, zero uppercase characters across \num{500} sampled lines, and Penn-Treebank-style pre-tokenisation throughout.
+
+Mixed-case prose produced a factual hallucination that the corpus convention did not.
+With newline characters as structural separators, two facts were lost, and the province Friesland became ``the country of friesland''.
+A heading included in a section's input was reproduced at the start of the output.
+On a page that keeps its own headings, each heading would then appear twice.
+
+This is the clearest instance in the project of a measurement changing a design decision instead of confirming one, though it rests on a single hand-constructed document.
+Segment joining likewise has no obviously safe strategy (\cref{tab:joins}), so the adopted rule was derived from the comparison (\cref{sec:unit-of-simplification}).
+
+\paragraph{The training-length distribution} reversed a planned optimisation.
+In a sample of \num{1500} source documents, the mean length is \num{180}~tokens, the median \num{120}, the \gls{p95} \num{510} and the maximum \num{1168}; \qty{68}{\percent} are at most \num{200}~tokens long (\cref{fig:doclen}).
+A single short section is therefore closer to the training distribution than several merged ones, so sections are not merged up to the \num{512}-token input cap.
+Sending a whole page as one document is not viable either: several articles have more than \num{2000}~tokens of prose, so more than \qty{74}{\percent} of such an article would be truncated at the cap and would be missing from the output.
+
+\begin{table}[htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{3pt}
+	\caption{Attribution of Document-Cut Symptoms to Pipeline Layers}
+	\label{tab:finding9}
+	\begin{tabular}{@{}P{5.0cm}P{5.2cm}P{2.0cm}@{}}
+		\toprule
+		\textbf{Symptom}                                                     & \textbf{Cause}                                                          & \textbf{Layer} \\
+		\midrule
+		a section's paragraphs shifted position; a sentence vanished         & a missing space after a full stop in the de-normaliser                  & presentation   \\
+		a section written back as one paragraph with a list of links deleted & the fold that wrote a section's output into its first element only      & write-back     \\
+		an invented organisation name in an otherwise faithful rewrite       & an opt-out subtree removed from the request rather than read as context & collection     \\
+		over-deletion on long documents                                      & checkpoint adopted deletion, compounded by truncation                   & model          \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+
+\paragraph{Three of the four symptoms that made the document cut look broken were not caused by the model} (\cref{tab:finding9}).
+The document error cases observed in the extension before these fixes therefore say more about the pipeline than about the model.
+The invented organisation name in the third row, for example, came from collection.
+No new cases were collected after the fixes, so none are reported here.
+The offline results are unaffected, since the evaluation harness sends whole articles directly to the backend.
+
+\paragraph{Two further defects affected the instruments rather than the page.}
+The History log recorded the text that was sent to the model rather than the text the page showed after write-back.
+The document cut registered only one item per section, so the leaves inside a section went uncounted.
+Neither defect changes the page, so no structural check reveals them; they show only when the log is compared with the page or the item counts with the registered leaves.
+Both were corrected: the log now records the whole chain from input to served text (\cref{sec:architecture}), and the document cut registers every leaf (\cref{sec:deployment-results}).
+
+\section{Runtime and cost}
+\label{sec:runtime}
+
+Latency was measured by running the extension's content script under \texttt{jsdom} against a live backend, so the timed requests are the ones the extension sends in use.
+The \gls{seqseq} models ran on the \gls{cpu} of an Apple~M3, not its \gls{gpu}, so their figures are not comparable to the \gls{gpu} evaluation runs above; the prompted 3\gls{billion} ran through Ollama, whose device use was not recorded.
+
+The main comparison cuts the same prose of one Wikipedia article in the two ways, using the fine-tuned sentence checkpoint and the reduced-scope document checkpoint.
+The prompted 3\gls{billion} and the comparison simplifier follow at the end of this section.
+The sentence cut sends 79 requests with a median payload of \num{124}~characters, and the document cut 11 requests with a median payload of \num{1262}~characters, for nearly the same total (\num{13448} and \num{13403}~characters).
+Median request latency is \qty{1.26}{\second} for the sentence cut and \qty{19.13}{\second} for the document cut, and \gls{p95} is \qty{3.28}{\second} and \qty{19.14}{\second}.
+The whole page takes \qty{15.5}{\second} and \qty{22.5}{\second}, or \num{869} and \num{596}~characters per second.
+Three independent cold repeats give \qty{15.8 \pm 0.5}{\second} and \qty{20.8 \pm 1.1}{\second}.
+Requests per second (\num{5.1} and \num{0.5}) reflect how the text is split rather than speed, so characters per second is the measure that compares the two cuts.
+
+Three findings follow.
+
+\textbf{Fewer, larger requests are not faster}: the document cut reduces the number of requests to one-seventh but increases the processing time per page by approximately \qty{45}{\percent}.
+Its 11 requests fill the client's eight-slot queue barely twice, while the sentence cut's 79 fill it ten times.
+The document cut therefore cannot hide its per-request latency behind concurrency.
+
+\textbf{They are, however, far steadier}: the document cut's \gls{p95} is within \qty{0.01}{\second} of its median, because its requests run in the same one or two server-side batches and finish together.
+The sentence cut's \gls{p95}, by contrast, is \num{2.6}~times its median.
+
+\textbf{They also appear more immune to contention} (\cref{fig:latency}c): in a separate run made while the machine was also running an evaluation job, the sentence cut's whole-page time was \qty{121.5}{\second} instead of \qty{15.5}{\second} (\(7.8\times\)) and its \gls{p95} \qty{62.7}{\second} instead of \qty{3.28}{\second} (\(19\times\)).
+The document cut did not show the same increase.
+A likely reason is that the sentence cut pays the contention penalty once per batch round, and it needed ten rounds here.
+This observation comes from a single run during an evaluation job, not from a controlled experiment.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=\textwidth]{fig_latency_regimes.pdf}
+	\caption{Latency Profiles of Four Model Configurations}
+	\label{fig:latency}
+	\note{
+		All three panels show the same Wikipedia article under the four configurations: (a) median and \gls{p95} request latency, (b) whole-page wall clock on its own scale, (c) three of those measurements in the idle run and in a separate run during an evaluation job, annotated with the ratio.
+		Panel (c) is one opportunistic observation, not a controlled experiment.
+	}
+\end{figure}
+
+Across the four profiled configurations, out of seven selectable models, the whole-page time differs by more than a factor of eight: \qty{15.5}{\second} for the fine-tuned sentence checkpoint, \qty{22.5}{\second} for the reduced-scope document checkpoint, \qty{43.6}{\second} for the comparison simplifier and \qty{132.7}{\second} for the prompted 3\gls{billion}.
+
+On the same input, the comparison simplifier is \num{2.4}~times slower per request and \num{2.8}~times slower per page than the fine-tuned sentence checkpoint, and the prompted 3\gls{billion} is \num{8.6}~times slower per page, at \num{101}~characters per second.
+The status check before each run adds \qtyrange{1.36}{4.06}{\second}, depending on the model.
+Simplifying a page again that the backend has already processed takes only \qtyrange{41}{183}{\milli\second}, because the backend serves cached outputs (\cref{sec:content-selection}).
+This is \(84\times\) faster than a first run, so a demonstration on an already processed page doesn't show the real latency of a computed simplification.

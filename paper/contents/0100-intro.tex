@@ -1,0 +1,90 @@
+\chapter{Introduction}
+\label{sec:introduction}
+
+\section{Motivation: The non-simple web}
+\label{sec:motivation}
+
+Web content is often written at a level of linguistic complexity that exceeds what some of its intended readers can readily process.
+\textcite[4--5]{west2003state}, for example, found that the front page of the average US government website read at an 11th-grade level and that only \qty{12}{\percent} of sites were at or below the 8th-grade level, the reading limit of half of the US public in 2003.
+Counterintuitively, sites potentially serving less educated audiences are not written in simpler language: \qty{83}{\percent} of corrections sites, \qty{74}{\percent} of elementary-education sites, and \qty{69}{\percent} of housing and of health sites read at a 12th-grade level \parencite[5]{west2003state}.
+
+Where prose is pitched above the reading level of the intended audience, the obstacle may lie not in the subject but in its linguistic packaging.
+\textcite[29, 31]{rink2018kommunikationsbarrieren} describes such obstacles as \emph{communication barriers}, among them a \emph{cognitive barrier}, which arises when a message's conceptual structure overtaxes its recipients cognitively.
+An important factor in this barrier is the linguistic or content-related complexity of the message \parencite[18--19]{schubert2016barriereabbau}.
+Affected readers include people with cognitive or learning disabilities, aphasia or dementia, and people with limited functional literacy \parencite[38]{rink2018kommunikationsbarrieren}, as well as readers with dyslexia or autism, but also non-native speakers, and children \parencite[135, 137]{alva-manchego-etal-2020-survey}.
+Access to communication is a condition for participation in society \parencite[29]{rink2018kommunikationsbarrieren}.
+Manual text simplification is resource-intensive \parencite[21]{stodden2026automatic}, and for continuously changing web content doesn't scale.
+
+This creates a role for \gls{ats}, which rewrites text to make it easier to understand while keeping its essential meaning \parencites[259]{siddharthan-2014-survey}[135]{alva-manchego-etal-2020-survey}.
+Meaning preservation is therefore a central constraint of the task: a rewrite that is easier to understand but changes what the source communicates would not fulfil the intended function of text simplification.
+\textcite[402]{xu-etal-2016-optimizing} note that Simple English Wikipedia data has dominated simplification research since 2010.
+
+\pagebreak
+
+Web-page simplification requires a deployed simplifier to determine which textual units to simplify and to write the resulting output back without disrupting the page's \gls{dom} structure (\cref{sec:background-web}).
+Real web pages contain heterogeneous content such as headings, lists, and captions \parencite[518--519]{hellbusch2018webdesign}.
+A simplifier trained exclusively on aligned sentence pairs may therefore not have learned to handle such non-sentence page elements.
+The challenge is consequently not only to produce simpler text, but also to ensure that the output remains structurally and semantically aligned with the input and can be integrated into the page without breaking its structure or functionality.
+
+These problems became apparent during different stages of this thesis.
+For example, in early implementation experiments, an existing \gls{bart}-based simplifier from the \gls{hf} Hub produced ``Other websites'' for isolated fragments such as ``By'', ``on'', and ``Published''.
+Later, the sentence-level model fine-tuned in this thesis turned the heading ``Municipal recycling policy revisions'' into the same phrase.
+These outputs were not caused by an error in the browser extension or the underlying infrastructure, but could be traced to the supervision data both models were trained on, as discussed in \cref{sec:sentence-failures}.
+Later, when the fine-tuned models were tested on authentic web pages, the site audit identified sentences that were served unchanged except for a deleted negation.
+The deletions reversed their meaning (\cref{sec:deployment-results}).
+
+Such failures illustrate a limitation of evaluating \gls{ats} only through benchmark scores: a flawed but well-formed output can pass through an automated evaluation without revealing that it failed.
+Held-out accuracy often overestimates how well a model performs outside its evaluation distribution \parencite[4902]{ribeiro-etal-2020-beyond}.
+
+\section{Research questions and scope}
+\label{sec:research-questions}
+
+This thesis evaluates \gls{ats} at the benchmark and at the deployment level, drawing on three kinds of evaluation: automatic metrics on public benchmarks, structured manual inspection, and an audit of the browser extension on authentic web pages.
+Two research questions organise the work.
+
+\begin{researchquestions}
+	\item\label{rq:comparison} \textbf{(Comparative performance):} How do different \gls{ats} methods compare with each other at sentence and document granularity, evaluated using established automatic metrics and structured manual inspection?
+	\item\label{rq:deployment} \textbf{(Deployment behaviour):} Which content-selection and \gls{dom}-preserving replacement strategies enable reliable application of \gls{ats} to real-world web pages, and what does an audit of the deployed system on such pages show about its robustness in practice?
+\end{researchquestions}
+
+Both questions are answered on English text, over a grid of three approaches against the two granularities (\cref{sec:comparison-design}).
+The approaches are an off-the-shelf \gls{seqseq} model for simplification (the \emph{comparison simplifier}); the author's \gls{seqseq} model fine-tuned on a parallel dataset; and prompted open-weight \glspl{llm}.
+Unlike the two \gls{seqseq} models, the prompted \glspl{llm} are general-purpose instruction models that were never trained for simplification specifically and receive the task through prompting with an instruction and a few demonstrations.
+I derive four hypotheses (\cref{sec:hypotheses}): fine-tuning should improve simplification-specific metrics over the same checkpoint before fine-tuning (\cref{hyp:finetuning}), a prompted \gls{llm} should match or exceed a fine-tuned model (\cref{hyp:llm-vs-finetuned}), reference-overlap and simplification-specific metrics should rank differently (\cref{hyp:metrics}), and behaviour on authentic pages should diverge from benchmark behaviour (\cref{hyp:web}).
+
+\section{Contributions}
+\label{sec:contributions}
+
+In this thesis I make these contributions to the evaluation and deployment of \gls{ats}.
+This thesis \dots
+
+\dots provides \textbf{a systematic assessment of the corpora used in the experimental setup}, documenting data-quality issues that affect their suitability for \gls{ats} (\cref{sec:corpus-preparation,sec:corpus-results}).
+
+\dots provides \textbf{a controlled comparison of three \gls{ats} approaches at sentence and document granularity}.
+The approaches are evaluated through a common evaluation harness, including the complete \num{8000}-document document-level test split.
+The reimplemented document-level metric is tested against its reference implementation (\cref{sec:finetuning,sec:method-three,sec:evaluation-protocol,sec:document-results}).
+
+\dots provides \textbf{a DOM-preserving browser deployment for comparing simplification approaches on authentic web pages}.
+This deployment makes it possible to examine content selection, simplification granularity, and replacement behaviour in the context in which such a system would actually be used, complementing evaluation on curated benchmarks (\cref{sec:unit-of-simplification,sec:deployment-results}).
+
+\dots derives \textbf{methodological findings about the evaluation of \gls{ats}}.
+In particular, the results show how conclusions can depend on benchmark and granularity choices, and how structured inspection of system outputs can reveal behaviour that is not captured by automatic metrics alone (\cref{sec:cross-cutting}).
+
+\section{Thesis structure}
+\label{sec:structure}
+
+Following the motivation, research questions, and core contributions outlined in \cref{sec:introduction}, the remainder of this thesis is structured as follows:
+
+\Cref{sec:background} establishes the necessary background by introducing automatic text simplification, trained versus instructed neural models, the parallel corpora utilized, evaluation metrics, and the unique challenges of using web pages as input.
+\Cref{sec:related} then reviews related work across simplification approaches, browser-based deployments, and behavioural robustness, culminating in the formalization of the core research hypotheses.
+
+The core technical and empirical contributions are divided across two methodology chapters:
+\Cref{sec:methodology-i} details the experimental design, corpus preparation, fine-tuning of sequence-to-sequence architectures, and the prompting strategy for open-weight language models, alongside the evaluation protocol.
+Subsequently, \cref{sec:methodology-ii} presents the architecture and deployment of the browser extension under local-processing constraints, detailing DOM-preserving content replacement, input-unit definitions, and output guards.
+
+\Cref{sec:results} reports the comprehensive empirical findings, ranging from automatic sentence- and document-level metrics to qualitative reviews and runtime performance.
+These results are critically analysed and mapped directly back to the core research questions in \cref{sec:discussion}.
+
+Finally, \cref{sec:limitations} addresses the limitations and threats to validity of this work, \cref{sec:future-work} outlines promising avenues for future research, and \cref{sec:conclusion} concludes the thesis.
+
+In addition, the \hyperref[app:appendix]{appendices} provide the complete evaluation harness, the full set of structured inspection results, and the comprehensive audit of the deployed system on authentic web pages.

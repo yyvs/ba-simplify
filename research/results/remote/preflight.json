@@ -1,0 +1,102 @@
+{
+  "provenance": {
+    "recorded_at": "2026-08-22T01:06:16.714111+00:00",
+    "git_commit": "171d08e",
+    "git_dirty": true,
+    "host": {
+      "hostname": "beet",
+      "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+      "python": "3.12.13",
+      "cpu_count": 20,
+      "nvidia_driver": "535.309.01",
+      "gpu_name": "NVIDIA RTX A5000",
+      "gpu_memory_total": "24564 MiB",
+      "torch": "2.6.0+cu124",
+      "torch_cuda_build": "12.4",
+      "cuda_available": true,
+      "device_name": "NVIDIA RTX A5000",
+      "compute_capability": "8.6",
+      "device_count": 1,
+      "vram_gb": 23.7,
+      "bf16_supported": true
+    },
+    "hf_home": "/home/yunusrenz/simple-website/research/scratch/hf",
+    "profile": "beet"
+  },
+  "stage": "all",
+  "passed": true,
+  "checks": [
+    {
+      "name": "environment: CUDA visible to torch",
+      "ok": true,
+      "blocking": true,
+      "detail": "torch 2.6.0+cu124 (cuda build 12.4), device=NVIDIA RTX A5000, vram=23.7GB, cc=8.6, bf16=True"
+    },
+    {
+      "name": "environment: metric packages importable",
+      "ok": true,
+      "blocking": true,
+      "detail": "missing: ['none']"
+    },
+    {
+      "name": "normalizer: abbreviations",
+      "ok": true,
+      "blocking": true,
+      "detail": "normalize_for_model('The U.S. Army in 1990.') -> 'the u.s. army in 1990 .'"
+    },
+    {
+      "name": "prompting: document granularity constant",
+      "ok": true,
+      "blocking": true,
+      "detail": "evaluate_document.py references ['WHOLE_SECTIONS']; missing from prompting: ['none']"
+    },
+    {
+      "name": "d_sari: reference test",
+      "ok": true,
+      "blocking": true,
+      "detail": "REFERENCE VERIFICATION: upstream comparison PASSED"
+    },
+    {
+      "name": "corpus: filter divergence recorded",
+      "ok": true,
+      "blocking": true,
+      "detail": "present: /home/yunusrenz/simple-website/research/results/remote/corpus_filter_divergence.json"
+    },
+    {
+      "name": "corpus: train/eval overlap audited",
+      "ok": true,
+      "blocking": true,
+      "detail": "present: /home/yunusrenz/simple-website/research/results/remote/overlap_audit.json"
+    },
+    {
+      "name": "environment: easse pinned to a commit",
+      "ok": true,
+      "blocking": false,
+      "detail": "pinned"
+    },
+    {
+      "name": "repo: working tree clean",
+      "ok": false,
+      "blocking": false,
+      "detail": "uncommitted changes present"
+    },
+    {
+      "name": "repo: thesis draft under version control",
+      "ok": false,
+      "blocking": false,
+      "detail": "untracked (/thesisDraft.md is in .gitignore:201)"
+    },
+    {
+      "name": "environment: disk headroom",
+      "ok": true,
+      "blocking": false,
+      "detail": "50.7 GB free at research/scratch"
+    },
+    {
+      "name": "environment: HF_HOME set outside $HOME",
+      "ok": true,
+      "blocking": false,
+      "detail": "/home/yunusrenz/simple-website/research/scratch/hf"
+    }
+  ]
+}

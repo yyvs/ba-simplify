@@ -1,0 +1,12 @@
+{
+  "name": "simplifier-research-profiling",
+  "version": "1.0.0",
+  "private": true,
+  "description": "jsdom, for the research scripts that drive the extension's real content.js rather than reimplementing it: profile_deployment.mjs, audit_sites.mjs and the two inspect_*.mjs helpers. A Python reimplementation of what the extension sends would be measuring a different system.",
+  "scripts": {
+    "profile": "node profile_deployment.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

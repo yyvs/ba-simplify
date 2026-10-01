@@ -1,0 +1,80 @@
+{
+  "run": {
+    "script": "evaluate_document.py",
+    "script_version": "1.1",
+    "step": "4B",
+    "status": "complete",
+    "started_at": "2026-08-21T21:52:33.117958+00:00",
+    "finished_at": "2026-08-21T22:04:35.447756+00:00",
+    "duration_seconds": 722.3,
+    "git_commit": "cbd5ef6",
+    "device": "cuda"
+  },
+  "models": {
+    "finetuned": {
+      "model_id": "yunvs/bart-base-dwikipedia-simplification",
+      "source": "huggingface_hub"
+    },
+    "baseline": {
+      "model_id": "facebook/bart-base",
+      "source": "huggingface_hub"
+    }
+  },
+  "dataset": {
+    "name": "D-Wikipedia",
+    "citation": "Sun, Jin & Wan (EMNLP 2021)",
+    "split": "test",
+    "references_per_document": 1,
+    "n_evaluated": 500,
+    "split_total_raw": 8000,
+    "split_total_cleaned": 8000,
+    "mojibake_dropped": 0,
+    "sampled": true,
+    "sample_seed": 42,
+    "sample_indices_sha": "b225feab254d4af2"
+  },
+  "decoding": {
+    "strategy": "beam_search",
+    "num_beams": 4,
+    "no_repeat_ngram_size": 3,
+    "repetition_penalty": 1.2,
+    "max_input_tokens": 512,
+    "max_output_tokens": 512,
+    "batch_size": 16
+  },
+  "scores": {
+    "finetuned": {
+      "BLEU": 22.285585016732682,
+      "SARI": 41.13150731549416,
+      "FKGL": 7.578872533998581,
+      "D-SARI": 31.61664632257971,
+      "BERTScore": 89.94469046592712,
+      "LENS": null
+    },
+    "baseline": {
+      "BLEU": 18.087459495422706,
+      "SARI": 21.476977855488972,
+      "FKGL": 9.535481255387172,
+      "D-SARI": 14.625060142908666,
+      "BERTScore": 89.21400308609009,
+      "LENS": null
+    }
+  },
+  "significance": {
+    "metric": "d_sari",
+    "test": "paired bootstrap over documents",
+    "resamples": 1000,
+    "seed": 42,
+    "p_value": 0.0
+  },
+  "generation_seconds": {
+    "finetuned": 208.5,
+    "baseline": 484.2
+  },
+  "notes": [
+    "D-SARI is the headline metric here; plain SARI is reported only for continuity with the ASSET-based Step 4 numbers and does not model sentence deletion/merging/reordering.",
+    "BERTScore truncates inputs past ~510 tokens.",
+    "Every system's predictions are normalized into D-Wikipedia's own text convention (lowercased, PTB-pre-tokenized) before scoring, because the corpus's sources and references both use it and D-SARI/SARI/BLEU are n-gram metrics. It is NOT a no-op for the seq2seq systems -- it changed ~25% of fine-tuned and ~65% of baseline predictions at n=500 -- and it moves D-SARI by up to ~1 point; see the per-system counts logged above.",
+    "LENS not computed (lens-metric unavailable in this environment)."
+  ]
+}

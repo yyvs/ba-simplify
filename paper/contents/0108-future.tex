@@ -1,0 +1,65 @@
+\chapter{Future Work}
+\label{sec:future-work}
+
+\paragraph{Human evaluation} is the most urgent item, because only human judgements of the simplified outputs can resolve the document-level metric disagreement.
+\Gls{dsari} ranks the fine-tuned document model above the prompted 7\gls{billion}, and \gls{lens} ranks them the other way round (\cref{sec:document-results}).
+\Gls{lens} was trained on sentence-level human ratings \parencite[16385--16386]{maddela-etal-2023-lens}, so on documents it is applied out of domain and cannot settle the disagreement it creates (\cref{sec:limitations}).
+
+A study of this disagreement needs two systems, three raters, and 30 to 50 documents.
+Two systems suffice because the disagreement concerns only these two, and with three raters no single rater decides an item.
+The number of documents is limited by reading load: at a corpus mean of about 180 tokens per source document (\cref{sec:granularity-findings}), 30 to 50 documents already give each rater 60 to 100 outputs to read against their sources.
+The raters would score meaning preservation, fluency, and simplicity, the three standard dimensions \parencite[147]{alva-manchego-etal-2020-survey}, and the study would report inter-annotator agreement.
+
+The samples already exist: the paired document sets are on disk with a verified fingerprint, and the \num{130} labelled audit items carry content-hash identifiers.
+The four error cases of \cref{sec:qualitative} (reciting the corpus over the input, over-deletion, fluent invention on technical prose, declining to edit) give the raters a taxonomy to rate against.
+What is missing are the participants, an ethics and consent process, and rater training.
+The ratings could later serve as training data for a learned metric at document level, which \gls{lens} is not.
+
+\paragraph{A polarity check in the change guard} would address the five negation deletions that inverted a sentence's meaning (\cref{sec:deployment-results}).
+The obvious implementation is a negation stop-list, which was not built: like the two-entry deny-list of \cref{sec:limitations}, it would ship without a measured false-positive rate.
+The measurement that matters first is how often such inversions occur.
+Run on more real prose, the detection method of \cref{app:inversions} gives a lower bound per thousand sentences and needs no \gls{gpu}.
+
+\pagebreak
+
+\paragraph{A language gate} should come before any multilingual training.
+Both checkpoints are English-only, and nothing checks the language of the text sent to them.
+On one German page, the served outputs contained two deleted negations and lowercased non-words, and no guard fired.
+A gate that detects a unit's language and declines non-English text would make the system's behaviour match its documented English-only scope; it would not add multilingual capability.
+
+Multilingual training comes second because it raises a question the English pipeline never had to answer: which simplified register to target.
+German, for example, codifies two, \emph{Leichte Sprache} (``Easy Language'') and \emph{Einfache Sprache} (``Plain Language''), each with its own rule set and its own audience \parencite[21, 42]{stodden2026automatic}.
+
+\paragraph{Natural-case document training} would make the normalisation layer unnecessary.
+The document model consumes and produces the corpus's lowercased, pre-tokenised convention, so the deployed system normalises its input and de-normalises its output (\cref{sec:unit-of-simplification}).
+This pair is a handwritten approximation of the corpus's tokenisation, and it caused two defects: it shifted a section's paragraphs out of step (\cref{sec:granularity-findings}) and produced the German non-words of \cref{sec:deployment-results}.
+Training on natural-case, normally punctuated text would remove the layer and the failure modes that come with it.
+
+A cheaper first step is to measure what the layer contributes.
+The input-convention comparison of \cref{tab:conventions} rests on one hand-constructed document; repeating it on many natural-case documents, with and without normalisation, needs new generations but no retraining.
+
+\paragraph{Cohesion} was not measured, although over-deletion is the deployed checkpoint's dominant quality failure on long documents (\cref{sec:qualitative}).
+Deletion can separate pronouns from their antecedents or connectives from the clauses they link, raising the question of whether cohesion decreases as compression increases.
+Future work could measure cohesion using \gls{taaco}-style indices \parencite[1227]{crossley-etal-2016-taaco} across source, reference, and system outputs.
+Since global cohesion indices could predict coherence judgements in the validation of \gls{taaco} \parencite[1227, 1233--1234]{crossley-etal-2016-taaco}, global and local measures should both be reported, although the global indices compare paragraphs \parencite[1227]{crossley-etal-2016-taaco}, which the D-Wikipedia documents do not mark (\cref{sec:granularity-findings}).
+
+If cohesion decreases with compression, it could become a target for controllable simplification. Conditioning on cohesion with a control token, following \gls{access} \parencite[4691]{martin-etal-2020-controllable}, would require retraining and a validated cohesion metric.
+SimDoc's joint objective \parencite[1]{vasquezrodriguez2024simple} provides a related existing approach.
+
+\paragraph{Two filter changes} were quantified but not made, because each also has a cost.
+Dropping the semicolon from the code heuristic would send all \num{102} items it matched, not only the 17 that were wanted (\cref{sec:rq2}); a narrower rule would have to separate those 17 from the other 85.
+
+Raising the minimum word count from four to six would stop \num{647} of the \num{2222} sentence-cut items from being sent, more than any other change measured.
+It would also drop \num{349} rewrites of short text whose value was never labelled (\cref{sec:deployment-results}), so labelling them would decide whether the change is worth making.
+
+\paragraph{In-browser inference} would remove the local backend constraints, and runtime measurements show which models it suits.
+The fine-tuned sentence and document checkpoints take \(\approx\)\qty{20}{\second} per page, while the prompted 3\gls{billion} can take up to \qty{2}{\minute} (\cref{sec:runtime}).
+Therefore, should investigate whether \gls{bart}-based \gls{seqseq} models and prompted \glspl{llm}, if they could run in the browser at a usable speed, and how their runtime compares with the local backend.
+
+\paragraph{Audience control} exists here only as an instruction to the prompted models, and whether it serves the audiences it names was not tested.
+Four of its five audiences have no reference data (\cref{sec:limitations}), and their demonstrations are hand-authored (\cref{app:demos}).
+
+A human study with readers from these audiences, could show whether the audience parameter helps them specifically.
+With the help of generative AI models, a corpus of such audience-conditioned examples could be built.
+A separate model could also be fine-tuned on them, so that trained and instructed audience control could be compared directly.
+Fine-tuning the prompted model itself, for example parameter-efficiently, is excluded, because it enters \cref{rq:comparison} as an instructed rather than a trained system, and fine-tuning it would remove that distinction.

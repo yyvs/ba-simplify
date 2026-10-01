@@ -1,0 +1,94 @@
+\chapter{Limitations and Threats to Validity}
+\label{sec:limitations}
+
+\paragraph{The scope of the comparison} is limited by two choices about the models.
+First, both fine-tuned checkpoints are \gls{bart}-based, so the fine-tuned approach is represented by a single architecture family.
+The obvious alternative is \gls{tfive} \parencite[1]{raffel2023exploringlimitstransferlearning}, which casts every text problem into one text-to-text format.
+It was not trained or evaluated here, so the results say nothing about how the two architectures would compare.
+
+Second, the prompted models were evaluated only in 4-bit quantised form, so that they could run locally on a laptop alongside the \gls{bart} checkpoints, as the browser extension's local deployment requires (\cref{sec:method-three}).
+The effect of quantisation on their outputs was not measured.
+
+\paragraph{Evaluation validity} is bounded by the benchmarks themselves.
+WikiLarge's test split is a strict subset of ASSET's, so an improvement that holds on both confirms the scoring, not that the model generalises.
+\qty{19.02}{\percent} of WikiLarge's validation split also appears in the training split.
+Every validation loss quoted here is therefore a training diagnostic, not an estimate of generalisation.
+Checkpoint selection is unaffected, because all checkpoints are validated on the same split.
+
+ASSET's ten references were written under instructions for non-native speakers of English \parencite[13294]{kew-etal-2023-bless}, so metrics computed against them reward that style of simplification.
+This matters most for the four other audiences, for which no reference data exist.
+
+For roughly \qty{2}{\percent} of the document test split, no model could produce the target: the sources are disambiguation stubs, each paired with a full article as its reference.
+Every system is scored against these references alike.
+
+\paragraph{Metric validity} is the tighter constraint.
+\Gls{lens} was trained on sentence-level human ratings \parencite[16385--16386]{maddela-etal-2023-lens} and is applied here to documents, out of its domain.
+Its verdict therefore cannot fully settle its disagreement with \gls{dsari}.
+It was not computed at sentence level, so the sentence-level comparison rests on \gls{ngram} and readability metrics alone.
+
+\pagebreak
+
+The \texttt{bert-score} implementation used here silently truncates inputs beyond roughly \num{510}~tokens, a second truncation point that need not coincide with the model's.
+BERTScore also separates the fine-tuned and untuned document checkpoints by only \num{0.73}~points at \(\gls{nsize} = 500\) and \num{1.81} at \(\gls{nsize} = 8{,}000\), so it confirms nothing on its own.
+Neither \gls{lens} nor BERTScore was significance-tested.
+\Gls{dsari} here compares a corpus-trained system with a prompted one against a single reference, which is one reason the document-level ordering remains open.
+
+\paragraph{Human judgement} was not collected.
+All of these metrics are proxies for it, and \gls{bleu} and \gls{sari} correlate with human judgement only on some dimensions \parencite[148, 150--151]{alva-manchego-etal-2020-survey}.
+They are complemented by structured manual inspection from the author.
+No rating protocol was followed and no agreement statistics were computed.
+
+Neither the metrics nor the inspection measure cohesion across sentences, so it remains open how far simplification disturbs it.
+\Cref{sec:future-work} specifies both a cohesion measurement and a human study.
+
+\paragraph{Confounds affect the headline comparisons} in four places.
+First, the full-scope document run increased the corpus \num{6.6}-fold and the epoch count \num{2.5}-fold at once, so its gain cannot be attributed to either change alone.
+The normaliser correction, by contrast, was measured separately and is not part of this confound (\cref{sec:document-results}).
+
+Second, the two document runs differ in sample size.
+The stability of the shared untuned checkpoint suggests that the comparison is informative, but it does not replace scoring both checkpoints on the same sample.
+Third, scope and checkpoint also change together in the qualitative comparison.
+
+Fourth, the comparison simplifier was fine-tuned with the prefix \texttt{Simplify:} on every source sentence, a preprocessing detail given in the training setup of the paper that released it \parencite[4]{cohen2026simplify}.
+This project's evaluation and backend pass inputs without it.
+With the prefix, its authors report \num{37.96}~\gls{sari} and \num{7.87}~\gls{fkgl} on the same \num{359} ASSET test sentences \parencite[3, 6]{cohen2026simplify}, against \num{38.17} and \num{7.85} measured here without it.
+Both evaluations compute \gls{sari} and \gls{fkgl} with EASSE \parencite[12]{cohen2026simplify}.
+The decoding differs: the profile they report for validation sets no repetition penalty \parencite[12]{cohen2026simplify}, whereas the one used here sets it to \num{1.2} (\cref{sec:finetuning}).
+Their EASSE version is not reported either, so the two figures are not a controlled comparison.
+They nonetheless give no sign that the omission lowered the comparison simplifier's score.
+
+\pagebreak
+
+\paragraph{Reproducibility} is bounded, and the bound was measured.
+The numbers in this thesis were produced on four machines.
+The same \num{500} documents, scored under CUDA and under Apple Silicon from two copies of the weights, produce byte-identical generations.
+A rescore of cached generations on the \gls{cpu} reproduces a CUDA run bit-wise.
+Deterministic beam-search output and the \gls{ngram} metrics computed from it.
+Sampled output, which the prompted rows rely on, is not covered by this check.
+
+\Gls{lens} runs only in a separate environment with a pinned library version.
+The \gls{lens} column was therefore produced by a different software stack than the other metrics in the same table, and it cannot be recomputed in the service's environment.
+
+The two unseeded training runs behind the noise floor (\cref{sec:sentence-results}) predate the provenance tooling and have no artefact.
+They are quoted only as a variance observation.
+There are two mojibake filters implementations, and every row count is quoted with the one it used.
+Until automatic checkpoint pruning was switched off, training runs kept only their most recent checkpoints, so no per-epoch metric trajectory can be reconstructed for those early runs.
+
+\paragraph{The guards and the content filter} rest on little labelled data.
+The guards were not checked against labelled data, so no false-positive rate exists for any of them.
+The measurements count how often they fire per request, since the response format does not allow a per-sentence rate (\cref{sec:deployment-results}).
+
+The corpus deny-list rejects two strings, ``other websites'' and ``other pages'', but supports no claim about how often the checkpoints produce corpus boilerplate.
+Prompt injection is not mitigated: the guards check only the generated output, and preventing it would require additional checks on the input.
+The content filter's decisions, finally, were labelled for a sample of 69 items (\cref{sec:deployment-results}).
+
+\paragraph{Deployment evaluation validity} is the weakest of these.
+The site audit covers twelve pages, two per category, and reports no confidence intervals.
+Both the site audit and the latency profiler run under \texttt{jsdom}, which by default does not run a page's own scripts \parencite{jsdom2026}.
+The latency figures therefore do not include the time a browser needs to update and lay out the page.
+Visual changes and pages rendered entirely by client-side JavaScript are not part of the audit; both were checked by hand on several pages during development.
+The contention result comes from a single run.
+
+The document-level error cases reported here come from the offline evaluation (\cref{sec:qualitative}).
+The errors observed in the extension before the pipeline fixes reflect the pipeline rather than the model (\cref{tab:finding9}).
+Finally, the document cut's coverage rate is counted but was not analysed, so it is unknown how much of each simplified section is left as the page wrote it.

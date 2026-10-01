@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo 01 — Basic paragraphs</title>
+    <link rel="stylesheet" href="demo.css" />
+  </head>
+  <body>
+    <nav class="demo-nav">
+      <a href="index.html" translate="no" class="notranslate"
+        >← back to index</a
+      >
+    </nav>
+    <h1>01 — Basic paragraphs</h1>
+    <p class="meta notranslate">
+      Baseline toggle/revert check. Click the toolbar icon once to simplify,
+      again to revert. Notes like this one (<code>class="notranslate"</code>)
+      must never change.
+    </p>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: simplifies. This is the classic case the extension has always
+        handled.
+      </p>
+      <p>
+        Despite the multiplicity of antecedent conditions and the intervening
+        variables which collectively obfuscate causal inference, the overarching
+        regulatory framework mandates uniform compliance across heterogeneous
+        entities.
+      </p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: simplifies even though it's short. The old 30-character
+        minimum-length filter was removed on 2026-07-13 (the length gate that
+        remains is the 4-word one in <code>shouldSimplifyElement()</code>) —
+        short text is no longer silently skipped.
+      </p>
+      <p>The cat sat.</p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: skipped — looks like code (braces/semicolons), matches the
+        code-pattern heuristic in <code>shouldSimplifyElement()</code>.
+      </p>
+      <p>function add(a, b) { return a + b; }</p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: skipped — empty/whitespace-only text.
+      </p>
+      <p>&nbsp;</p>
+    </section>
+
+    <section class="case">
+      <p class="meta notranslate">
+        Expected: hovering a simplified paragraph shows the original text as a
+        tooltip (<code>title</code> attribute); toggling off restores this exact
+        text.
+      </p>
+      <p>
+        Prior to the commencement of the aforementioned undertaking, all
+        participating stakeholders are required to furnish written
+        acknowledgment of the terms herein described.
+      </p>
+    </section>
+  </body>
+</html>

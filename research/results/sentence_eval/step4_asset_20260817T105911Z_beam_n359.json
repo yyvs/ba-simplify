@@ -1,0 +1,110 @@
+{
+  "run": {
+    "script": "evaluate_sentence.py",
+    "script_version": "1.1",
+    "step": "4/5",
+    "started_at": "2026-08-17T10:59:11.817219+00:00",
+    "finished_at": "2026-08-17T11:10:26.309916+00:00",
+    "duration_seconds": 674.5,
+    "git_commit": "fb873a4",
+    "device": "cpu"
+  },
+  "dataset": "facebook/asset test",
+  "n_sentences": 359,
+  "references_per_sentence": 10,
+  "seeds_per_sampled_condition": 3,
+  "seq2seq_decoding": {
+    "strategy": "beam",
+    "num_beams": 4,
+    "no_repeat_ngram_size": 3,
+    "repetition_penalty": 1.2,
+    "max_length": 64
+  },
+  "decoding_eval": {
+    "temperature": 1.0,
+    "top_p": 0.9,
+    "num_predict": 100,
+    "stop": [
+      "\nComplex:",
+      "\nSimple:",
+      "\n\n"
+    ]
+  },
+  "fewshot_n": 3,
+  "significance_baseline": "base",
+  "models": {
+    "base": {
+      "model_id": "facebook/bart-base",
+      "source": "huggingface_hub"
+    },
+    "local": {
+      "model_id": "yunvs/bart-base-wikilarge-simplification",
+      "source": "huggingface_hub"
+    }
+  },
+  "results": {
+    "base": {
+      "label": "BART-base zero-shot (RQ1 baseline)",
+      "model_id": "facebook/bart-base",
+      "n_runs": 1,
+      "metrics": {
+        "sari": 21.389175880744475,
+        "bleu": 91.63649067449825,
+        "fkgl": 10.022140324209833,
+        "bertscore_f1": 0.9858493804931641,
+        "unchanged_rate": 0.9387186629526463,
+        "mean_words": 19.685236768802227
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.1789246191981464,
+      "sample_outputs": [
+        "One side of the armed conflicts is composed mainly of the Sudanese military and the Janjaweed, a Sudanese militia group recruited mostly from the Afro-Arab Abbala tribes of the northern Rizeigat region in Sudan.",
+        "Jeddah is the principal gateway to Mecca, Islam's holiest city, which able-bodied Muslims are required to visit at least once in their lifetime.",
+        "The Great Dark Spot is thought to represent a hole in the methane cloud deck of Neptune.",
+        "His next work, Saturday, follows an especially eventful day in the life of a successful neurosurgeon.",
+        "The tarantula, the trickster character, spun a black cord and, attaching it to the ball, crawled away fast to the east, pulling on the cord with all his strength.",
+        "There he died six weeks later, on 13 January 888.",
+        "They are culturally akin to the coastal peoples of Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also been presented with the Colin Mears Award to the value of \u00a35000.",
+        "Following the drummers are dancers, who often play the sogo (a tiny drum that makes almost no sound) and tend to have more elaborate \u2014 even acrobatic \u2014 choreography.",
+        "The spacecraft consists of two main elements: the NASA Cassini orbiter, named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe, named for the Dutch astronomer, mathematician and physicist Christiaan Huygenens."
+      ]
+    },
+    "local": {
+      "label": "BART fine-tuned (this project)",
+      "model_id": "yunvs/bart-base-wikilarge-simplification",
+      "n_runs": 1,
+      "metrics": {
+        "sari": 37.79715713008546,
+        "bleu": 88.30066064221708,
+        "fkgl": 8.17781742279599,
+        "bertscore_f1": 0.976455807685852,
+        "unchanged_rate": 0.116991643454039,
+        "mean_words": 16.147632311977716
+      },
+      "reason_counts": {},
+      "seconds_per_sentence": 0.13582787163228752,
+      "sample_outputs": [
+        "One side of the conflict is composed mainly of the Sudanese military and the Janjaweed, a Sudanese militia group.",
+        "Jeddah is the main gateway to Mecca, Islam 's holiest city.",
+        "The Great Dark Spot is a hole in the methane cloud deck of Neptune.",
+        "His next work, Saturday, follows an eventful day in the life of a successful neurosurgeon.",
+        "The tarantula spun a black cord and attached it to the ball, crawled away fast to the east, pulling on the cord with all his strength.",
+        "He died six weeks later, on 13 January 888.",
+        "They are similar to the coastal peoples of Papua New Guinea.",
+        "Since 2000, the recipient of the Kate Greenaway Medal has also been presented with the Colin Mears Award.",
+        "Following the drummers are dancers, who often play the sogo (a tiny drum that makes almost no sound ).",
+        "The spacecraft is named after the Italian-French astronomer Giovanni Domenico Cassini, and the ESA Huygens probe."
+      ],
+      "vs_baseline": {
+        "baseline_condition": "base",
+        "baseline_model_id": "facebook/bart-base",
+        "mean_delta_sari": 16.41763042917965,
+        "ci_low": 15.376179346681086,
+        "ci_high": 17.498552424698744,
+        "p_value": 0.0,
+        "n_resamples": 1000
+      }
+    }
+  }
+}

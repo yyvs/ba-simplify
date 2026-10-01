@@ -1,0 +1,225 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: #f5f5f7;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+h1 {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+h2 {
+  font-size: 16px;
+}
+
+.subtitle {
+  color: #555;
+  margin-top: 0;
+}
+
+.status-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin: 16px 0 20px;
+  font-size: 14px;
+}
+
+.status-checking { background: #eee; color: #444; }
+.status-down { background: #fdecea; color: #7a1f14; }
+.status-up { background: #e6f4ea; color: #1e5b2f; }
+
+.status-divider {
+  border: none;
+  border-top: 1px solid #d9d9d9;
+  margin: 20px 0 24px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  background: #eaeaea;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.dash-grid {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.dash-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  background: #fff;
+  align-items: flex-start;
+}
+
+.dash-row + .dash-row {
+  border-top: 1px solid #eee;
+}
+
+.dash-label { color: #555; }
+.dash-value { font-weight: 600; }
+
+.dash-value.status-box {
+  margin: 0;
+  padding: 8px 10px;
+  min-height: auto;
+  line-height: 1.2;
+}
+
+.dash-value-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+
+.dash-value-inline {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  text-align: right;
+}
+
+.loaded-model-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.loaded-model-name {
+  font-weight: 600;
+}
+
+.model-id-subtle {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+/* model scope beside each name (all scopes on a merged row); muted, as a qualifier */
+.model-scope {
+  font-size: 11px;
+  color: #555;
+}
+
+.model-id-subtle,
+.model-id-inline {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: #555;
+  overflow-wrap: anywhere;
+  white-space: nowrap;
+}
+
+.model-id-subtle a.model-id,
+.model-id-inline a.model-id {
+  font-size: 11px;
+}
+
+.model-inline {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.model-name-inline {
+  font-weight: 600;
+}
+
+.status-icon-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #d0d0d0;
+  background: #f7f7f7;
+  color: #333;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+}
+
+/* exact id from /health: quieter than the name, monospace for tags like
+   "qwen2.5:7b-instruct-q4_K_M", wraps mid-string since ids can be long */
+.model-id {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 400;
+  color: #555;
+  overflow-wrap: anywhere;
+}
+
+a.model-id {
+  color: #1a56b8;
+}
+
+a.model-id:hover {
+  text-decoration: none;
+}
+
+/* the "loaded models" and "selected model" rows are right-aligned lists; keep their
+   id lines aligned with the names above them */
+.dash-value-right {
+  text-align: right;
+}
+
+.hint {
+  color: #777;
+  font-size: 13px;
+}
+
+.status-btn {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+}
+
+.status-btn:hover {
+  background: #f0f0f0;
+}
+
+.status-btn:disabled {
+  color: #999;
+  cursor: default;
+}

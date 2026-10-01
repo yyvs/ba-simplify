@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#PBS -N simplify-doc-full
+#PBS -l select=1:ncpus=8:mem=64GB:ngpus=1:accelerator_model=a100
+#PBS -l walltime=12:00:00
+#PBS -j oe
+#PBS -o logs/pbs_train_document_full.log
+#
+# Full-scope document training on the HHU HPC cluster.
+#
+#     qsub remote/hpc/train_document_full.pbs          # submit
+#     qstat -u $USER                                    # watch
+#     qstat -f <job-id>                                 # detail
+#     https://myjam3.uni-duesseldorf.de/                # what it actually used
+#
+# Before submitting:
+#   1. `bash remote/hpc/prefetch.sh` on the STORAGE node (compute nodes have no internet).
+#   2. `module load hpc-tools && gpus_available` on the login node to pick a free
+#      accelerator_model.
+#
+# Resource request:
+#   - a100; `rtx6000` also works unchanged (Ampere+, bf16). Not `gtx1080ti`: Pascal has no
+#     bf16, and at 11 GB the batch size drops too far to fit the walltime.
+#   - 12 h: 5 epochs over ~129k documents at 512 tokens estimates ~5-8 h on a 24 GB Ampere
+#     card, and PBS kills at walltime. With ~per-epoch checkpoints and `--resume` an overrun
+#     costs one epoch; a padded walltime queues longer.
+#   - `-A <project>` is per person: add `#PBS -A yourproject` above or `qsub -A yourproject`.
+#   - 64 GB RAM: tokenising the full split once peaked at ~8-9 GB and was OOM-killed with no
+#     traceback (before the chunked tokeniser).
+
+set -euo pipefail
+
+# PBS starts the job in $HOME regardless of where you submitted from.
+cd "${PBS_O_WORKDIR:-$PWD}"
+
+echo "=== job ${PBS_JOBID:-interactive} on $(hostname) ==="
+echo "started:  $(date -Is)"
+echo "workdir:  $PWD"
+nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader || true
+
+# needed by the profile, not inherited into a batch job
+export HHU_KENNUNG="${HHU_KENNUNG:-$USER}"
+# shellcheck disable=SC1091
+source remote/profiles/hpc.env
+
+mkdir -p logs results/remote/logs
+
+# fail fast: each check would otherwise silently change a number this job produces
+python remote/preflight.py --stage train
+
+# --resume: re-submission after a walltime kill continues rather than restarts
+python remote/train.py \
+  --structure document \
+  --scope full \
+  --filter strict \
+  --resume \
+  2>&1 | tee -a results/remote/logs/train_document_full.log
+
+echo "finished: $(date -Is)"
+echo
+echo "Next, as a separate job so a failed evaluation does not cost the training:"
+echo "  qsub remote/hpc/eval_document.pbs"

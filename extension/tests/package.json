@@ -1,0 +1,12 @@
+{
+  "name": "simplifier-extension-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "jsdom harness for the extension's content script and its injected UI. Kept in its own folder so the extension itself stays a plain, unbuilt MV3 directory with no node_modules in it.",
+  "scripts": {
+    "test": "node document-watcher.test.js && node document-sections.test.js && node inline-markup.test.js && node revert-attributes.test.js && node navigation.test.js && node failure-notice.test.js && node stop-run.test.js && node one-run-at-a-time.test.js && node compare-models.test.js && node model-picker.test.js && node status-models.test.js && node status-reachable.test.js && node background-menu.test.js && node cache-eviction.test.js && node history-analysis.test.js && node history-view.test.js && node reports-view.test.js && node history-cache-delete.test.js && node history-logging.test.js && node toolbar-clear-cache.test.js && node layer-order.test.js && node manifest-assets.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

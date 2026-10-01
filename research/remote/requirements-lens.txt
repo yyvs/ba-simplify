@@ -1,0 +1,32 @@
+# The LENS environment, deliberately separate from requirements-gpu.txt.
+#
+# LENS (Maddela, Dou, Heineman & Xu, ACL 2023): `lens-metric` pins torch/transformers
+# versions that conflict with the FastAPI service's (§6.6), so it gets its own venv.
+# lens_only.py only reads cached generations and writes one JSON.
+#
+#     bash remote/setup.sh --lens
+#     ../venv-lens/bin/python remote/lens_only.py --generations results/remote/document_eval
+#
+# Install torch as in the main venv (matched to the host driver) and let lens-metric pull the
+# torch it wants on top. transformers stays pinned below: this venv holds old versions, not
+# unconstrained ones.
+
+# Python 3.11 or older: pandas<2.0 wheels stop at cp311, and the 1.5.3 sdist fails on a
+# pkg_resources import. setup.sh picks an older interpreter itself.
+lens-metric==0.2.0
+
+# lens-metric only declares `transformers>=4.8`; current releases (5.15.1 when written)
+# break its RoBERTa encoder: `ValueError: not enough values to unpack (expected 3, got 2)` in
+# lens/encoders/roberta.py. 4.30.2 is what the encoder was written against; tokenizers 0.13
+# is what 4.30 requires (pip would otherwise keep a newer one).
+transformers==4.30.2
+tokenizers==0.13.3
+
+# numpy 1.x: pandas 1.5.3 wheels are built against it; with numpy 2, `import lens` fails in
+# pandas._libs ("numpy.dtype size changed, Expected 96 from C header, got 88"). torch 2.5.1
+# and pytorch-lightning 2.0.9 are fine on 1.26.
+numpy==1.26.4
+
+# checkpoint (davidheineman/lens) downloads on first use: HF_HOME needs space
+# (`source remote/profiles/beet.env` sets it).
+huggingface-hub

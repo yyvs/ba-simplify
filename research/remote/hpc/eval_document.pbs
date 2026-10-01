@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+#PBS -N simplify-doc-eval
+#PBS -l select=1:ncpus=8:mem=48GB:ngpus=1:accelerator_model=a100
+#PBS -l walltime=06:00:00
+#PBS -j oe
+#PBS -o logs/pbs_eval_document.log
+#
+# Document evaluation on the full D-Wikipedia test split (8,000 documents).
+#
+# Separate from training so a scoring-stage crash does not discard a finished training run
+# (training fails on walltime, evaluation on metric dependencies).
+#
+#     qsub remote/hpc/eval_document.pbs
+#
+# `--limit 0` scores the whole split instead of the seeded 500-document sample the existing
+# document rows use (a §6.6 limitation).
+#
+# No prompted-LLM condition: it needs Ollama on the compute node. Run the three-way
+# comparison on beet (`pipeline.py --only document`).
+
+set -euo pipefail
+
+cd "${PBS_O_WORKDIR:-$PWD}"
+
+echo "=== job ${PBS_JOBID:-interactive} on $(hostname) ==="
+echo "started: $(date -Is)"
+nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader || true
+
+export HHU_KENNUNG="${HHU_KENNUNG:-$USER}"
+# shellcheck disable=SC1091
+source remote/profiles/hpc.env
+
+mkdir -p logs results/remote/logs
+
+# Gated on the abbreviation-normaliser fix: otherwise "u.s." becomes "u . s ." (0 vs. 531
+# occurrences in D-Wikipedia test) and every metric inherits it.
+python remote/preflight.py --stage document
+
+CKPT="${DOC_CHECKPOINT:-scratch/simplification_results_document/best_checkpoint}"
+if [[ ! -d "$CKPT" ]]; then
+  echo "No checkpoint at $CKPT." >&2
+  echo "Run the training job first, or set DOC_CHECKPOINT to a Hub id / another path." >&2
+  exit 1
+fi
+echo "checkpoint: $CKPT"
+
+python evaluate_document.py \
+  --model "$CKPT" \
+  --baseline facebook/bart-base \
+  --limit 0 \
+  --seed 42 \
+  --device cuda \
+  --batch-size 16 \
+  --resamples 1000 \
+  --skip-lens \
+  --outdir results/remote/document_eval \
+  2>&1 | tee -a results/remote/logs/eval_document.log
+
+# Cached generations only (no model, no GPU); keeps §6.3's error taxonomy on this checkpoint.
+python review_document_outputs.py \
+  --generations results/remote/document_eval/generations_n8000_seed42.json \
+  --partial results/remote/document_eval/finetuned_n8000_seed42.partial.json \
+  --limit 0 --seed 42 \
+  --out results/remote/document_eval/qualitative_review_full.json \
+  2>&1 | tee -a results/remote/logs/review.log
+
+echo "finished: $(date -Is)"
+echo
+echo "LENS is still missing from these rows and needs its own environment:"
+echo "  bash remote/setup.sh --lens"
+echo "  ../venv-lens/bin/python remote/lens_only.py --generations results/remote/document_eval"

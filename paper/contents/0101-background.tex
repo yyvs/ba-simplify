@@ -1,0 +1,128 @@
+\chapter{Background}
+\label{sec:background}
+
+\section{Automatic text simplification}
+\label{sec:background-ats}
+
+\Gls{ats} takes in a text and outputs a version that is easier to read, while preserving the main idea \parencite[259]{siddharthan-2014-survey}.
+The rewriting proceeds through transformations such as replacement, reordering, and splitting \parencite[135, 137--138]{alva-manchego-etal-2020-survey}:
+
+\begin{itemize}
+	\item \emph{Lexical operations} replace a rare or difficult word with a common or easier synonym.
+	\item \emph{Syntactic operations} include splitting longer sentences, reordering clauses, and converting passive to active voice.
+	\item \emph{Content-level operations} consist of deleting material judged to be peripheral or redundant.
+\end{itemize}
+
+The list is not exhaustive.\footnote{Operations can also apply at the morphological level \parencite[117]{cardon-bibal-2023-operations}; for German, long, one-token compounds are frequent, and their segmentation has been identified as a language-specific operation \parencite[189]{stodden2026automatic}.}
+The last of these operations makes the task particularly challenging to evaluate, as deletion lowers the \gls{fkgl} (a readability formula, \cref{sec:background-evaluation}), but this does not necessarily make the output a better simplification \parencite[175, 177]{alva-manchego-etal-2020-survey}.
+
+The task is formulated at two granularities.
+In \textbf{sentence-level} simplification the training and evaluation units are single aligned sentence pairs, a narrower scope that has made corpora easier to collect and curate \parencite[136]{alva-manchego-etal-2020-survey}.
+In this field, most progress has been shown at this level \parencite[1]{vasquezrodriguez2024simple}.
+A system that simplifies one sentence at a time, however, cannot preserve cross-sentence cohesion.
+It cannot see those referential chains and discourse connectives across sentences, which lie outside its window.
+\textcite[136]{alva-manchego-etal-2020-survey} note that document-level simplification arguably cannot be achieved by simplifying sentences one at a time.
+
+In \textbf{document-level} simplification, the unit is an article paired with its simplified version.
+In the D-Wikipedia corpus an article is the lead section below the title, and pairs longer than \num{1000}~words are excluded \parencite[7999]{sun-etal-2021-document}.
+
+\pagebreak
+
+A document-level model therefore sees the referential chains and discourse connectives that a sentence-level system loses, although access to this context does not guarantee that the model exploits it.
+The model is moreover permitted, indeed expected, to delete, merge, reorder, and split across sentence boundaries, so its output may have no positional correspondence to its source.
+The trade-off is between an evaluation unit that is tractable and a modelling unit more faithful to how text is actually read.
+Which of the two units a deployed system should feed its model is a separate question, taken up for web pages in \cref{sec:background-web}.
+
+\section{Neural simplification: trained and instructed models}
+\label{sec:background-models}
+
+Both families of system compared here are transformer-based, built on the attention-only architecture of \textcite[1]{vaswani2023attentionneed}.
+They differ in whether the simplification behaviour is acquired by gradient update or elicited by instruction.
+
+The first family is the pretrained encoder--decoder, fine-tuned on parallel data.
+\Gls{bart} \parencite[7871]{lewis-etal-2020-bart} is a denoising \gls{seqseq} model trained by corrupting text with an arbitrary noising function and learning to reconstruct the original, an objective that aligns closely with rewriting.
+Its released checkpoints carry learned absolute positional embeddings sized for \num{1024}~tokens (\texttt{max\_position\_embeddings} in the checkpoint configuration).
+The \num{1024}-token size becomes a binding positional limit at document scale.
+
+The second family is the instruction-tuned decoder-only causal \gls{llm}, steered by a prompt that carries a task instruction and some demonstrations.
+In-context learning \parencite[1, 3]{brown2020languagemodels} induces a task from demonstrations placed in the prompt without updating the model's weights.
+The prompted approach used here follows \gls{bless} \parencite{kew-etal-2023-bless}, the benchmark of prompted simplification described in \cref{sec:related-baselines}.
+\Gls{bless} reports its best prompted models performing comparably with trained simplification baselines at sentence level \parencite[13291]{kew-etal-2023-bless}.
+Whether this holds against a model fine-tuned on task-matched data at the document level remains open; Hypothesis~\cref{hyp:llm-vs-finetuned} formalizes this comparison.
+
+Between the two families sits controllable simplification.
+Control tokens as introduced by \gls{access} \parencite[4691]{martin-etal-2020-controllable} train control into the model by conditioning generation on attributes computed from each source--target pair, such as compression ratio, paraphrase amount, and lexical or syntactic complexity.
+The \gls{llm} approach instead asks for control by prompting its target audience.
+The distinction is \emph{control trained in} versus \emph{control asked for} (\cref{sec:related-baselines,sec:method-three}).
+
+\section{Parallel corpora for text simplification}
+\label{sec:background-corpora}
+
+Five corpora were assessed for this project.
+WikiLarge \parencite{zhang-lapata-2017-sentence} was adopted for sentence-level training, D-Wikipedia \parencite{sun-etal-2021-document} for document-level training and evaluation, and ASSET \parencite{alva-manchego-etal-2020-asset} for sentence-level evaluation.
+WikiSmall \parencite{zhu-etal-2010-monolingual} and SWiPE \parencite{laban-etal-2023-swipe} were rejected.
+\Cref{sec:corpus-preparation} gives the specification of each and the reasoning behind the two rejections.
+
+Three properties of these corpora constrain the results.
+First, ASSET supplies ten human references per sentence \parencite[4671]{alva-manchego-etal-2020-asset} while D-Wikipedia supplies one, so an \gls{ngram} metric computed against the two is not measuring the same quantity.
+Second, D-Wikipedia's release is fully lowercased, Penn-Treebank-style pre-tokenised, and stored one document per line with no newline inside a document body.
+That convention differs from WikiLarge's natural-case sentences and, more consequentially, from the web text the extension processes.
+Third, both Wikipedia-derived corpora are automatically aligned, and automatic alignment is a known corpus-quality risk \parencite[589]{zhang-lapata-2017-sentence}.
+\textcite[285]{xu-etal-2015-problems} examined \num{200} sampled pairs of the \gls{pwkp} corpus by hand and found half of them not to be simplifications at all: \qty{17}{\percent} carried different meanings on the two sides, and a further \qty{33}{\percent} were no simpler on the simple side.
+\Cref{sec:qualitative} reports an instance of the same class in D-Wikipedia's own test split.
+
+Nor are the adopted and rejected corpora independent of each other.
+WikiLarge was built by aggregating earlier collections, among them Zhu's \gls{pwkp}, the corpus distributed as WikiSmall \parencite[588]{zhang-lapata-2017-sentence}.
+Material from the corpus rejected here therefore survives inside the corpus adopted.
+Whether fine-tuning on corpora of this quality still clearly improves on the same checkpoint before fine-tuning is the question addressed by Hypothesis~\cref{hyp:finetuning}.
+
+\section{Evaluating text simplification}
+\label{sec:background-evaluation}
+
+\paragraph{Reference-overlap metrics} score an output by its \gls{ngram} overlap with human references.
+\Gls{bleu} \parencite[312]{papineni-etal-2002-bleu} measures modified \gls{ngram} precision against one or more references.
+It is computed here through sacreBLEU \parencite[186]{post-2018-call}, which applies a fixed tokenisation and preprocessing, so the scores are comparable with other sacreBLEU scores.
+\Gls{bleu} does not compare the output with the input, so it favours conservative, low-edit output \parencite[410]{xu-etal-2016-optimizing}.
+It is therefore a poor primary metric for a task where change is the goal.
+It is reported here as a documented counterexample and not as evidence of quality.
+
+\Gls{sari} \parencite[404--405]{xu-etal-2016-optimizing} was designed for simplification specifically.
+It scores the \glspl{ngram} a system \emph{adds}, \emph{keeps}, and \emph{deletes} against both the source and the references.
+The three scores are combined as the arithmetic mean of \gls{fadd}, \gls{fkeep}, and \gls{pdel}, so a system that copies its input scores poorly rather than well.
+Deletion enters as a precision term rather than an F-score.
+\Gls{sari} is the primary sentence-level metric here.
+Because the two metrics treat copying so differently, they can rank the same outputs in different orders, a phenomenon captured by Hypothesis~\cref{hyp:metrics}.
+
+\paragraph{Readability formulas} measure the surface only.
+The \gls{fkgl} estimates a school grade level from the average sentence length and the average number of syllables per word \parencite[14]{Kincaid1975DerivationON}:
+\[
+	\text{grade level} = 0.39 \times \frac{\text{words}}{\text{sentences}} + 11.8 \times \frac{\text{syllables}}{\text{words}} - 15.59.
+\]
+It can therefore neither see meaning preservation nor distinguish a well-simplified sentence from a truncated one.
+\Gls{bless} makes the point empirically: the five models it ranks best by \gls{fkgl} produced the least simple and least meaning-preserving outputs of any group it examined, hallucinating at \qty{36}{\percent} against \qty{12}{\percent} across all outputs \parencite[13297]{kew-etal-2023-bless}.
+\Gls{fkgl} is reported throughout, but no claim in this thesis rests on it alone.
+
+\paragraph{Document-adapted metrics} exist because \gls{sari} has no notion of document structure.
+A document-level system can therefore score well on \gls{sari} while producing an implausibly short or implausibly fragmented document.
+\Gls{dsari} \parencite[8001--8002]{sun-etal-2021-document} adapts \gls{sari} for exactly this, adding two length-penalty terms and a sentence-count penalty.
+These penalties discount the keep, add, and delete components when the output's length or segmentation departs from the reference's.
+Its sensitivity is structural only: the sentence-count penalty is a segmentation penalty rather than a cohesion measure, so it cannot see whether a pronoun resolves or a connective survives.
+
+\paragraph{Learned and semantic metrics} score outputs through learned representations rather than \gls{ngram} overlap.
+\Gls{lens} \parencite[16385--16386]{maddela-etal-2023-lens} is a supervised metric for the task, trained directly on human simplification ratings.
+It was trained on sentence-level ratings, so applying it to documents is out of domain by construction (\cref{sec:limitations}).
+BERTScore \parencite[1]{zhang2020bertscoreevaluatingtextgeneration} measures contextual-embedding similarity and is a general text-generation metric rather than a simplification-specific one.
+
+\paragraph{Human evaluation} is what all of the above are proxies for.
+It is elicited along three standard dimensions: grammaticality (often called fluency), meaning preservation (often called adequacy), and simplicity \parencite[147]{alva-manchego-etal-2020-survey}.
+No such study is conducted in this thesis.
+\Cref{sec:future-work} proposes one, with a specific question and a minimum useful design.
+
+\section{Web pages as input}
+\label{sec:background-web}
+
+A web page is a structured document: its content sits in paragraphs, headings, lists, and tables, alongside regions such as navigation, headers and footers, and form controls with their labels \parencite[518--519]{hellbusch2018webdesign}.
+Screen readers navigate this structure directly, for example by jumping from heading to heading \parencite[519]{hellbusch2018webdesign}.
+A simplifier applied to such a page receives text units whose boundaries are set by the markup rather than by sentence punctuation, and it must write its output back without disturbing the structure the page and its readers rely on.
+None of the corpora of \cref{sec:background-corpora} contains input of this kind.
+\Cref{rq:deployment} addresses this gap, which motivates Hypothesis~\cref{hyp:web}.
