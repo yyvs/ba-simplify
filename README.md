@@ -149,4 +149,12 @@ each component, and the roadmap, are kept as working documents outside the repos
 
 ## Licence
 
-The project licence will be added here later (e.g. MIT).
+© 2026 Yunus Oscar Renz. Licensed under [CC BY 4.0](LICENSE): you may share and adapt this work for any purpose,
+provided you give appropriate credit, link to the licence, and indicate if changes were made.
+Please cite the thesis:
+
+> Renz, Yunus Oscar (2026). *From Benchmark to Browser: A Comparative Evaluation of Automatic Text Simplification
+> Approaches for DOM-Preserving Web Deployment*. Bachelor's thesis, Heinrich Heine University Düsseldorf.
+
+The fine-tuned checkpoints on the Hugging Face Hub are a separate release under CC BY-SA 4.0, inherited from their
+Wikipedia-derived training data; see [`research/model_cards/`](research/model_cards/).

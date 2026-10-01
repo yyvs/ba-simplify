@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite the thesis as below."
+title: "From Benchmark to Browser: A Comparative Evaluation of Automatic Text Simplification Approaches for DOM-Preserving Web Deployment"
+type: software
+authors:
+  - family-names: Renz
+    given-names: Yunus Oscar
+license: CC-BY-4.0
+repository-code: "https://github.com/yyvs/ba-simplify"
+date-released: 2026-10-01
+preferred-citation:
+  type: thesis
+  thesis-type: "Bachelor's thesis"
+  title: "From Benchmark to Browser: A Comparative Evaluation of Automatic Text Simplification Approaches for DOM-Preserving Web Deployment"
+  authors:
+    - family-names: Renz
+      given-names: Yunus Oscar
+  institution:
+    name: "Heinrich Heine University Düsseldorf"
+  year: 2026
+  url: "https://github.com/yyvs/ba-simplify"
